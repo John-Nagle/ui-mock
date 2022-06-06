@@ -17,8 +17,9 @@ use gui::update_gui;
 use std::sync::Arc;
 
 pub struct UiData {
+    //  These keep reference-counted Rend3 objects alive.
     _object_handle: rend3::types::ObjectHandle,
-    material_handle: rend3::types::MaterialHandle,
+    _material_handle: rend3::types::MaterialHandle,
     _directional_handle: rend3::types::DirectionalLightHandle,
 
     egui_routine: rend3_egui::EguiRenderRoutine,
@@ -92,12 +93,12 @@ impl rend3_framework::App for Ui {
             transparency: rend3_routine::pbr::Transparency::Blend,
             ..rend3_routine::pbr::PbrMaterial::default()
         };
-        let material_handle = renderer.add_material(material);
+        let _material_handle = renderer.add_material(material);
 
         // Combine the mesh and the material with a location to give an object.
         let object = rend3::types::Object {
             mesh_kind: rend3::types::ObjectMeshKind::Static(mesh_handle),
-            material: material_handle.clone(),
+            material: _material_handle.clone(),
             transform: glam::Mat4::IDENTITY,
         };
 
@@ -154,7 +155,7 @@ impl rend3_framework::App for Ui {
 
         self.data = Some(UiData {
             _object_handle,
-            material_handle,
+            _material_handle,
             _directional_handle,
             egui_routine,
             platform,
