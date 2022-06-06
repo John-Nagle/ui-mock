@@ -16,6 +16,10 @@ mod gui;
 use gui::update_gui;
 use std::sync::Arc;
 
+/// Configuration
+const MENU_DISPLAY_SECS: u64 = 3;                       // hide menus after this much time
+
+
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
     _object_handle: rend3::types::ObjectHandle,
@@ -26,6 +30,7 @@ pub struct UiData {
     platform: egui_winit_platform::Platform,
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
+    quit: bool,                              // set to true to exit program
 }
 
 impl UiData {
@@ -152,6 +157,7 @@ impl rend3_framework::App for Ui {
 
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
+        let quit = false;
 
         self.data = Some(UiData {
             _object_handle,
@@ -161,6 +167,7 @@ impl rend3_framework::App for Ui {
             platform,
             start_time,
             last_interaction_time,
+            quit,
         });
     }
 
@@ -188,7 +195,6 @@ impl rend3_framework::App for Ui {
                 data.platform.begin_frame();
 
                 // Insert egui commands here
-                const MENU_DISPLAY_SECS: u64 = 5; // hide menus after this much time
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
                 let inuse = update_gui(&self.assets, data, show_menus);
                 if inuse {
@@ -251,8 +257,12 @@ impl rend3_framework::App for Ui {
 
                 // Dispatch a render using the built up rendergraph!
                 graph.execute(renderer, frame, cmd_bufs, &ready);
-
-                control_flow(winit::event_loop::ControlFlow::Poll);
+                //  Exit if all done.
+                if data.quit {
+                    control_flow(winit::event_loop::ControlFlow::Exit); 
+                } else { 
+                    control_flow(winit::event_loop::ControlFlow::Poll);
+                }
             }
             rend3_framework::Event::MainEventsCleared => {
                 window.request_redraw();

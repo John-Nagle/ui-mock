@@ -14,6 +14,9 @@ use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use std::sync::Arc;
 
+/// Configuration
+const HELP_PAGE: &str = "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
+
 /// GUI utility functions
 
 /// Load an icon at compile time. Image is built into executable.
@@ -53,26 +56,36 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
             .show(&ctx, |ui| {
                 menu::bar(ui, |ui| {
                     ui.menu_button("File", |ui| {
-                        let response = ui.button("Open");
-                        if response.clicked() {
-                            if let Some(path) = rfd::FileDialog::new()
-                                .set_title("Viewer session file to play back")
-                                .add_filter("json", &["json"])
-                                .pick_file()
-                            {
-                                let picked_path = Some(path.display().to_string());
-                                println!("File picked: {}", picked_path.unwrap());
+                        {   let response = ui.button("Open");   // Open menu entry
+                            if response.clicked() {
+                                if let Some(path) = rfd::FileDialog::new()
+                                    .set_title("Viewer session file to play back")
+                                    .add_filter("json", &["json"])
+                                    .pick_file()
+                                {
+                                    let picked_path = Some(path.display().to_string());
+                                    println!("File picked: {}", picked_path.unwrap());
+                                }
                             }
+                            if response.hovered() {
+                                inuse = true;
+                            } // pointer is over this button
                         }
-                        if response.hovered() {
-                            inuse = true;
-                        } // pointer is over this button
+                        {   let response = ui.button("Quit");   // Quit menu entry
+                            if response.clicked() {
+                                data.quit = true;
+                            }
+                            if response.hovered() {
+                                inuse = true;
+                            } // pointer is over this button
+                        }
+
                     });
                     ui.menu_button("Help", |ui| {
                         let response = ui.button("Help");
                         if response.clicked() {
-                            webbrowser::open("https://www.rust-lang.org")
-                                .expect("failed to open URL");
+                            webbrowser::open(HELP_PAGE)
+                                .expect("failed to open URL");  // ***MAKE THIS NON FATAL***
                         }
                         if response.hovered() {
                             inuse = true;

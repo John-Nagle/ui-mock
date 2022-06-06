@@ -1,5 +1,5 @@
 [package]
-name = "eguitest"
+name = "ui-mock"
 version = "0.1.0"
 edition = "2021"
 
