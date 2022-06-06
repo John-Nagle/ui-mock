@@ -1,0 +1,40 @@
+[package]
+name = "eguitest"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+glam = {version = "0.20.0", features = ["bytemuck", "serde"]}	
+rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+
+# Egui renderer integration
+rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+
+# The egui immediate mode gui library
+egui = "0.17.0"
+# Backend-agnostic interface for writing apps using egui
+epi = "0.17.0"
+# Winit integration with egui
+egui_winit_platform = "0.14.0"
+# logging
+env_logger = { version = "0.9", default-features = false, features = ["termcolor", "atty"] }			
+# Importing png's
+image = { version = "0.23.14", default-features = false, features = ["png"] }
+# Portable implementation of Instant.
+instant = { version = "0.1", features = ["wasm-bindgen"] }
+
+# egui = "0.18.1"
+# winit = "0.26.1"
+# Windowing
+winit = "0.26"
+# Opening URL's
+webbrowser = "0.5.5"
+# Creating textures
+wgpu = "0.12"
+# File dialogs
+rfd = "0.8.3"
