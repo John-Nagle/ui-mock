@@ -1,9 +1,22 @@
+//
+//  Main program of user interface
+//
+//  This is a mockup of the user interface for
+//  a metaverse viewer. It has windows and menus,
+//  but doesn't do anything except display them.
+//
+//  Should be portable to Linux, Windows, and Apple desktop platforms.
+//
+//  Modeled after the "egui" example from "Rend3".
+//
+//  Animats
+//  June 2022
+//
 mod gui;
-use std::sync::Arc;
 use gui::update_gui;
+use std::sync::Arc;
 
-
-pub struct EguiExampleData {
+pub struct UiData {
     _object_handle: rend3::types::ObjectHandle,
     material_handle: rend3::types::MaterialHandle,
     _directional_handle: rend3::types::DirectionalLightHandle,
@@ -11,10 +24,10 @@ pub struct EguiExampleData {
     egui_routine: rend3_egui::EguiRenderRoutine,
     platform: egui_winit_platform::Platform,
     start_time: instant::Instant,
-    last_interaction_time: instant::Instant,
+    last_interaction_time: instant::Instant, // time of last user interaction
 }
 
-impl EguiExampleData {
+impl UiData {
     /// Call this for anything that indicates the GUI should be awakened to show menus.
     pub fn wake_up_gui(&mut self) {
         self.last_interaction_time = instant::Instant::now();
@@ -25,23 +38,26 @@ const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// Assets used in displaying the GUI.
 #[derive(Default)]
-pub struct EguiAssets {
+pub struct UiAssets {
     rust_logo: egui::TextureId,
 }
 
+/// The application.
 #[derive(Default)]
-pub struct EguiExample {
-    data: Option<EguiExampleData>,
-    assets: EguiAssets,
-
+pub struct Ui {
+    data: Option<UiData>,
+    assets: UiAssets,
 }
-impl rend3_framework::App for EguiExample {
+
+/// This is an instance of the Rend3 application framework.
+impl rend3_framework::App for Ui {
     const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
 
     fn sample_count(&self) -> rend3::types::SampleCount {
         SAMPLE_COUNT
     }
 
+    /// Setup of the graphics environment
     fn setup(
         &mut self,
         window: &winit::window::Window,
@@ -101,7 +117,10 @@ impl rend3_framework::App for EguiExample {
 
         // Set camera location data
         renderer.set_camera_data(rend3::types::Camera {
-            projection: rend3::types::CameraProjection::Perspective { vfov: 60.0, near: 0.1 },
+            projection: rend3::types::CameraProjection::Perspective {
+                vfov: 60.0,
+                near: 0.1,
+            },
             view,
         });
 
@@ -117,13 +136,14 @@ impl rend3_framework::App for EguiExample {
         });
 
         // Create the winit/egui integration, which manages our egui context for us.
-        let platform = egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
-            physical_width: window_size.width as u32,
-            physical_height: window_size.height as u32,
-            scale_factor: window.scale_factor(),
-            font_definitions: egui::FontDefinitions::default(),
-            style: Default::default(),
-        });
+        let platform =
+            egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
+                physical_width: window_size.width as u32,
+                physical_height: window_size.height as u32,
+                scale_factor: window.scale_factor(),
+                font_definitions: egui::FontDefinitions::default(),
+                style: Default::default(),
+            });
 
         //  Icon loading
         let image_bytes = include_bytes!("images/rust-logo-128x128-blk.png");
@@ -132,7 +152,7 @@ impl rend3_framework::App for EguiExample {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
 
-        self.data = Some(EguiExampleData {
+        self.data = Some(UiData {
             _object_handle,
             material_handle,
             _directional_handle,
@@ -143,6 +163,7 @@ impl rend3_framework::App for EguiExample {
         });
     }
 
+    /// The event loop. This runs forever, or at least until the user causes an exit.
     fn handle_event(
         &mut self,
         window: &winit::window::Window,
@@ -161,22 +182,32 @@ impl rend3_framework::App for EguiExample {
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
-                data.platform.update_time(data.start_time.elapsed().as_secs_f64());
+                data.platform
+                    .update_time(data.start_time.elapsed().as_secs_f64());
                 data.platform.begin_frame();
 
                 // Insert egui commands here
-                const MENU_DISPLAY_SECS: u64 = 5;   // hide menus after this much time
-                let show_menus = data.last_interaction_time.elapsed().as_secs() < 	MENU_DISPLAY_SECS;
+                const MENU_DISPLAY_SECS: u64 = 5; // hide menus after this much time
+                let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
                 let inuse = update_gui(&self.assets, data, show_menus);
-                if inuse { data.wake_up_gui(); }
+                if inuse {
+                    data.wake_up_gui();
+                }
                 let egui::FullOutput {
-                    shapes, textures_delta, platform_output, ..
+                    shapes,
+                    textures_delta,
+                    platform_output,
+                    ..
                 } = data.platform.end_frame(Some(window));
                 if !platform_output.events.is_empty() {
                     data.wake_up_gui(); // reset GUI idle time.
-                    println!("Platform events: {:?}, {} shapes.", platform_output.events, shapes.len());   // ***TEMP***
+                    println!(
+                        "Platform events: {:?}, {} shapes.",
+                        platform_output.events,
+                        shapes.len()
+                    ); // ***TEMP***
                 }
-                
+
                 let paint_jobs = data.platform.context().tessellate(shapes);
 
                 let input = rend3_egui::Input {
@@ -234,12 +265,14 @@ impl rend3_framework::App for EguiExample {
                     control_flow(winit::event_loop::ControlFlow::Exit);
                 }
                 winit::event::WindowEvent::Focused(gained) => {
-                    if gained { data.wake_up_gui(); } // make menus reappear on focus
+                    if gained {
+                        data.wake_up_gui();
+                    } // make menus reappear on focus
                 }
-                winit::event::WindowEvent::CursorEntered{ .. } => {
-                    data.wake_up_gui();                     // either entering or leaving makes menus reappear
+                winit::event::WindowEvent::CursorEntered { .. } => {
+                    data.wake_up_gui(); // either entering or leaving makes menus reappear
                 }
-                winit::event::WindowEvent::CursorLeft{ .. } => {
+                winit::event::WindowEvent::CursorLeft { .. } => {
                     data.wake_up_gui();
                 }
                 _ => {}
@@ -250,11 +283,11 @@ impl rend3_framework::App for EguiExample {
 }
 
 fn main() {
-    let app = EguiExample::default();
+    let app = Ui::default();
     rend3_framework::start(
         app,
         winit::window::WindowBuilder::new()
-            .with_title("egui")
+            .with_title("UI mockup")
             .with_maximized(true),
     )
 }
@@ -311,4 +344,3 @@ fn create_mesh() -> rend3::types::Mesh {
         .build()
         .unwrap()
 }
-

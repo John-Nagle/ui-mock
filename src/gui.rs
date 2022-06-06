@@ -1,7 +1,14 @@
 //
-//  The 2D GUI
+//  gui.rs -- window and menu layout.
 //
-use crate::{EguiAssets, EguiExampleData};
+//  Top menu bar, and a bottom button bar.
+//  Both disappear when not used for a while, for
+//  a clean game screen.
+//
+//  Animats
+//  June 2022
+//
+use crate::{UiAssets, UiData};
 use egui::{menu, Frame, TextureId};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
@@ -33,38 +40,50 @@ pub fn load_canned_icon(
 }
 
 /// Update the GUI. Called on each frame.
-pub fn update_gui(assets: &EguiAssets, data: &mut EguiExampleData, show_menus: bool) -> bool {
+//  Returns true if the GUI is active and should not disappear.
+pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     ////let data = example.data.as_mut().unwrap();
     // Insert egui commands here
     let ctx = data.platform.context();
     //  Top menu bar
-    let mut inuse = false;                  // true if GUI in use
+    let mut inuse = false; // true if GUI in use
     if show_menus {
-        if egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
-            menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    let response = ui.button("Open");
-                    if response.clicked() {
-                        if let Some(path) = rfd::FileDialog::new()
-                            .set_title("Viewer session file to play back")
-                            .add_filter("json", &["json"])
-                            .pick_file()
-                        {
-                            let picked_path = Some(path.display().to_string());
-                            println!("File picked: {}", picked_path.unwrap());
+        if egui::TopBottomPanel::top("menu_bar")
+            .show(&ctx, |ui| {
+                menu::bar(ui, |ui| {
+                    ui.menu_button("File", |ui| {
+                        let response = ui.button("Open");
+                        if response.clicked() {
+                            if let Some(path) = rfd::FileDialog::new()
+                                .set_title("Viewer session file to play back")
+                                .add_filter("json", &["json"])
+                                .pick_file()
+                            {
+                                let picked_path = Some(path.display().to_string());
+                                println!("File picked: {}", picked_path.unwrap());
+                            }
                         }
-                    }
-                    if response.hovered() { inuse = true; }     // pointer is over this button
+                        if response.hovered() {
+                            inuse = true;
+                        } // pointer is over this button
+                    });
+                    ui.menu_button("Help", |ui| {
+                        let response = ui.button("Help");
+                        if response.clicked() {
+                            webbrowser::open("https://www.rust-lang.org")
+                                .expect("failed to open URL");
+                        }
+                        if response.hovered() {
+                            inuse = true;
+                        }
+                    });
                 });
-                ui.menu_button("Help", |ui| {
-                    let response = ui.button("Help");
-             	    if response.clicked() {
-                        webbrowser::open("https://www.rust-lang.org").expect("failed to open URL");
-                    }
-                    if response.hovered() { inuse = true; }
-                });
-            });
-        }).response.hovered() { inuse = true };
+            })
+            .response
+            .hovered()
+        {
+            inuse = true
+        };
         //  Bottom button panel
         if egui::TopBottomPanel::bottom("bottom_panel")
             .frame(Frame::none().fill(egui::Color32::TRANSPARENT))
@@ -81,8 +100,12 @@ pub fn update_gui(assets: &EguiAssets, data: &mut EguiExampleData, show_menus: b
                 {
                     println!("Clicked on Rust button");
                 }
-            }).response.hovered() { inuse = true };
-        
+            })
+            .response
+            .hovered()
+        {
+            inuse = true
+        };
     }
-    inuse                       // true if menus are in use
+    inuse // true if menus are in use
 }
