@@ -41,6 +41,7 @@ pub fn load_canned_icon(
 
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
+#[allow(clippy::blocks_in_if_conditions)]   // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     ////let data = example.data.as_mut().unwrap();
     // Insert egui commands here
