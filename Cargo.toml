@@ -4,13 +4,16 @@ version = "0.1.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-# The bundler doesn't work yet.
-# [package.metadata.bundle]
-# identifier = "com.animats.ui-mock"
-# category = "Game"
-# resources = ["src/images"]
+# Usable targets:
+# native (on Linux)
+# x86_64-pc-windows-gnu
+
+[package.metadata.bundle]
+identifier = "com.animats.ui-mock"
+category = "Game"
+resources = ["src/images"]
+icon = ["src/images/64x64.png", "src/images/32x32.png"]
 
 [dependencies]
 glam = {version = "0.20.0", features = ["bytemuck", "serde"]}	

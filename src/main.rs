@@ -58,7 +58,7 @@ pub struct Ui {
 /// True if cursor is at the top or bottom of the screen in full screen mode.
 //  This is how you get the menus back from a totally clean window.
 pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: &UiData) -> bool {
-    const NEAR_EDGE: f32 = 2.0;                               // if within 2 pixels of top or bottom
+    const NEAR_EDGE: f32 = 5.0;                               // if within this many pixels of top or bottom
     if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
     let inner_size = window.inner_size();                   // sizes of window
     let ctx = data.platform.context();
@@ -86,8 +86,8 @@ impl rend3_framework::App for Ui {
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
     ) {
-        //  Test forcing full screen
-        window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
+        //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
+        ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
         let window_size = window.inner_size();
 
         // Create the egui render routine
