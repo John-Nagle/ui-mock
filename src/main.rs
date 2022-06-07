@@ -202,8 +202,11 @@ impl rend3_framework::App for Ui {
     ) {
         let data = self.data.as_mut().unwrap();
 
-        // Pass the winit events to the platform integration.
+        //  This is where EGUI handles 2D UI events.
         data.platform.handle_event(&event);
+        if data.platform.captures_event(&event) {
+            return                            // 2D UI consumed this event.
+        }
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
