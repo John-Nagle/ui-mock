@@ -55,6 +55,21 @@ pub struct Ui {
     assets: UiAssets,
 }
 
+/// True if cursor is at the top or bottom of the screen in full screen mode.
+//  This is how you get the menus back from a totally clean window.
+pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: &UiData) -> bool {
+    const NEAR_EDGE: f32 = 2.0;                               // if within 2 pixels of top or bottom
+    if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
+    let inner_size = window.inner_size();                   // sizes of window
+    let ctx = data.platform.context();
+    if let Some(pos) = ctx.pointer_interact_pos() {         // check for pointer at top or bottom of window
+        ////println!("pos: {:?}, height: {}", pos, inner_size.height);
+        pos.y < NEAR_EDGE || pos.y + NEAR_EDGE > (inner_size.height as f32)
+    } else {
+        false
+    }
+}
+
 /// This is an instance of the Rend3 application framework.
 impl rend3_framework::App for Ui {
     const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
@@ -71,6 +86,8 @@ impl rend3_framework::App for Ui {
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
     ) {
+        //  Test forcing full screen
+        window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
         let window_size = window.inner_size();
 
         // Create the egui render routine
@@ -196,7 +213,8 @@ impl rend3_framework::App for Ui {
 
                 // Insert egui commands here
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
-                let inuse = update_gui(&self.assets, data, show_menus);
+                let mut inuse = update_gui(&self.assets, data, show_menus); // draws the GUI
+                inuse |= is_at_fullscreen_window_top_bottom(&window, &data); // check if need to escape from full screen
                 if inuse {
                     data.wake_up_gui();
                 }
