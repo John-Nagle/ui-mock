@@ -1,0 +1,15 @@
+Notes for ui-mock
+
+2022-06-08
+
+Works under Linux.
+Works under Wine 7.0.
+Worked on Windows 10.
+
+Still working towards a clean screen.
+- Going full screen does not work under Wine. Program aborts. Wine bug. Must report.
+- Can't tell if screen is maximized under Winit on Linux. Documented missing feature.
+
+TODO: Make ESC button restore menus from clean screeen.
+
+Still don't have a way to build an .msi installer under Linux. Filed Rust feature request.
