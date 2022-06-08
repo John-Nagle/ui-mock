@@ -59,7 +59,7 @@ pub struct Ui {
 //  This is how you get the menus back from a totally clean window.
 pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: &UiData) -> bool {
     const NEAR_EDGE: f32 = 5.0;                               // if within this many pixels of top or bottom
-    if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
+    ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
     let inner_size = window.inner_size();                   // sizes of window
     let ctx = data.platform.context();
     if let Some(pos) = ctx.pointer_interact_pos() {         // check for pointer at top or bottom of window
