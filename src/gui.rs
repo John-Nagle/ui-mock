@@ -55,7 +55,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
             menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
+                ui.menu_button(t!("menu.file",lang), |ui| {
                     // File menu
                     {
                         if ui.button(t!("menu.open", lang)).clicked() {
@@ -71,15 +71,15 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                         }
                     }
                     {
-                        if ui.button("Quit").clicked() {
+                        if ui.button(t!("menu.quit",lang)).clicked() {
                             //  Quit menu entry
                             data.quit = true;
                         }
                     }
                 });
-                ui.menu_button("Help", |ui| {
+                ui.menu_button(t!("menu.help", lang), |ui| {
                     // Help menu
-                    if ui.button("Help").clicked() {
+                    if ui.button(t!("menu.help", lang)).clicked() {
                         // Help menu entry
                         webbrowser::open(HELP_PAGE).expect("failed to open URL");
                         // ***MAKE THIS NON FATAL***
