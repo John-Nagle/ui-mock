@@ -32,6 +32,7 @@ pub struct UiData {
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
     quit: bool,                              // set to true to exit program
+    lang: String,                            // 2-letter language code
 }
 
 impl UiData {
@@ -177,6 +178,7 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
         let quit = false;
+        let lang = "en".to_string();    // ***TEMP***
 
         self.data = Some(UiData {
             _object_handle,
@@ -187,6 +189,7 @@ impl rend3_framework::App for Ui {
             start_time,
             last_interaction_time,
             quit,
+            lang,
         });
     }
 
