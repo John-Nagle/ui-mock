@@ -17,8 +17,7 @@ use gui::update_gui;
 use std::sync::Arc;
 
 /// Configuration
-const MENU_DISPLAY_SECS: u64 = 3;                       // hide menus after this much time
-
+const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -58,11 +57,12 @@ pub struct Ui {
 /// True if cursor is at the top or bottom of the screen in full screen mode.
 //  This is how you get the menus back from a totally clean window.
 pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: &UiData) -> bool {
-    const NEAR_EDGE: f32 = 5.0;                               // if within this many pixels of top or bottom
-    ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
-    let inner_size = window.inner_size();                   // sizes of window
+    const NEAR_EDGE: f32 = 5.0; // if within this many pixels of top or bottom
+                                ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
+    let inner_size = window.inner_size(); // sizes of window
     let ctx = data.platform.context();
-    if let Some(pos) = ctx.pointer_interact_pos() {         // check for pointer at top or bottom of window
+    if let Some(pos) = ctx.pointer_interact_pos() {
+        // check for pointer at top or bottom of window
         ////println!("pos: {:?}, height: {}", pos, inner_size.height);
         pos.y < NEAR_EDGE || pos.y + NEAR_EDGE > (inner_size.height as f32)
     } else {
@@ -205,7 +205,7 @@ impl rend3_framework::App for Ui {
         //  This is where EGUI handles 2D UI events.
         data.platform.handle_event(&event);
         if data.platform.captures_event(&event) {
-            return                            // 2D UI consumed this event.
+            return; // 2D UI consumed this event.
         }
 
         match event {
@@ -280,8 +280,8 @@ impl rend3_framework::App for Ui {
                 graph.execute(renderer, frame, cmd_bufs, &ready);
                 //  Exit if all done.
                 if data.quit {
-                    control_flow(winit::event_loop::ControlFlow::Exit); 
-                } else { 
+                    control_flow(winit::event_loop::ControlFlow::Exit);
+                } else {
                     control_flow(winit::event_loop::ControlFlow::Poll);
                 }
             }
