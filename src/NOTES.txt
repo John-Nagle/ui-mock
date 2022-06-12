@@ -10,6 +10,9 @@ Still working towards a clean screen.
 - Going full screen does not work under Wine. Program aborts. Wine bug. Must report.
 - Can't tell if screen is maximized under Winit on Linux. Documented missing feature.
 
+Test icon still does not have a transparent backgroupd.
+
 TODO: Make ESC button restore menus from clean screeen.
+TODO: Dark mode.
 
 Still don't have a way to build an .msi installer under Linux. Filed Rust feature request.

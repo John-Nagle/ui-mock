@@ -50,14 +50,12 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
     // Insert egui commands here
     let ctx = data.platform.context();
     //  Top menu bar
-    let mut inuse = false; // true if GUI in use
     if show_menus {
         if egui::TopBottomPanel::top("menu_bar")
             .show(&ctx, |ui| {
                 menu::bar(ui, |ui| {
-                    ui.menu_button("File", |ui| {
-                        {   let response = ui.button("Open");   // Open menu entry
-                            if response.clicked() {
+                    ui.menu_button("File", |ui| { // File menu
+                        {   if ui.button("Open").clicked() { // Open menu entry
                                 if let Some(path) = rfd::FileDialog::new()
                                     .set_title("Viewer session file to play back")
                                     .add_filter("json", &["json"])
@@ -67,28 +65,17 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                                     println!("File picked: {}", picked_path.unwrap());
                                 }
                             }
-                            if response.hovered() {
-                                inuse = true;
-                            } // pointer is over this button
                         }
-                        {   let response = ui.button("Quit");   // Quit menu entry
-                            if response.clicked() {
+                        {   if ui.button("Quit").clicked() {    //  Quit menu entry
                                 data.quit = true;
                             }
-                            if response.hovered() {
-                                inuse = true;
-                            } // pointer is over this button
                         }
 
                     });
-                    ui.menu_button("Help", |ui| {
-                        let response = ui.button("Help");
-                        if response.clicked() {
+                    ui.menu_button("Help", |ui| {           // Help menu
+                        if ui.button("Help").clicked() {    // Help menu entry
                             webbrowser::open(HELP_PAGE)
                                 .expect("failed to open URL");  // ***MAKE THIS NON FATAL***
-                        }
-                        if response.hovered() {
-                            inuse = true;
                         }
                     });
                 });
@@ -96,30 +83,32 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
             .response
             .hovered()
         {
-            inuse = true
+            ////inuse = true
         };
         //  Bottom button panel
         if egui::TopBottomPanel::bottom("bottom_panel")
             .frame(Frame::none().fill(egui::Color32::TRANSPARENT))
             .show(&ctx, |ui| {
+                ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                 if ui
                     .add(
                         egui::widgets::ImageButton::new(
                             (*assets).rust_logo,
                             egui::Vec2::splat(64.0),
                         )
-                        .frame(false),
+                        .frame(true),
                     )
                     .clicked()
                 {
                     println!("Clicked on Rust button");
                 }
+                ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
             })
             .response
             .hovered()
         {
-            inuse = true
+            ////inuse = true
         };
     }
-    inuse // true if menus are in use
+    ctx.is_pointer_over_area() // True if GUI is in use
 }
