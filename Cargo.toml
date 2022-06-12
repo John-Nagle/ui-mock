@@ -48,3 +48,5 @@ webbrowser = "0.5.5"
 wgpu = "0.12"
 # File dialogs
 rfd = "0.8.3"
+# Internationalization
+internationalization = "^0.0.2"

@@ -15,6 +15,8 @@
 mod gui;
 use gui::update_gui;
 use std::sync::Arc;
+#[macro_use]
+extern crate internationalization;  // must still be at crate root.
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time

@@ -14,6 +14,7 @@ use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use std::sync::Arc;
 
+
 /// Configuration
 const HELP_PAGE: &str =
     "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
@@ -47,7 +48,7 @@ pub fn load_canned_icon(
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
-    ////let data = example.data.as_mut().unwrap();
+    let lang = "fr"; // *** TEMP***
     // Insert egui commands here
     let ctx = data.platform.context();
     //  Top menu bar
@@ -57,7 +58,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                 ui.menu_button("File", |ui| {
                     // File menu
                     {
-                        if ui.button("Open").clicked() {
+                        if ui.button(t!("menu.open", lang)).clicked() {
                             // Open menu entry
                             if let Some(path) = rfd::FileDialog::new()
                                 .set_title("Viewer session file to play back")

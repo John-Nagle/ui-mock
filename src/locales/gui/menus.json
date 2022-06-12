@@ -1,0 +1,25 @@
+{   "menu.file": {
+        "en": "File",
+        "fr": "Fichier"
+    },
+    "menu.open": {
+        "en": "Open",
+        "fr": "Ouvert"
+    },
+    "menu.quit": {
+        "en": "Quit",
+        "fr": "Quitter"
+    },
+    "menu.ok": {
+        "en": "Ok",
+        "fr": "D'accord"
+    },
+    "menu.cancel": {
+        "en": "Cancel",
+        "fr": "Annuler"
+    },
+    "menu.help": {
+        "en": "Help",
+        "fr": "Aidez-moi"
+    }
+}
