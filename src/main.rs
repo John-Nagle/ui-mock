@@ -17,9 +17,11 @@ use gui::update_gui;
 use std::sync::Arc;
 #[macro_use]
 extern crate internationalization;  // must still be at crate root.
+use oxilangtag::LanguageTag;
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
+const SUPPORTED_LANGUAGES: [&str;2] = ["en", "fr"]; // current list of supported languages in menus.json. First is default
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -55,6 +57,31 @@ pub struct UiAssets {
 pub struct Ui {
     data: Option<UiData>,
     assets: UiAssets,
+}
+
+/// Get locale for translation purposes.
+//  All locales in the menus.json files should be listed here.
+//  Use ISO 3166 country codes in lower case.
+//  Result is a 2-letter country code.
+pub fn get_translation_locale() -> String {
+    let default_language = SUPPORTED_LANGUAGES[0];          // normally "en"
+    let locale = if let Some(locale) = sys_locale::get_locale() {
+        locale
+    } else {
+        println!("System did not provide a locale.");       // ***TEMP***
+        return default_language.to_string();
+    };
+    println!("Language tag: {:?}", locale);       // ***TEMP***
+    let locale = locale.replace("_","-");         // Workaround for https://github.com/1Password/sys-locale/issues/3
+    let language_tag = LanguageTag::parse(locale).unwrap(); // system locale is garbled if this doesn't parse.
+    let tag = language_tag.primary_language();              // two-letter tag
+    println!("Locale: {:?} -> {:?}", language_tag, tag);     // ***TEMP***
+    //  Check that language is supported
+    if SUPPORTED_LANGUAGES.into_iter().find(|&x| x == tag).is_some() {
+        tag.to_string() 
+    } else {
+        default_language.to_string()
+    }
 }
 
 /// True if cursor is at the top or bottom of the screen in full screen mode.
@@ -178,7 +205,7 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
         let quit = false;
-        let lang = "en".to_string();    // ***TEMP***
+        let lang = get_translation_locale();    // select language
 
         self.data = Some(UiData {
             _object_handle,
