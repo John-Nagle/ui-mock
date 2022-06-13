@@ -51,6 +51,11 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
     let lang = data.lang.as_str();      // language for translations
     // Insert egui commands here
     let ctx = data.platform.context();
+    if data.dark_mode 
+        { ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+    } else {
+        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
+    }
     //  Top menu bar
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {

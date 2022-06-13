@@ -12,7 +12,8 @@ Still working towards a clean screen.
 
 Test icon still does not have a transparent backgroupd.
 
-TODO: Make ESC button restore menus from clean screeen.
+TODO: Make ESC button restore menus from clean screen.
 TODO: Dark mode.
+TODO: Static string caching for internationalization.
 
 Still don't have a way to build an .msi installer under Linux. Filed Rust feature request.

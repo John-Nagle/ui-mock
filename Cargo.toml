@@ -52,3 +52,5 @@ rfd = "0.8.3"
 internationalization = "^0.0.2"
 sys-locale = "0.2.0"
 oxilangtag = "0.1.3"
+# Dark mode
+dark-light = "0.2.2"

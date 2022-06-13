@@ -35,6 +35,7 @@ pub struct UiData {
     last_interaction_time: instant::Instant, // time of last user interaction
     quit: bool,                              // set to true to exit program
     lang: String,                            // 2-letter language code
+    dark_mode: bool,                         // true if in dark mode
 }
 
 impl UiData {
@@ -206,7 +207,9 @@ impl rend3_framework::App for Ui {
         let last_interaction_time = instant::Instant::now();
         let quit = false;
         let lang = get_translation_locale();    // select language
-
+        let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
+        ////let dark_mode = true; // ***TEMP*** force dark mode
+        println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***          
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -217,6 +220,7 @@ impl rend3_framework::App for Ui {
             last_interaction_time,
             quit,
             lang,
+            dark_mode
         });
     }
 
