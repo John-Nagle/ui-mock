@@ -207,8 +207,9 @@ impl rend3_framework::App for Ui {
         let last_interaction_time = instant::Instant::now();
         let quit = false;
         let lang = get_translation_locale();    // select language
-        let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
-        ////let dark_mode = true; // ***TEMP*** force dark mode
+        //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
+        ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode 
+        let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***          
         self.data = Some(UiData {
             _object_handle,
