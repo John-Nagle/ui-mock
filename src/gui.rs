@@ -19,6 +19,13 @@ use std::sync::Arc;
 const HELP_PAGE: &str =
     "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
 
+/// Grey background for button area.
+//  This really should be a gradient.    
+const TRANSLUCENT_GREY_ALPHA: u8 = 48;
+const TRANSLUCENT_GREY: u8 = 32;
+const TRANSLUCENT_GREY_COLOR: u8 = ((TRANSLUCENT_GREY_ALPHA as u16 * TRANSLUCENT_GREY as u16) / 256) as u8;
+const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premultiplied(TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_ALPHA);
+
 /// GUI utility functions
 
 /// Load an icon at compile time. Image is built into executable.
@@ -95,7 +102,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
 
         //  Bottom button panel
         egui::TopBottomPanel::bottom("bottom_panel")
-            .frame(Frame::none().fill(egui::Color32::TRANSPARENT))
+            .frame(Frame::none().fill(TRANSLUCENT_GREY_COLOR32))
             .show(&ctx, |ui| {
                 ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                 if ui

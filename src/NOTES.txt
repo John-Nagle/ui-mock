@@ -17,3 +17,41 @@ TODO: Dark mode.
 TODO: Static string caching for internationalization.
 
 Still don't have a way to build an .msi installer under Linux. Filed Rust feature request.
+
+2022-06-13
+
+Menu plan, initial version:
+
+Avatar
+- Preferences
+- Exit
+
+Comm
+- Empty for now
+
+Build
+- Empty for now
+
+
+World
+- Teleport home
+- Teleport to (dialog)
+
+Help
+- About
+- Help page
+
+Developer
+- Load replay file
+- Save replay file
+- Show statistics
+- Show logging window
+- Set log message level
+
+
+Buttons
+- Chat window
+- Look
+- Walk/Run/Fly
+- Clothing (empty for now)
+- Inventory (empty for now)
