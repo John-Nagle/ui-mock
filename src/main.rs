@@ -242,6 +242,7 @@ impl rend3_framework::App for Ui {
         event: rend3_framework::Event<'_, ()>,
         control_flow: impl FnOnce(winit::event_loop::ControlFlow),
     ) {
+        profiling::scope!("Event");
         let data = self.data.as_mut().unwrap();
 
         //  This is where EGUI handles 2D UI events.
@@ -252,6 +253,7 @@ impl rend3_framework::App for Ui {
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
+                profiling::scope!("Redraw.");
                 data.platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
                 data.platform.begin_frame();
@@ -285,7 +287,7 @@ impl rend3_framework::App for Ui {
                     textures_delta,
                     context: data.platform.context(),
                 };
-
+                profiling::scope!("3D");
                 // Get a frame
                 let frame = rend3::util::output::OutputFrame::Surface {
                     surface: Arc::clone(surface.unwrap()),
@@ -326,6 +328,7 @@ impl rend3_framework::App for Ui {
                 } else {
                     control_flow(winit::event_loop::ControlFlow::Poll);
                 }
+                profiling::finish_frame!();             // end of frame for Tracy purposes
             }
             rend3_framework::Event::MainEventsCleared => {
                 window.request_redraw();
@@ -357,6 +360,8 @@ impl rend3_framework::App for Ui {
 }
 
 fn main() {
+    profiling::scope!("Main");
+    profiling::register_thread!();
     let app = Ui::default();
     rend3_framework::start(
         app,

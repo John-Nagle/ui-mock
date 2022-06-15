@@ -55,6 +55,7 @@ pub fn load_canned_icon(
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
+    profiling::scope!("Gui");
     let lang = data.lang.as_str();      // language for translations
     // Insert egui commands here
     let ctx = data.platform.context();
