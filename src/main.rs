@@ -13,7 +13,7 @@
 //  June 2022
 //
 mod gui;
-use gui::update_gui;
+use gui::{TextWindow, update_gui};
 use std::sync::Arc;
 #[macro_use]
 extern crate internationalization;  // must still be at crate root.
@@ -36,6 +36,8 @@ pub struct UiData {
     quit: bool,                              // set to true to exit program
     lang: String,                            // 2-letter language code
     dark_mode: bool,                         // true if in dark mode
+    //  Windows
+    message_window: TextWindow,              // miscellaneous messages
 }
 
 impl UiData {
@@ -210,7 +212,9 @@ impl rend3_framework::App for Ui {
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode 
         let dark_mode = true; // ***TEMP*** force dark mode as default
-        println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***          
+        println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
+        //  Window setup
+        let message_window = TextWindow::new("Messages", t!("window.messages", lang)); 
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -221,7 +225,8 @@ impl rend3_framework::App for Ui {
             last_interaction_time,
             quit,
             lang,
-            dark_mode
+            dark_mode,
+            message_window
         });
     }
 

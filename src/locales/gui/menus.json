@@ -21,5 +21,9 @@
     "menu.help": {
         "en": "Help",
         "fr": "Aidez-moi"
+    },
+    "window.messages": {
+        "en": "Messages",
+        "fr": "Messages"
     }
 }

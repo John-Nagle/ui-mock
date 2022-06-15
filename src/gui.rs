@@ -120,5 +120,30 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                 ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
             });
     }
+    //  Non-menu items
+    data.message_window.new_window();
+    //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
+}
+
+/// A text window.
+//  The persistent part
+pub struct TextWindow {
+    title: String,              // title of window
+    id: egui::Id,               // unique ID
+}
+
+impl TextWindow {
+
+    pub fn new(id: &str, title: &str) -> Self {
+        TextWindow {
+            id: egui::Id::new(id),
+            title: title.to_string(), 
+        }
+    }
+
+    pub fn new_window(&self) -> egui::containers::Window {
+        egui::containers::Window::new(self.title.as_str())
+            .id(self.id)
+    }
 }
