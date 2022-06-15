@@ -135,6 +135,7 @@ pub struct TextWindow {
 
 impl TextWindow {
 
+    /// Create persistent text window
     pub fn new(id: &str, title: &str) -> Self {
         TextWindow {
             id: egui::Id::new(id),
@@ -142,9 +143,22 @@ impl TextWindow {
         }
     }
 
+    /// Draw window of text
     pub fn new_window(&self, ctx: &egui::Context) {
         let window = egui::containers::Window::new(self.title.as_str())
             .id(self.id);
-        window.show(ctx, |_|{});
+        window.show(ctx, |ui| {
+            //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
+            let text_style = egui::TextStyle::Body;
+            let row_height = ui.text_style_height(&text_style);
+            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
+            let total_rows = 10;
+            egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
+                for row in row_range {
+                    let text = format!("Row {}/{}", row + 1, total_rows);
+                    ui.label(text);
+                }
+            });
+        });
     }
 }
