@@ -121,7 +121,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
             });
     }
     //  Non-menu items
-    data.message_window.new_window();
+    data.message_window.new_window(&ctx);
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
 }
@@ -142,8 +142,9 @@ impl TextWindow {
         }
     }
 
-    pub fn new_window(&self) -> egui::containers::Window {
-        egui::containers::Window::new(self.title.as_str())
-            .id(self.id)
+    pub fn new_window(&self, ctx: &egui::Context) {
+        let window = egui::containers::Window::new(self.title.as_str())
+            .id(self.id);
+        window.show(ctx, |_|{});
     }
 }
