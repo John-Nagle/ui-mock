@@ -5,8 +5,10 @@
 //  Animats
 //  June, 2022
 //
+use std::fs::File;
+use std::io::Read;
 use std::collections::HashMap;
-use anyhow::{Error};
+use anyhow::{Error, Context, anyhow};
 
 ///#  Translate with memoization
 //
@@ -54,7 +56,17 @@ impl Dictionary {
     /// Add translations from a JSON file.
     /// Add only for one language, which cannot be changed once initialized.
     fn add_translations(translations: &mut HashMap<&'static str, &'static str>, filename: &str, langid: &str) -> Result<(), Error> {
-        //  ***MORE***
+        //  Read and process one translations file
+        let file = File::open(filename).with_context(|| anyhow!("Failed to open the translations file: {}", filename))?;
+        let mut reader = std::io::BufReader::new(file);
+        let mut content = String::new();
+        reader
+            .read_to_string(&mut content)
+            .context("Failed to read the translations file")?;
+        let res: HashMap<String, HashMap<String, String>> =
+            serde_json::from_str(&content).context("Failed to parse translations file")?;
+        println!("Loaded translations from {}", filename);  // ***TEMP***
+        // ***MORE***
         Ok(())
     }
     
@@ -67,7 +79,8 @@ impl Dictionary {
 fn test_translation() {
     use once_cell::sync::OnceCell;
     //  Initialize the dictionary
-    let mut dictionary: Dictionary = Dictionary::new(&[],"fr").unwrap();
+    let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json");    // test only
+    let mut dictionary: Dictionary = Dictionary::new(&[locale_file],"fr").unwrap();
     let s: &str = t!("Hello", dictionary);
     /*
     dictionary.insert("Hello", "Allo");
