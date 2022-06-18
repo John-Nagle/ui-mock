@@ -14,7 +14,7 @@ use anyhow::{Error};
 //
 //      t!("key", lang)
 //
-//  which will return a static string with the translation of "key".
+//  which will return a reference to a static string with the translation of "key".
 //  This is a simple word lookup only. There is no substitution.
 //  Translations cannot be changed after first use.
 #[macro_export]

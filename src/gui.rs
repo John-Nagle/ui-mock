@@ -71,10 +71,10 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
             menu::bar(ui, |ui| {
-                ui.menu_button(t!("menu.file",lang), |ui| {
+                ui.menu_button(*t!("menu.file",lang), |ui| {
                     // File menu
                     {
-                        if ui.button(t!("menu.open", lang)).clicked() {
+                        if ui.button(*t!("menu.open", lang)).clicked() {
                             // Open menu entry
                             if let Some(path) = rfd::FileDialog::new()
                                 .set_title("Viewer session file to play back")
@@ -87,15 +87,15 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                         }
                     }
                     {
-                        if ui.button(t!("menu.quit",lang)).clicked() {
+                        if ui.button(*t!("menu.quit",lang)).clicked() {
                             //  Quit menu entry
                             data.quit = true;
                         }
                     }
                 });
-                ui.menu_button(t!("menu.help", lang), |ui| {
+                ui.menu_button(*t!("menu.help", lang), |ui| {
                     // Help menu
-                    if ui.button(t!("menu.help", lang)).clicked() {
+                    if ui.button(*t!("menu.help", lang)).clicked() {
                         // Help menu entry
                         webbrowser::open(HELP_PAGE).expect("failed to open URL");
                         // ***MAKE THIS NON FATAL***
