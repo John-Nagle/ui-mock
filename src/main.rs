@@ -214,7 +214,7 @@ impl rend3_framework::App for Ui {
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         //  Window setup
-        let message_window = TextWindow::new("Messages", t!("window.messages", lang)); 
+        let message_window = TextWindow::new("Messages", t!("window.messages".as_str(), lang)); 
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -360,6 +360,8 @@ impl rend3_framework::App for Ui {
 }
 
 fn main() {
+    ////let _client = tracy_client::Client::start(); 
+    ////assert!(tracy_client::Client::is_running());
     profiling::scope!("Main");
     profiling::register_thread!();
     let app = Ui::default();

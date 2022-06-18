@@ -53,11 +53,13 @@ wgpu = "0.12"
 # File dialogs
 rfd = "0.8.3"
 # Internationalization
-internationalization = "^0.0.2"
+once_cell = "1.12.0"
+## internationalization = "^0.0.2"
+internationalization = { path = "../rustcode/internationalization-rs", package = "locales" }
 sys-locale = "0.2.0"
 oxilangtag = "0.1.3"
 # Dark mode
 dark-light = "0.2.2"
 # Performance monitoring
-tracy-client = {version = "0.12", optional = true }
+tracy-client = {version = "0.14", optional = true }
 profiling = { version = "1", default-features = false }
