@@ -13,6 +13,7 @@
 //  June 2022
 //
 mod gui;
+mod basicintl;
 use gui::{TextWindow, update_gui};
 use std::sync::Arc;
 #[macro_use]

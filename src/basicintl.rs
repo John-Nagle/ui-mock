@@ -5,44 +5,65 @@
 //  Animats
 //  June, 2022
 //
-//  Usage:
+use std::collections::HashMap;
+use once_cell::sync::OnceCell;
+use anyhow::{Error, anyhow};
+
+///#  Translate with memoization
 //
 //  For each item to be translated, write
 //
 //      t!("key", lang)
 //
 //  which will return a static string with the translation of "key".
-//  This is a simple word lookup only. There is no substitution. 
-
-use std::collections::HashMap;
-use once_cell::sync::OnceCell;
-
-//  The dictionary - just a hash table here.
-type Dictionary<'a> = HashMap<&'a str, &'static str>;
-
-//  Lookup, only done once per t! macro expansion
-fn translate<'a>(s: &str, dict: &'a Dictionary) -> &'static str {
-    dict.get(s).unwrap()
-}
-
-//  Translate with memoization
+//  This is a simple word lookup only. There is no substitution.
+//  Translations cannot be changed after first use.
 macro_rules! t{
     ($s:expr,$dict:expr)=>{
  // macro expands this
     {   static MSG: OnceCell<&str> = OnceCell::new();
         MSG.get_or_init(|| {
-            println!("Did Lookup"); // ***TEMP*** 
+            println!("Did Lookup of {}",$s); // ***TEMP*** 
             translate($s, $dict)    // first time only
         }
     )}
     }
 }
 
-fn string_to_static_str(s: String) -> &'static str {
-    Box::leak(s.into_boxed_str())
+/// Language dictionary. Constructed from a JSON file.
+struct Dictionary{
+    translations: HashMap<&'static str, &'static str>    // translations for chosen language
 }
 
-fn main() {
+impl Dictionary {
+    pub fn new(files: &[&str], langid: &str) -> Result<Dictionary, Error> {
+        let mut translations = HashMap::new();      
+        //  Add translations from all JSON files
+        for file in files {
+            Self::add_translations(&mut translations, file, langid)?;
+        }   
+        Ok(Dictionary {translations })
+    }
+    
+    // Make static string, which we must do so we can
+    // create strings that can be memoized
+    fn string_to_static_str(s: String) -> &'static str {
+        Box::leak(s.into_boxed_str())
+    }
+    
+    fn add_translations(translations: &mut HashMap<&'static str, &'static str>, filename: &str, langid: &str) -> Result<(), Error> {
+        //  ***MORE***
+        Ok(())
+    }
+    
+    //  Lookup, only done once per t! macro expansion
+    pub fn translate<'a>(&self, s: &str) -> &'static str {
+        self.translations.get(s).unwrap()
+    }
+}
+/*
+[test]
+fn test_translation() {
     //  Initialize the dictionary
     let mut dictionary: Dictionary = HashMap::new();
     dictionary.insert("Hello", "Allo");
@@ -58,3 +79,4 @@ fn main() {
         println!("{} => {}", "Stop", t!("Stop", &dictionary));
     }
 }
+*/

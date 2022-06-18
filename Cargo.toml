@@ -63,3 +63,5 @@ dark-light = "0.2.2"
 # Performance monitoring
 tracy-client = {version = "0.14", optional = true }
 profiling = { version = "1", default-features = false }
+# Errors
+anyhow = "1.0"
