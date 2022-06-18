@@ -67,9 +67,9 @@ impl Dictionary {
             serde_json::from_str(&content).context("Failed to parse translations file")?;
         for (key, value) in res {
             println!("Key: {}, Value: {:?}", key, value);   // ***TEMP***
-            let lang_value = if let Some(v) = value.get(langid) {
+            if let Some(v) = value.get(langid) {
                 //  We have a translation for this key for this language
-                translations.insert(Self::string_to_static_str(key), Self::string_to_static_str(value));    // add to translations
+                translations.insert(Self::string_to_static_str(key), Self::string_to_static_str(v.to_string()));    // add to translations
             } else {
                 //  Translation file needs repair
                 return Err(anyhow!("No translation for key {}, language {} in file {}", key, langid, filename));
@@ -90,8 +90,8 @@ fn test_translation() {
     use once_cell::sync::OnceCell;
     //  Initialize the dictionary
     let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json");    // test only
-    let mut dictionary: Dictionary = Dictionary::new(&[locale_file],"fr").unwrap();
-    let s: &str = t!("Hello", dictionary);
+    let dictionary: Dictionary = Dictionary::new(&[locale_file],"fr").unwrap(); // build translations for "fr".
+    let s: &str = t!("menu.file", dictionary);
     /*
     dictionary.insert("Hello", "Allo");
     dictionary.insert("Bye", "Au revoir");
