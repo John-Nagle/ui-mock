@@ -210,8 +210,8 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
         let quit = false;
-        let locale_files = [];  // ***TEMP***
-        let lang = Dictionary::new(&locale_files, &get_translation_locale()).expect("Trouble loading language translation files");    // select language
+        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json");    // test only
+        let lang = Dictionary::new(&[locale_file],"fr").expect("Trouble loading language translation files");    // select language
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode 
         let dark_mode = true; // ***TEMP*** force dark mode as default
