@@ -6,8 +6,7 @@
 //  June, 2022
 //
 use std::collections::HashMap;
-use once_cell::sync::OnceCell;
-use anyhow::{Error, anyhow};
+use anyhow::{Error};
 
 ///#  Translate with memoization
 //
@@ -21,7 +20,7 @@ use anyhow::{Error, anyhow};
 #[macro_export]
 macro_rules! t{
     ($s:expr,$dict:expr)=>{
- // macro expands this
+    // macro expands this
     {   static MSG: OnceCell<&str> = OnceCell::new();
         MSG.get_or_init(|| {
             println!("Did Lookup of {}",$s); // ***TEMP*** 
@@ -53,6 +52,7 @@ impl Dictionary {
     }
     
     /// Add translations from a JSON file.
+    /// Add only for one language, which cannot be changed once initialized.
     fn add_translations(translations: &mut HashMap<&'static str, &'static str>, filename: &str, langid: &str) -> Result<(), Error> {
         //  ***MORE***
         Ok(())
@@ -65,6 +65,7 @@ impl Dictionary {
 }
 #[test]
 fn test_translation() {
+    use once_cell::sync::OnceCell;
     //  Initialize the dictionary
     let mut dictionary: Dictionary = Dictionary::new(&[],"fr").unwrap();
     let s: &str = t!("Hello", dictionary);
