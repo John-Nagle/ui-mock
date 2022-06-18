@@ -65,6 +65,16 @@ impl Dictionary {
             .context("Failed to read the translations file")?;
         let res: HashMap<String, HashMap<String, String>> =
             serde_json::from_str(&content).context("Failed to parse translations file")?;
+        for (key, value) in res {
+            println!("Key: {}, Value: {:?}", key, value);   // ***TEMP***
+            let lang_value = if let Some(v) = value.get(langid) {
+                //  We have a translation for this key for this language
+                translations.insert(Self::string_to_static_str(key), Self::string_to_static_str(value));    // add to translations
+            } else {
+                //  Translation file needs repair
+                return Err(anyhow!("No translation for key {}, language {} in file {}", key, langid, filename));
+            };
+        }
         println!("Loaded translations from {}", filename);  // ***TEMP***
         // ***MORE***
         Ok(())
