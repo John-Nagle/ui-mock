@@ -18,20 +18,21 @@ use anyhow::{Error, anyhow};
 //  which will return a static string with the translation of "key".
 //  This is a simple word lookup only. There is no substitution.
 //  Translations cannot be changed after first use.
+#[macro_export]
 macro_rules! t{
     ($s:expr,$dict:expr)=>{
  // macro expands this
     {   static MSG: OnceCell<&str> = OnceCell::new();
         MSG.get_or_init(|| {
             println!("Did Lookup of {}",$s); // ***TEMP*** 
-            translate($s, $dict)    // first time only
+            $dict.translate($s)    // first time only
         }
     )}
     }
 }
 
 /// Language dictionary. Constructed from a JSON file.
-struct Dictionary{
+pub struct Dictionary{
     translations: HashMap<&'static str, &'static str>    // translations for chosen language
 }
 
@@ -51,6 +52,7 @@ impl Dictionary {
         Box::leak(s.into_boxed_str())
     }
     
+    /// Add translations from a JSON file.
     fn add_translations(translations: &mut HashMap<&'static str, &'static str>, filename: &str, langid: &str) -> Result<(), Error> {
         //  ***MORE***
         Ok(())
@@ -61,11 +63,12 @@ impl Dictionary {
         self.translations.get(s).unwrap()
     }
 }
-/*
-[test]
+#[test]
 fn test_translation() {
     //  Initialize the dictionary
-    let mut dictionary: Dictionary = HashMap::new();
+    let mut dictionary: Dictionary = Dictionary::new(&[],"fr").unwrap();
+    let s: &str = t!("Hello", dictionary);
+    /*
     dictionary.insert("Hello", "Allo");
     dictionary.insert("Bye", "Au revoir");
     dictionary.insert("Go", "Allez");
@@ -78,5 +81,6 @@ fn test_translation() {
         println!("{} => {}", "Go", t!("Go", &dictionary));
         println!("{} => {}", "Stop", t!("Stop", &dictionary));
     }
+    */
 }
-*/
+

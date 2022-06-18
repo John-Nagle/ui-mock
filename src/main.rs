@@ -16,9 +16,10 @@ mod gui;
 mod basicintl;
 use gui::{TextWindow, update_gui};
 use std::sync::Arc;
-#[macro_use]
-extern crate internationalization;  // must still be at crate root.
+////#[macro_use]
+use basicintl::{Dictionary};
 use oxilangtag::LanguageTag;
+use once_cell::sync::OnceCell;
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
@@ -35,7 +36,7 @@ pub struct UiData {
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
     quit: bool,                              // set to true to exit program
-    lang: String,                            // 2-letter language code
+    lang: Dictionary,                        // 2-letter language code
     dark_mode: bool,                         // true if in dark mode
     //  Windows
     message_window: TextWindow,              // miscellaneous messages
@@ -209,13 +210,14 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
         let quit = false;
-        let lang = get_translation_locale();    // select language
+        let locale_files = [];  // ***TEMP***
+        let lang = Dictionary::new(&locale_files, &get_translation_locale()).expect("Trouble loading language translation files");    // select language
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode 
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         //  Window setup
-        let message_window = TextWindow::new("Messages", t!("window.messages".as_str(), lang)); 
+        let message_window = TextWindow::new("Messages", t!("window.messages", lang)); 
         self.data = Some(UiData {
             _object_handle,
             _material_handle,

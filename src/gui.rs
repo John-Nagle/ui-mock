@@ -13,6 +13,9 @@ use egui::{menu, Frame, TextureId};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use std::sync::Arc;
+////#[macro_use]
+use crate::t;
+use once_cell::sync::OnceCell;
 
 
 /// Configuration
@@ -56,7 +59,7 @@ pub fn load_canned_icon(
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     profiling::scope!("Gui");
-    let lang = data.lang.as_str();      // language for translations
+    let lang = &data.lang;                   // language for translations
     // Insert egui commands here
     let ctx = data.platform.context();
     if data.dark_mode 
