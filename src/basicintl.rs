@@ -24,11 +24,12 @@ macro_rules! t{
     ($s:expr,$dict:expr)=>{
     // macro expands this
     {   static MSG: OnceCell<&str> = OnceCell::new();
-        MSG.get_or_init(|| {
+        let s: &str = MSG.get_or_init(|| {
             println!("Did Lookup of {}",$s); // ***TEMP*** 
             $dict.translate($s)    // first time only
-        }
-    )}
+        });
+        s
+    }
     }
 }
 
