@@ -91,20 +91,10 @@ fn test_translation() {
     //  Initialize the dictionary
     let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json");    // test only
     let dictionary: Dictionary = Dictionary::new(&[locale_file],"fr").unwrap(); // build translations for "fr".
-    let s: &str = t!("menu.file", dictionary);
-    /*
-    dictionary.insert("Hello", "Allo");
-    dictionary.insert("Bye", "Au revoir");
-    dictionary.insert("Go", "Allez");
-    let stop = "Arrêt".to_string();
-    dictionary.insert("Stop", string_to_static_str(stop));
     //  Demonstrate that it only does the lookup once
     for _ in 1..5 {
-        println!("{} => {}", "Hello", t!("Hello", &dictionary));
-        println!("{} => {}", "Hello", t!("Hello", &dictionary));
-        println!("{} => {}", "Go", t!("Go", &dictionary));
-        println!("{} => {}", "Stop", t!("Stop", &dictionary));
+        println!("{} => {}", "menu.file", t!("menu.file", &dictionary));
     }
-    */
+    assert_eq!("Fichier", t!("menu.file", &dictionary)); // consistency check
 }
 
