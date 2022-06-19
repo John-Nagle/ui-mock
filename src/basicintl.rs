@@ -7,7 +7,7 @@
 //
 use std::fs::File;
 use std::io::Read;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use anyhow::{Error, Context, anyhow};
 
 ///#  Translate with memoization
@@ -66,8 +66,10 @@ impl Dictionary {
             .context("Failed to read the translations file")?;
         let res: HashMap<String, HashMap<String, String>> =
             serde_json::from_str(&content).context("Failed to parse translations file")?;
+        let mut languages = HashSet::new();                 // list of languages
         for (key, value) in res {
             println!("Key: {}, Value: {:?}", key, value);   // ***TEMP***
+            Self::validate_translation_set(&key, &value, &mut languages)?; // check that all translations are present
             if let Some(v) = value.get(langid) {
                 //  We have a translation for this key for this language
                 translations.insert(Self::string_to_static_str(key), Self::string_to_static_str(v.to_string()));    // add to translations
@@ -77,6 +79,20 @@ impl Dictionary {
             };
         }
         log::info!("Loaded translations from {}", filename);  // note translations loaded
+        Ok(())
+    }
+    
+    /// Check that each translation has all the languages
+    fn validate_translation_set(key: &str, value: &HashMap<String, String>, languages: &mut HashSet<String>) -> Result<(), Error> {
+        let this_set: HashSet<String> = value.iter().map(|(k,_v)| k.clone()).collect(); // all the languages
+        //  Language list from first language becomes the master
+        if languages.is_empty() {
+            *languages = this_set.clone();
+        }
+        if this_set != *languages {
+            let missing = languages.difference(&this_set);
+            return Err(anyhow!("Translation dictionary is missing a translation to {:?} for \"{}\"", missing, key));
+        }
         Ok(())
     }
     
