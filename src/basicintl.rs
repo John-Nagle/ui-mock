@@ -9,6 +9,10 @@ use std::fs::File;
 use std::io::Read;
 use std::collections::{HashMap, HashSet};
 use anyhow::{Error, Context, anyhow};
+use oxilangtag::LanguageTag;
+
+//  If no locale info is available, pick one of these, in order, as available.
+const IMPERIAL_LANGUAGES: [&str;3] = ["en", "cn", "ru"];    // should support at least one of these. May support more
 
 ///#  Translate with memoization
 //
@@ -33,52 +37,86 @@ macro_rules! t{
     }
 }
 
+/// Format of the translations dictionary for a single language
+type TranslationDictionary = HashMap<&'static str, &'static str>;
+/// Format of the translations file, in JSON
+type TranslationFile = HashMap<String, HashMap<String, String>>;   // File contents { "key" : {"lang", "key in lang" }}
+
+
 /// Language dictionary. Constructed from a JSON file.
 pub struct Dictionary{
-    translations: HashMap<&'static str, &'static str>    // translations for chosen language
+    translations: TranslationDictionary   // translations for chosen language
 }
 
 impl Dictionary {
+    /// Create the dictionary for one language.
     pub fn new(files: &[&str], langid: &str) -> Result<Dictionary, Error> {
         let mut translations = HashMap::new();      
         //  Add translations from all JSON files
+        let mut languages = HashSet::new();                 // list of languages
         for file in files {
-            Self::add_translations(&mut translations, file, langid)?;
-        }   
+            let translation_file = Self::read_translation_file(file).with_context(|| format!("Translation file: \"{}\"", file))?;
+            Self::validate_translation_file(&translation_file, &mut languages).with_context(|| format!("Translation file: \"{}\"", file))?;
+            Self::add_translations(&mut translations, &translation_file, langid)?;
+            log::info!("Loaded translations from {}", file);  // note translations loaded
+    	    }   
         Ok(Dictionary {translations })
     }
     
-    // Make static string, which we must do so we can
-    // create strings that can be memoized
+    /// Get list of available languages.
+    //  Reading the first entry will tell us this, because all entries have to match.
+    pub fn get_language_list(files: &[&str]) -> Result<HashSet<String>, Error> {
+        if files.is_empty() {
+            return Ok(HashSet::new())                   // empty list, no translations available
+        }
+        let file = files[0];                    // we have at least one
+        let translation_file = Self::read_translation_file(file).with_context(|| format!("Translation file: \"{}\"", file))?;
+        for (_,v) in translation_file {
+            return Ok(v.iter().map(|(k,_)| k.clone()).collect()) // unordered list of available translations           
+        }
+        return Ok(HashSet::new())                   // empty list, no translations available
+        
+    }
+    
+    // Make static string, which we must do so we can create strings which can be memoized in static variables.
     fn string_to_static_str(s: String) -> &'static str {
         Box::leak(s.into_boxed_str())
     }
     
-    /// Add translations from a JSON file.
-    /// Add only for one language, which cannot be changed once initialized.
-    fn add_translations(translations: &mut HashMap<&'static str, &'static str>, filename: &str, langid: &str) -> Result<(), Error> {
-        //  Read and process one translations file
+    /// Read the JSON translation file tnto a Translationfile structure.
+    fn read_translation_file(filename: &str) -> Result<TranslationFile, Error> {
+        //  Read one translations file
         let file = File::open(filename).with_context(|| anyhow!("Failed to open the translations file: {}", filename))?;
         let mut reader = std::io::BufReader::new(file);
         let mut content = String::new();
         reader
             .read_to_string(&mut content)
             .context("Failed to read the translations file")?;
-        let res: HashMap<String, HashMap<String, String>> =
-            serde_json::from_str(&content).context("Failed to parse translations file")?;
-        let mut languages = HashSet::new();                 // list of languages
-        for (key, value) in res {
+        serde_json::from_str(&content).context("Failed to parse translations file")
+    }
+    
+    /// Add translations from a JSON file.
+    /// Add only for one language, which cannot be changed once initialized.
+    fn add_translations(res: &mut TranslationDictionary, translation_file: &TranslationFile, langid: &str) -> Result<(), Error> {
+        //  Select desired language from translations file
+        for (key, value) in translation_file {
             println!("Key: {}, Value: {:?}", key, value);   // ***TEMP***
-            Self::validate_translation_set(&key, &value, &mut languages)?; // check that all translations are present
             if let Some(v) = value.get(langid) {
                 //  We have a translation for this key for this language
-                translations.insert(Self::string_to_static_str(key), Self::string_to_static_str(v.to_string()));    // add to translations
+                res.insert(Self::string_to_static_str(key.to_string()), Self::string_to_static_str(v.to_string()));    // add to translations
             } else {
                 //  Translation file needs repair
-                return Err(anyhow!("No translation for key {}, language {} in file {}", key, langid, filename));
+                return Err(anyhow!("No translation for key {}, language {}", key, langid));
             };
         }
-        log::info!("Loaded translations from {}", filename);  // note translations loaded
+        Ok(())
+    }
+    
+    /// Validate entire translation file for having a translation for every language mentioned
+    fn validate_translation_file(res: &TranslationFile, languages: &mut HashSet<String>) -> Result<(), Error> {
+        for (key, value) in res {
+            Self::validate_translation_set(&key, &value, languages)?; // check that all translations are present
+        }
         Ok(())
     }
     
@@ -105,7 +143,47 @@ impl Dictionary {
             Self::string_to_static_str(s.to_string())          // use the key as the result
         }
     }
+    
+    /// Get translation dictionary
+    pub fn get_translation(locale_files: &[&str]) -> Result<Dictionary, Error> {
+        fn pick_default_language(available: &HashSet<String>) -> Result<String, Error> {
+            
+            for lang in IMPERIAL_LANGUAGES.iter() {
+                if available.contains(&lang.to_string()) {
+                    return Ok(lang.to_string())
+                }
+            }
+            //  No major languages available. Pick at random from available translations.
+            //  Probably means someone substituted an unusual translations file that
+            //  contains none of the major languages and does not match the system locale.
+            for lang in available {
+                log::error!("No default language choices available. Picking \"{}\"", lang);
+                return Ok(lang.clone());
+            }
+            //  We give up.
+            Err(anyhow!("No language translations are available"))
+        }     
+        //  Get list of languages for which we have a translation
+        let lang_list = Dictionary::get_language_list(locale_files)?;      // get list of supported languages.
+        let locale_opt = sys_locale::get_locale();                          // system locale
+        log::info!("System locale: {:?}.  Available language translations: {:?}", locale_opt, lang_list);
+        let lang_tag = if let Some(locale) = locale_opt {
+            let locale = locale.replace("_","-");         // Workaround for https://github.com/1Password/sys-locale/issues/3
+            let language_tag = LanguageTag::parse(locale)?; // system locale is garbled if this doesn't parse.
+            let tag = language_tag.primary_language();              // two-letter tag
+            if lang_list.contains(tag) {                           // if matches locale
+                tag.to_string()                                         // use it
+            } else {
+                pick_default_language(&lang_list)?           // pick some default
+            }                                
+        } else {
+            log::error!("System did not provide a locale."); 
+            pick_default_language(&lang_list)?               // pick some default
+        };
+        Self::new(locale_files, &lang_tag)                    // build the translations dictionary 
+    }   
 }
+
 #[test]
 fn test_translation() {
     use once_cell::sync::OnceCell;
