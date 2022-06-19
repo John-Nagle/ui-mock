@@ -74,10 +74,19 @@ impl Dictionary {
         let file = files[0]; // we have at least one
         let translation_file = Self::read_translation_file(file)
             .with_context(|| format!("Translation file: \"{}\"", file))?;
+        //  Get the unordered list of available translations from the first entry.
+        //  They all have to be the same, and that's checked.
+        if let Some((_, v)) = translation_file.into_iter().next() {
+            Ok(v.iter().map(|(k, _)| k.clone()).collect())
+        } else {
+            Ok(HashSet::new()) // empty list, no translations available
+        }
+    /*
         for (_, v) in translation_file {
             return Ok(v.iter().map(|(k, _)| k.clone()).collect()); // unordered list of available translations
         }
-        return Ok(HashSet::new()); // empty list, no translations available
+        Ok(HashSet::new()) // empty list, no translations available
+    */
     }
 
     // Make static string, which we must do so we can create strings which can be memoized in static variables.
@@ -132,7 +141,7 @@ impl Dictionary {
         languages: &mut HashSet<String>,
     ) -> Result<(), Error> {
         for (key, value) in res {
-            Self::validate_translation_set(&key, &value, languages)?; // check that all translations are present
+            Self::validate_translation_set(key, value, languages)?; // check that all translations are present
         }
         Ok(())
     }
@@ -160,7 +169,7 @@ impl Dictionary {
     }
 
     //  Lookup, only done once per t! macro expansion
-    pub fn translate<'a>(&self, s: &str) -> &'static str {
+    pub fn translate(&self, s: &str) -> &'static str {
         if let Some(st) = self.translations.get(s) {
             st
         } else {
@@ -180,15 +189,15 @@ impl Dictionary {
             //  No major languages available. Pick at random from available translations.
             //  Probably means someone substituted an unusual translations file that
             //  contains none of the major languages and does not match the system locale.
-            for lang in available {
+            if let Some(lang) = available.iter().next() {
                 log::error!(
                     "No default language choices available. Picking \"{}\"",
-                    lang
-                );
-                return Ok(lang.clone());
+                    lang);
+                Ok(lang.clone())
+            } else {
+                //  We give up.
+                Err(anyhow!("No language translations are available"))
             }
-            //  We give up.
-            Err(anyhow!("No language translations are available"))
         }
         //  Get list of languages for which we have a translation
         let lang_list = Dictionary::get_language_list(locale_files)?; // get list of supported languages.
@@ -224,7 +233,7 @@ fn test_translation() {
     let dictionary: Dictionary = Dictionary::new(&[locale_file], "fr").unwrap(); // build translations for "fr".
                                                                                  //  Demonstrate that it only does the lookup once
     for _ in 1..5 {
-        println!("{} => {}", "menu.file", t!("menu.file", &dictionary));
+        println!("menu.file => {}", t!("menu.file", &dictionary));
     }
     assert_eq!("Fichier", t!("menu.file", &dictionary)); // consistency check
 }

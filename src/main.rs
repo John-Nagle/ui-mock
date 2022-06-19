@@ -239,7 +239,7 @@ impl rend3_framework::App for Ui {
                 // Insert egui commands here
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
                 let mut inuse = update_gui(&self.assets, data, show_menus); // draws the GUI
-                inuse |= is_at_fullscreen_window_top_bottom(&window, &data); // check if need to escape from full screen
+                inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
                 if inuse {
                     data.wake_up_gui();
                 }
