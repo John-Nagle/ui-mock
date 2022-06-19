@@ -200,7 +200,7 @@ impl Dictionary {
             lang_list
         );
         let lang_tag = if let Some(locale) = locale_opt {
-            let locale = locale.replace("_", "-"); // Workaround for https://github.com/1Password/sys-locale/issues/3
+            let locale = locale.replace('_', "-"); // Workaround for https://github.com/1Password/sys-locale/issues/3
             let language_tag = LanguageTag::parse(locale)?; // system locale is garbled if this doesn't parse.
             let tag = language_tag.primary_language(); // two-letter tag
             if lang_list.contains(tag) {
@@ -223,7 +223,8 @@ fn test_translation() {
     //  Initialize the dictionary
     let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // test only
     let dictionary: Dictionary = Dictionary::new(&[locale_file], "fr").unwrap(); // build translations for "fr".
-                                                                                 //  Demonstrate that it only does the lookup once
+                                                                                 
+    //  Demonstrate that it only does the lookup once
     for _ in 1..5 {
         println!("menu.file => {}", t!("menu.file", &dictionary));
     }
