@@ -76,13 +76,18 @@ impl Dictionary {
                 return Err(anyhow!("No translation for key {}, language {} in file {}", key, langid, filename));
             };
         }
-        println!("Loaded translations from {}", filename);  // ***TEMP***
+        log::info!("Loaded translations from {}", filename);  // note translations loaded
         Ok(())
     }
     
     //  Lookup, only done once per t! macro expansion
     pub fn translate<'a>(&self, s: &str) -> &'static str {
-        self.translations.get(s).unwrap()
+        if let Some(st) =  self.translations.get(s) {
+            st
+        } else {
+            log::error!("No translation is available for \"{}\"", s);    // non-fatal error.
+            Self::string_to_static_str(s.to_string())          // use the key as the result
+        }
     }
 }
 #[test]

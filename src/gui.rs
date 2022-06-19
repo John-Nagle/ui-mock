@@ -83,7 +83,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                                 .pick_file()
                             {
                                 let picked_path = Some(path.display().to_string());
-                                println!("File picked: {}", picked_path.unwrap());
+                                log::warn!("File picked: {}", picked_path.unwrap());
                             }
                         }
                     }
