@@ -12,12 +12,12 @@
 //  Animats
 //  June 2022
 //
-mod gui;
 mod basicintl;
-use gui::{TextWindow, update_gui};
+mod gui;
+use gui::{update_gui, TextWindow};
 use std::sync::Arc;
 ////#[macro_use]
-use basicintl::{Dictionary};
+use basicintl::Dictionary;
 use once_cell::sync::OnceCell;
 
 /// Configuration
@@ -37,7 +37,7 @@ pub struct UiData {
     lang: Dictionary,                        // 2-letter language code
     dark_mode: bool,                         // true if in dark mode
     //  Windows
-    message_window: TextWindow,              // miscellaneous messages
+    message_window: TextWindow, // miscellaneous messages
 }
 
 impl UiData {
@@ -183,15 +183,16 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
         let quit = false;
-        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json");    // test only
-        ////let lang = Dictionary::new(&[locale_file],get_translation_locale().as_str()).expect("Trouble loading language translation files");    // select language
-        let lang = Dictionary::get_translation(&[locale_file]).expect("Trouble loading language translation files");    // select language
-        //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
-        ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode 
+        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // test only
+                                                                                          ////let lang = Dictionary::new(&[locale_file],get_translation_locale().as_str()).expect("Trouble loading language translation files");    // select language
+        let lang = Dictionary::get_translation(&[locale_file])
+            .expect("Trouble loading language translation files"); // select language
+                                                                   //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
+                                                                   ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
-        //  Window setup
-        let message_window = TextWindow::new("Messages", t!("window.messages", lang)); 
+                                                                            //  Window setup
+        let message_window = TextWindow::new("Messages", t!("window.messages", lang));
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -203,7 +204,7 @@ impl rend3_framework::App for Ui {
             quit,
             lang,
             dark_mode,
-            message_window
+            message_window,
         });
     }
 
@@ -305,7 +306,7 @@ impl rend3_framework::App for Ui {
                 } else {
                     control_flow(winit::event_loop::ControlFlow::Poll);
                 }
-                profiling::finish_frame!();             // end of frame for Tracy purposes
+                profiling::finish_frame!(); // end of frame for Tracy purposes
             }
             rend3_framework::Event::MainEventsCleared => {
                 window.request_redraw();
@@ -337,7 +338,7 @@ impl rend3_framework::App for Ui {
 }
 
 fn main() {
-    ////let _client = tracy_client::Client::start(); 
+    ////let _client = tracy_client::Client::start();
     ////assert!(tracy_client::Client::is_running());
     profiling::scope!("Main");
     profiling::register_thread!();

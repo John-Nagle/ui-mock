@@ -17,17 +17,22 @@ use std::sync::Arc;
 use crate::t;
 use once_cell::sync::OnceCell;
 
-
 /// Configuration
 const HELP_PAGE: &str =
     "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
 
 /// Grey background for button area.
-//  This really should be a gradient.    
+//  This really should be a gradient.
 const TRANSLUCENT_GREY_ALPHA: u8 = 48;
 const TRANSLUCENT_GREY: u8 = 32;
-const TRANSLUCENT_GREY_COLOR: u8 = ((TRANSLUCENT_GREY_ALPHA as u16 * TRANSLUCENT_GREY as u16) / 256) as u8;
-const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premultiplied(TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_COLOR,TRANSLUCENT_GREY_ALPHA);
+const TRANSLUCENT_GREY_COLOR: u8 =
+    ((TRANSLUCENT_GREY_ALPHA as u16 * TRANSLUCENT_GREY as u16) / 256) as u8;
+const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premultiplied(
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_ALPHA,
+);
 
 /// GUI utility functions
 
@@ -59,20 +64,20 @@ pub fn load_canned_icon(
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     profiling::scope!("Gui");
-    let lang = &data.lang;                   // language for translations
-    // Insert egui commands here
+    let lang = &data.lang; // language for translations
+                           // Insert egui commands here
     let ctx = data.platform.context();
-    if data.dark_mode 
-        { ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+    if data.dark_mode {
+        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
     } else {
         ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
     }
     //  Top menu bar
-    
+
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
             menu::bar(ui, |ui| {
-                ui.menu_button(t!("menu.file",lang), |ui| {
+                ui.menu_button(t!("menu.file", lang), |ui| {
                     // File menu
                     {
                         if ui.button(t!("menu.open", lang)).clicked() {
@@ -88,7 +93,7 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                         }
                     }
                     {
-                        if ui.button(t!("menu.quit",lang)).clicked() {
+                        if ui.button(t!("menu.quit", lang)).clicked() {
                             //  Quit menu entry
                             data.quit = true;
                         }
@@ -134,24 +139,22 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
 /// A text window.
 //  The persistent part
 pub struct TextWindow {
-    title: String,              // title of window
-    id: egui::Id,               // unique ID
+    title: String, // title of window
+    id: egui::Id,  // unique ID
 }
 
 impl TextWindow {
-
     /// Create persistent text window
     pub fn new(id: &str, title: &str) -> Self {
         TextWindow {
             id: egui::Id::new(id),
-            title: title.to_string(), 
+            title: title.to_string(),
         }
     }
 
     /// Draw window of text
     pub fn new_window(&self, ctx: &egui::Context) {
-        let window = egui::containers::Window::new(self.title.as_str())
-            .id(self.id);
+        let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
