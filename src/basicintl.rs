@@ -30,7 +30,6 @@ macro_rules! t {
         {
             static MSG: OnceCell<&str> = OnceCell::new();
             let s: &str = MSG.get_or_init(|| {
-                println!("Did Lookup of {}", $s); // ***TEMP***
                 $dict.translate($s) // first time only
             });
             s
@@ -81,12 +80,6 @@ impl Dictionary {
         } else {
             Ok(HashSet::new()) // empty list, no translations available
         }
-    /*
-        for (_, v) in translation_file {
-            return Ok(v.iter().map(|(k, _)| k.clone()).collect()); // unordered list of available translations
-        }
-        Ok(HashSet::new()) // empty list, no translations available
-    */
     }
 
     // Make static string, which we must do so we can create strings which can be memoized in static variables.
@@ -116,7 +109,6 @@ impl Dictionary {
     ) -> Result<(), Error> {
         //  Select desired language from translations file
         for (key, value) in translation_file {
-            println!("Key: {}, Value: {:?}", key, value); // ***TEMP***
             if let Some(v) = value.get(langid) {
                 //  We have a translation for this key for this language
                 res.insert(
