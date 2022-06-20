@@ -342,10 +342,7 @@ fn main() {
     #[cfg(feature = "tracy")]
     let _client = tracy_client::Client::start();    // enable profiler if "tracy" feature is on
     #[cfg(feature = "tracy")]
-    {
-        assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
-        println!("Tracy is running");
-    }
+    assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
     profiling::scope!("Main");
     profiling::register_thread!();
     let app = Ui::default();
