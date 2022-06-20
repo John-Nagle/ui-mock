@@ -18,10 +18,6 @@ use std::sync::Arc;
 use crate::t;
 use once_cell::sync::OnceCell;
 
-/// Configuration
-const HELP_PAGE: &str =
-    "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
-
 /// Grey background for button area.
 //  This really should be a gradient.
 const TRANSLUCENT_GREY_ALPHA: u8 = 48;
@@ -77,33 +73,57 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
 
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
-            ui.menu_button(t!("menu.avatar", &data.lang), |ui| {                                       
+            menu::bar(ui, |ui| {
+                ui.menu_button(t!("menu.avatar", &data.lang), |ui| {                                       
                     // Avatar menu
-                    if ui.button(t!("menu.preferences", &data.lang)).clicked() {
+                    if ui.button(t!("menu.avatar.preferences", &data.lang)).clicked() {
                         // Preferences menu entry
                         guimenus::manu_preferences(ui, data);
                     }
 
-                    if ui.button(t!("menu.quit", &data.lang)).clicked() {
+                    if ui.button(t!("menu.avatar.quit", &data.lang)).clicked() {
                         guimenus::menu_quit(ui, data);
                     }
                 });
-            menu::bar(ui, |ui| {
-                ui.menu_button(t!("menu.developer", &data.lang), |ui| {                                       
-                    // Replay file menu
-                    if ui.button(t!("menu.loadreplay", &data.lang)).clicked() {
-                        // Open menu entry
-                        guimenus::menu_open_replay(ui, data);
-                     } 
-
+                ui.menu_button(t!("menu.comm", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
                 });
+                ui.menu_button(t!("menu.world", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+                });
+                ui.menu_button(t!("menu.content", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+                });        
                 ui.menu_button(t!("menu.help", &data.lang), |ui| {
                     // Help menu
                     if ui.button(t!("menu.help", &data.lang)).clicked() {
-                        // Help menu entry
-                        webbrowser::open(HELP_PAGE).expect("failed to open URL");
-                        // ***MAKE THIS NON FATAL***
+                        guimenus::menu_help_manual(ui, data);
                     }
+                    if ui.button(t!("menu.help.about", &data.lang)).clicked() {
+                        // About menu entry
+                        guimenus::menu_help_about(ui, data);
+                    }
+                 });
+                 ui.menu_button(t!("menu.developer", &data.lang), |ui| {                                       
+                    // Replay file menu
+                    if ui.button(t!("menu.developer.open_replay", &data.lang)).clicked() {
+                        // Open menu entry
+                        guimenus::menu_open_replay(ui, data);
+                    }
+                    if ui.button(t!("menu.developer.save_replay", &data.lang)).clicked() {
+                        // Open menu entry
+                        guimenus::menu_open_replay(ui, data);
+                    } 
+
                 });
             });
         });

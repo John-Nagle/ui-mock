@@ -1,14 +1,64 @@
-{   "menu.file": {
+{   "menu.avatar": {
+        "en": "Avatar",
+        "fr": "Avatar"
+    },
+    "menu.avatar.preferences": {
+        "en": "Preferences",
+        "fr": "Préférences"
+    },
+   "menu.avatar.quit": {
+        "en": "Quit",
+        "fr": "Quitter"
+    },
+    
+    "menu.comm": {
+        "en": "Comm",
+        "fr": "Communiquer"
+    },
+    "menu.world": {
+        "en": "World",
+        "fr": "Monde"
+    },
+    "menu.build": {
+        "en": "Build",
+        "fr": "Construire"
+    },
+    "menu.content": {
+        "en": "Content",
+        "fr": "Contenu"
+    },    
+    "menu.help": {
+        "en": "Help",
+        "fr": "Aidez-moi"
+    },
+    "menu.help.about": {
+        "en": "About",
+        "fr": "À propos"
+    }, 
+
+   "menu.developer": {
+        "en": "Developer",
+        "fr": "Développeur"
+    },
+    "menu.developer.open_replay": {
+        "en": "Open replay",
+        "fr": "Relecture ouverte"
+    },
+   "menu.developer.save_replay": {
+        "en": "Save replay",
+        "fr": "Enregistrer la relecture"
+    },
+    "menu.unimplemented": {
+        "en": "Unimplemented",
+        "fr": "Non construit"
+    },
+    "menu.file": {
         "en": "File",
         "fr": "Fichier"
     },
     "menu.open": {
         "en": "Open",
         "fr": "Ouvert"
-    },
-    "menu.quit": {
-        "en": "Quit",
-        "fr": "Quitter"
     },
     "menu.ok": {
         "en": "Ok",
@@ -17,13 +67,17 @@
     "menu.cancel": {
         "en": "Cancel",
         "fr": "Annuler"
-    },
-    "menu.help": {
-        "en": "Help",
-        "fr": "Aidez-moi"
-    },
+    },   
     "window.messages": {
         "en": "Messages",
         "fr": "Messages"
+    },
+    "title.open_replay": {
+        "en": "Open replay file",
+        "fr": "Ouvrir le fichier de relecture"
+    },
+    "title.save_replay": {
+        "en": "Save replay file",
+        "fr": "Ouvrir le fichier de relecture"
     }
 }

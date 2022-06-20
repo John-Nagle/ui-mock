@@ -10,6 +10,12 @@ use crate::UiData;
 use crate::t;
 use once_cell::sync::OnceCell;
 use egui::Ui;
+
+/// Configuration
+const HELP_PAGE: &str =
+    "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
+
+
 //
 /// Avatar->Preferences
 pub fn manu_preferences(_ui: &mut Ui, _data: &mut UiData) {
@@ -19,6 +25,15 @@ pub fn manu_preferences(_ui: &mut Ui, _data: &mut UiData) {
 /// Avatar->Quit
 pub fn menu_quit(_ui: &mut Ui, data: &mut UiData) {
     data.quit = true;                   // normal exit
+}
+
+/// Help->Help
+pub fn menu_help_manual(_ui: &mut Ui, _data: &mut UiData) {
+    //  Open help page in browser
+    webbrowser::open(HELP_PAGE).expect("failed to open URL");
+}
+pub fn menu_help_about(_ui: &mut Ui, _data: &mut UiData) {
+    //  ***MORE***
 }
 
 /// Developer->Open Replay
