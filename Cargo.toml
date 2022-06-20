@@ -62,7 +62,7 @@ oxilangtag = "0.1.3"
 # Dark mode
 dark-light = "0.2.2"
 # Performance monitoring
-tracy-client = {version = "0.14", optional = true }
+tracy-client = {version = "0.13", optional = true }
 profiling = { version = "1", default-features = false }
 # Error handling
 log = "0.4.17"

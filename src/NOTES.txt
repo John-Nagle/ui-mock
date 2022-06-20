@@ -55,3 +55,30 @@ Buttons
 - Walk/Run/Fly
 - Clothing (empty for now)
 - Inventory (empty for now)
+
+2022-06-20 
+
+CF on Tracy problems.
+
+06/15/2022
+you either need tracy-client 0.13 and tracy 0.7.8 or you can patch profiling to git, which has tracy-client 0.14
+oh sorry, got versions confused you need to depend on tracy-client 0.13
+setzer22BOT
+ — 
+06/15/2022
+oh, okay. In my case going to 0.13 is not an issue at all. I just looked the most recent version on crates.io and found it to be 0.14 so I chose that one
+cwfitzgeraldBOT
+ — 
+06/15/2022
+yeah, 0.12 -> 0.13 changed which version of tracy you needed
+or something
+imbrisBOT
+ — 
+
+2022-06-20
+
+Tracy working.
+
+Profiler version: 0.8.1 (built from C++ source)
+tracy-client = {version = "0.13", optional = true }
+profiling = { version = "1", default-features = false }

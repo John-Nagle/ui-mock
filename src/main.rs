@@ -185,11 +185,11 @@ impl rend3_framework::App for Ui {
         let last_interaction_time = instant::Instant::now();
         let quit = false;
         let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // test only
-                                                                                          ////let lang = Dictionary::new(&[locale_file],get_translation_locale().as_str()).expect("Trouble loading language translation files");    // select language
         let lang = Dictionary::get_translation(&[locale_file])
             .expect("Trouble loading language translation files"); // select language
-                                                                   //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
-                                                                   ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
+                                                                   
+        //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
+        ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
@@ -339,8 +339,13 @@ impl rend3_framework::App for Ui {
 }
 
 fn main() {
-    ////let _client = tracy_client::Client::start();
-    ////assert!(tracy_client::Client::is_running());
+    #[cfg(feature = "tracy")]
+    let _client = tracy_client::Client::start();    // enable profiler if "tracy" feature is on
+    #[cfg(feature = "tracy")]
+    {
+        assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
+        println!("Tracy is running");
+    }
     profiling::scope!("Main");
     profiling::register_thread!();
     let app = Ui::default();
@@ -353,7 +358,7 @@ fn main() {
 }
 
 fn vertex(pos: [f32; 3]) -> glam::Vec3 {
-    glam::Vec3::from(pos)
+    glam::Vec3::from(pos)	
 }
 
 fn create_mesh() -> rend3::types::Mesh {
