@@ -14,6 +14,7 @@
 //
 mod basicintl;
 mod gui;
+mod guimenus;
 use gui::{update_gui, TextWindow};
 use std::sync::Arc;
 ////#[macro_use]

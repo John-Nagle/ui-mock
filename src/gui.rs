@@ -9,6 +9,7 @@
 //  June 2022
 //
 use crate::{UiAssets, UiData};
+use super::guimenus;
 use egui::{menu, Frame, TextureId};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
@@ -64,8 +65,8 @@ pub fn load_canned_icon(
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     profiling::scope!("Gui");
-    let lang = &data.lang; // language for translations
-                           // Insert egui commands here
+                           
+    // Insert egui commands here
     let ctx = data.platform.context();
     if data.dark_mode {
         ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
@@ -76,32 +77,29 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
 
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
-            menu::bar(ui, |ui| {
-                ui.menu_button(t!("menu.file", lang), |ui| {
-                    // File menu
-                    {
-                        if ui.button(t!("menu.open", lang)).clicked() {
-                            // Open menu entry
-                            if let Some(path) = rfd::FileDialog::new()
-                                .set_title("Viewer session file to play back")
-                                .add_filter("json", &["json"])
-                                .pick_file()
-                            {
-                                let picked_path = Some(path.display().to_string());
-                                log::warn!("File picked: {}", picked_path.unwrap());
-                            }
-                        }
+            ui.menu_button(t!("menu.avatar", &data.lang), |ui| {                                       
+                    // Avatar menu
+                    if ui.button(t!("menu.preferences", &data.lang)).clicked() {
+                        // Preferences menu entry
+                        guimenus::manu_preferences(ui, data);
                     }
-                    {
-                        if ui.button(t!("menu.quit", lang)).clicked() {
-                            //  Quit menu entry
-                            data.quit = true;
-                        }
+
+                    if ui.button(t!("menu.quit", &data.lang)).clicked() {
+                        guimenus::menu_quit(ui, data);
                     }
                 });
-                ui.menu_button(t!("menu.help", lang), |ui| {
+            menu::bar(ui, |ui| {
+                ui.menu_button(t!("menu.developer", &data.lang), |ui| {                                       
+                    // Replay file menu
+                    if ui.button(t!("menu.loadreplay", &data.lang)).clicked() {
+                        // Open menu entry
+                        guimenus::menu_open_replay(ui, data);
+                     } 
+
+                });
+                ui.menu_button(t!("menu.help", &data.lang), |ui| {
                     // Help menu
-                    if ui.button(t!("menu.help", lang)).clicked() {
+                    if ui.button(t!("menu.help", &data.lang)).clicked() {
                         // Help menu entry
                         webbrowser::open(HELP_PAGE).expect("failed to open URL");
                         // ***MAKE THIS NON FATAL***
