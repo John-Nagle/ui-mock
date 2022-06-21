@@ -51,7 +51,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             use sysinfo::SystemExt;
             let mut sys = sysinfo::System::new_all();           // get system information
             sys.refresh_all();
-            let os_info = format!("{}: {} {}", t!("message.os_version", data.lang), if_unknown(sys.name()), if_unknown(sys.os_version()));
+            let os_info = format!("{}: {}, {}", t!("message.os_version", data.lang), if_unknown(sys.name()), if_unknown(sys.long_os_version()));
             msgs.push(os_info.as_str());
             let system_memory = format!("{}: {:?}", t!("message.system_memory", data.lang), sys.total_memory());
             msgs.push(system_memory.as_str());
