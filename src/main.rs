@@ -15,7 +15,9 @@
 mod basicintl;
 mod gui;
 mod guimenus;
-use gui::{update_gui, TextWindow};
+mod guiwindows;
+use gui::{update_gui};
+use guiwindows::{TextWindow, GuiWindows};
 use std::sync::Arc;
 ////#[macro_use]
 use basicintl::Dictionary;
@@ -38,6 +40,7 @@ pub struct UiData {
     lang: Dictionary,                        // 2-letter language code
     dark_mode: bool,                         // true if in dark mode
     //  Windows
+    gui_windows: GuiWindows,                 // all the fixed windows
     message_window: TextWindow, // miscellaneous messages
 }
 
@@ -170,7 +173,7 @@ impl rend3_framework::App for Ui {
         // Create the winit/egui integration, which manages our egui context for us.
         let platform =
             egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
-                physical_width: window_size.width as u32,
+                physical_width: window_size.width as u32,	
                 physical_height: window_size.height as u32,
                 scale_factor: window.scale_factor(),
                 font_definitions: egui::FontDefinitions::default(),
@@ -206,6 +209,7 @@ impl rend3_framework::App for Ui {
             lang,
             dark_mode,
             message_window,
+            gui_windows: Default::default(),
         });
     }
 

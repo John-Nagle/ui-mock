@@ -79,6 +79,24 @@ imbrisBOT
 
 Tracy working.
 
-Profiler version: 0.8.1 (built from C++ source)
+Main program:
+
+fn main() {
+    #[cfg(feature = "tracy")]
+    let _client = tracy_client::Client::start();    // enable profiler if "tracy" feature is on
+    
+Cargo.toml:
+    
+[features]
+#   Feature "tracy" enables profiing with Tracy
+tracy = ["tracy-client", "profiling/profile-with-tracy"]
+
+[dependencies]
 tracy-client = {version = "0.13", optional = true }
 profiling = { version = "1", default-features = false }
+
+Tracy-release (the profiler tool): 0.8.1
+
+Build command:
+
+cargo build --features tracy --release
