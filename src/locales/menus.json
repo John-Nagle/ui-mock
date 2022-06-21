@@ -79,5 +79,21 @@
     "title.save_replay": {
         "en": "Save replay file",
         "fr": "Ouvrir le fichier de relecture"
+    },
+    "message.version": {
+        "en": "Version",
+        "fr": "Version"
+    },
+    "message.os_version": {
+        "en": "Operating system version",
+        "fr": "???"
+    },
+    "message.system_memory": {
+        "en": "System memory size",
+        "fr": "Taille de la mémoire système"
+    },
+    "message.cpu_count": {
+        "en": "Number of CPUs",
+        "fr": "Nombre de processeurs centraux"
     }
 }

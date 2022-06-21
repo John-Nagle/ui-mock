@@ -11,6 +11,7 @@ use crate::t;
 use once_cell::sync::OnceCell;
 use egui::Ui;
 use super::guiwindows::{MessageWindow};
+use sysinfo;
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -40,9 +41,23 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             w.is_open = true;      // reopen
         }
         None => {
+            //  Generate system information dump
+            let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option
             //  Need to create new window
-            let msgs = &["First about msg", "Second about msg"]; // the about message content
-            let about_window = MessageWindow::new("about window", t!("menu.help.about", &data.lang), msgs);
+            let mut msgs = Vec::new();
+            let version = format!("{}: {}", t!("message.version", data.lang), env!("CARGO_PKG_VERSION"));
+            msgs.push(version.as_str());
+            msgs.push("© 2022 Animats");
+            use sysinfo::SystemExt;
+            let mut sys = sysinfo::System::new_all();           // get system information
+            sys.refresh_all();
+            let os_info = format!("{}: {} {}", t!("message.os_version", data.lang), if_unknown(sys.name()), if_unknown(sys.os_version()));
+            msgs.push(os_info.as_str());
+            let system_memory = format!("{}: {:?}", t!("message.system_memory", data.lang), sys.total_memory());
+            msgs.push(system_memory.as_str());
+            let cpu_count = format!("{}: {}", t!("message.cpu_count", data.lang), sys.cpus().len());
+            msgs.push(cpu_count.as_str());
+            let about_window = MessageWindow::new("about window", t!("menu.help.about", &data.lang), &msgs);
             data.gui_windows.about_window = Some(about_window);
         }
     }
