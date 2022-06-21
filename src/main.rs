@@ -25,6 +25,7 @@ use once_cell::sync::OnceCell;
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
+const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -199,7 +200,7 @@ impl rend3_framework::App for Ui {
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
-        let message_window = MessageWindow::new("Messages", t!("window.messages", lang));
+        let message_window = MessageWindow::new("Messages", t!("window.messages", lang), MESSAGE_SCROLLBACK_LIMIT);
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -260,11 +261,11 @@ impl rend3_framework::App for Ui {
                 } = data.platform.end_frame(Some(window));
                 if !platform_output.events.is_empty() {
                     data.wake_up_gui(); // reset GUI idle time.
-                    println!(
+                    data.message_window.add_line(format!(
                         "Platform events: {:?}, {} shapes.",
                         platform_output.events,
                         shapes.len()
-                    ); // ***TEMP***
+                    )); // ***TEMP***
                 }
 
                 let paint_jobs = data.platform.context().tessellate(shapes);

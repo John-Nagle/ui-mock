@@ -17,6 +17,7 @@ use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use std::sync::Arc;
 */
+use std::collections::VecDeque;
 use crate::t;
 use once_cell::sync::OnceCell;
 
@@ -37,7 +38,7 @@ trait GuiWindow {
     fn draw(&mut self, ctx: &egui::Context);
 }
 
-/// Text window, with noninteractive content.
+/// Text window, with noninteractive content.	
 //  The persistent part
 pub struct TextWindow {
     title: String, // title of window
@@ -85,15 +86,22 @@ impl GuiWindow for TextWindow {
 pub struct MessageWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
+    lines: VecDeque<String>,         // the text
 }
 
 impl MessageWindow {
-    /// Create persistent scrollable message window
-    pub fn new(id: &str, title: &str) -> Self {
+    /// Create scrollable message window
+    pub fn new(id: &str, title: &str, scrollback_limit: usize) -> Self {
         MessageWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
-        }
+            lines: VecDeque::with_capacity(scrollback_limit),
+        }        
+    }
+    
+    /// Add a line of text. Consumes string
+    pub fn add_line(&mut self, text: String) {
+        self.lines.push_back(text);
     }
     
     /// Draw window of text
@@ -107,7 +115,8 @@ impl MessageWindow {
             let total_rows = 10;
             egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
                 for row in row_range {
-                    let text = format!("Row {}/{}", row + 1, total_rows);
+                    if row >= self.lines.len() { break }
+                    let text = &self.lines[row];
                     ui.label(text);
                 }
             });
