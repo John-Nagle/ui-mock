@@ -28,13 +28,13 @@ pub struct GuiWindows {
 
 impl GuiWindows {
     /// Draw all live windows
-    pub fn draw(&self, ctx: &egui::Context) {
-        if let Some(w) = &self.about_window { w.draw(ctx) }
+    pub fn draw(&mut self, ctx: &egui::Context) {
+        if let Some(w) = &mut self.about_window { w.draw(ctx) }
     }
 }
 
 trait GuiWindow {
-    fn draw(&self, ctx: &egui::Context);
+    fn draw(&mut self, ctx: &egui::Context);
 }
 
 /// Message window, with text content
@@ -42,7 +42,8 @@ trait GuiWindow {
 pub struct MessageWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
-    message: Vec::<String>,
+    pub is_open: bool,  // true if open
+    message: Vec::<String>, // window text
 }
 
 impl MessageWindow {
@@ -52,6 +53,7 @@ impl MessageWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
+            is_open: true,  // start open
         }
     }
 }
@@ -59,8 +61,9 @@ impl MessageWindow {
 impl GuiWindow for MessageWindow { 
     /// Draw window of text
     //  ***DECIDE HOW TO TURN OFF WHEN DISMISSED*** - delete, or just not open?
-    fn draw(&self, ctx: &egui::Context) {
-        let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
+    fn draw(&mut self, ctx: &egui::Context) {
+        let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
+            .open(&mut self.is_open);
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
