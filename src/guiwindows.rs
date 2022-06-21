@@ -60,16 +60,16 @@ impl MessageWindow {
 
 impl GuiWindow for MessageWindow { 
     /// Draw window of text
-    //  ***DECIDE HOW TO TURN OFF WHEN DISMISSED*** - delete, or just not open?
     fn draw(&mut self, ctx: &egui::Context) {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
+            .collapsible(false)
             .open(&mut self.is_open);
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
             // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
-            let total_rows = 10;
+            let total_rows = self.message.len();
             egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
                 for row in row_range {
                     if row >= self.message.len() { break }  // prevent scrolling off end

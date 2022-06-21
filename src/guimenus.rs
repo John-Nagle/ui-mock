@@ -16,7 +16,7 @@ use sysinfo;
 /// Configuration
 const HELP_PAGE: &str =
     "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
-
+const COPYRIGHT: &str = "© 2022 Animats";
 
 //
 /// Avatar->Preferences
@@ -45,9 +45,9 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option
             //  Need to create new window
             let mut msgs = Vec::new();
-            let version = format!("{}: {}", t!("message.version", data.lang), env!("CARGO_PKG_VERSION"));
+            let version = format!("{}: {}", t!("message.version", data.lang), data.version);
             msgs.push(version.as_str());
-            msgs.push("© 2022 Animats");
+            msgs.push(COPYRIGHT);
             use sysinfo::SystemExt;
             let mut sys = sysinfo::System::new_all();           // get system information
             sys.refresh_all();
