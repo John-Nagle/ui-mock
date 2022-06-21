@@ -149,7 +149,8 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
             });
     }
     //  Non-menu items
-    data.message_window.new_window(&ctx);
+    data.message_window.new_window(&ctx);   // dummy test window
+    data.gui_windows.draw(&ctx); // all the standard windows
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
 }

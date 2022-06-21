@@ -10,6 +10,7 @@ use crate::UiData;
 use crate::t;
 use once_cell::sync::OnceCell;
 use egui::Ui;
+use super::guiwindows::{MessageWindow};
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -32,8 +33,13 @@ pub fn menu_help_manual(_ui: &mut Ui, _data: &mut UiData) {
     //  Open help page in browser
     webbrowser::open(HELP_PAGE).expect("failed to open URL");
 }
-pub fn menu_help_about(_ui: &mut Ui, _data: &mut UiData) {
-    //  ***MORE***
+pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
+    //  Create window if necessary
+    if data.gui_windows.about_window.is_none() {
+        let msgs = &["First about msg", "Second about msg"]; // the about message content
+        let about_window = MessageWindow::new("about window", t!("menu.about", &data.lang), msgs);
+        data.gui_windows.about_window = Some(about_window);
+    };
 }
 
 /// Developer->Open Replay
