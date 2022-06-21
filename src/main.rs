@@ -12,15 +12,12 @@
 //  Animats
 //  June 2022
 //
-mod basicintl;
-mod gui;
-mod guimenus;
-mod guiwindows;
-use gui::{update_gui};
-use guiwindows::{MessageWindow, GuiWindows};
+mod libui;
+use libui::gui::{update_gui};
+use libui::guiwindows::{MessageWindow, GuiWindows};
 use std::sync::Arc;
 ////#[macro_use]
-use basicintl::Dictionary;
+use libui::basicintl::Dictionary;
 use once_cell::sync::OnceCell;
 
 /// Configuration
@@ -185,7 +182,7 @@ impl rend3_framework::App for Ui {
 
         //  Icon loading
         let image_bytes = include_bytes!("images/rust-logo-128x128-blk.png");
-        self.assets.rust_logo = gui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
+        self.assets.rust_logo = libui::gui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
 
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
