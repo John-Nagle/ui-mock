@@ -23,7 +23,7 @@ use once_cell::sync::OnceCell;
 /// All GUI windows persistent state.
 #[derive(Default)]
 pub struct GuiWindows {
-    pub about_window: Option<MessageWindow>,            // Help->About
+    pub about_window: Option<TextWindow>,            // Help->About
 }
 
 impl GuiWindows {
@@ -37,19 +37,19 @@ trait GuiWindow {
     fn draw(&mut self, ctx: &egui::Context);
 }
 
-/// Message window, with text content
+/// Text window, with noninteractive content.
 //  The persistent part
-pub struct MessageWindow {
+pub struct TextWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
     pub is_open: bool,  // true if open
     message: Vec::<String>, // window text
 }
 
-impl MessageWindow {
+impl TextWindow {
     /// Create persistent text window, multiline
     pub fn new(id: &str, title: &str, message: &[&str]) -> Self {
-        MessageWindow {
+        TextWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
@@ -58,7 +58,7 @@ impl MessageWindow {
     }
 }
 
-impl GuiWindow for MessageWindow { 
+impl GuiWindow for TextWindow { 
     /// Draw window of text
     fn draw(&mut self, ctx: &egui::Context) {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -80,17 +80,17 @@ impl GuiWindow for MessageWindow {
     }
 }
 
-/// A text window.
+/// A scrolling text message window.
 //  The persistent part
-pub struct TextWindow {
+pub struct MessageWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
 }
 
-impl TextWindow {
-    /// Create persistent text window
+impl MessageWindow {
+    /// Create persistent scrollable message window
     pub fn new(id: &str, title: &str) -> Self {
-        TextWindow {
+        MessageWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
         }

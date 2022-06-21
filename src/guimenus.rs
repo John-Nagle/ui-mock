@@ -10,7 +10,7 @@ use crate::UiData;
 use crate::t;
 use once_cell::sync::OnceCell;
 use egui::Ui;
-use super::guiwindows::{MessageWindow};
+use super::guiwindows::{TextWindow};
 use sysinfo;
 
 /// Configuration
@@ -57,7 +57,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             msgs.push(system_memory.as_str());
             let cpu_count = format!("{}: {}", t!("message.cpu_count", data.lang), sys.cpus().len());
             msgs.push(cpu_count.as_str());
-            let about_window = MessageWindow::new("about window", t!("menu.help.about", &data.lang), &msgs);
+            let about_window = TextWindow::new("about window", t!("menu.help.about", &data.lang), &msgs);
             data.gui_windows.about_window = Some(about_window);
         }
     }

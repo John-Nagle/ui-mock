@@ -17,7 +17,7 @@ mod gui;
 mod guimenus;
 mod guiwindows;
 use gui::{update_gui};
-use guiwindows::{TextWindow, GuiWindows};
+use guiwindows::{MessageWindow, GuiWindows};
 use std::sync::Arc;
 ////#[macro_use]
 use basicintl::Dictionary;
@@ -43,7 +43,7 @@ pub struct UiData {
     dark_mode: bool,                         // true if in dark mode
     //  Windows
     gui_windows: GuiWindows,                 // all the fixed windows
-    message_window: TextWindow, // miscellaneous messages
+    message_window: MessageWindow, // miscellaneous messages
 }
 
 impl UiData {
@@ -199,7 +199,7 @@ impl rend3_framework::App for Ui {
         let dark_mode = true; // ***TEMP*** force dark mode as default
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
-        let message_window = TextWindow::new("Messages", t!("window.messages", lang));
+        let message_window = MessageWindow::new("Messages", t!("window.messages", lang));
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
