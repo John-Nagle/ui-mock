@@ -114,15 +114,20 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                     }
                  });
                  ui.menu_button(t!("menu.developer", &data.lang), |ui| {                                       
-                    // Replay file menu
+                    //  Replay file menu. Only enabled if compiled with replay feature.
+                    //  This is for security of metaverse content.
+                    #[cfg (feature="replay")]
                     if ui.button(t!("menu.developer.open_replay", &data.lang)).clicked() {
                         // Open menu entry
                         guimenus::menu_open_replay(ui, data);
                     }
+                    #[cfg (feature="replay")]
                     if ui.button(t!("menu.developer.save_replay", &data.lang)).clicked() {
                         // Open menu entry
                         guimenus::menu_open_replay(ui, data);
-                    } 
+                    }
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
 
                 });
             });

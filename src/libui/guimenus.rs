@@ -64,6 +64,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
 }
 
 /// Developer->Open Replay
+#[cfg (feature="replay")]
 pub fn menu_open_replay(_ui: &mut Ui, data: &mut UiData) {
     // Open menu entry
     if let Some(path) = rfd::FileDialog::new()

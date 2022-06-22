@@ -100,3 +100,12 @@ Tracy-release (the profiler tool): 0.8.1
 Build command:
 
 cargo build --features tracy --release
+
+2020-06-21
+
+Message window is scrolling OK.
+
+TODO before merge.
+- Everything needed for playback  
+  - Open playback file
+  - Set log level.

@@ -16,8 +16,13 @@ resources = ["src/images"]
 icon = ["src/images/64x64.png", "src/images/32x32.png"]
 
 [features]
+#   Replay file is a development feature and will be off for production
+default = ["replay"]
 #   Feature "tracy" enables profiing with Tracy
 tracy = ["tracy-client", "profiling/profile-with-tracy"]
+#   Feature "replay" enables saving and reloading the viewer state.
+#   This should not be enabled in production builds for content security.
+replay = []
 
 [dependencies]
 glam = {version = "0.20.0", features = ["bytemuck", "serde"]}	
