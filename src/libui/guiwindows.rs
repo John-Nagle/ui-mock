@@ -38,7 +38,7 @@ trait GuiWindow {
     fn draw(&mut self, ctx: &egui::Context);
 }
 
-/// Text window, with noninteractive content.	
+/// Text window, with noninteractive content.
 //  The persistent part
 pub struct TextWindow {
     title: String, // title of window
