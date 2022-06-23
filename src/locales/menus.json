@@ -40,6 +40,10 @@
         "en": "Developer",
         "fr": "Développeur"
     },
+    "menu.developer.log_level": {
+        "en": "Log level",
+        "fr": "Détails de journalisation"
+    },
     "menu.developer.open_replay": {
         "en": "Open replay",
         "fr": "Relecture ouverte"
@@ -95,5 +99,29 @@
     "message.cpu_count": {
         "en": "Number of CPUs",
         "fr": "Nombre de processeurs centraux"
+    },
+    "menu.log_level.off": {
+        "en": "Off",
+        "fr": "Désactivé"
+    },
+    "menu.log_level.error": {
+        "en": "Error",
+        "fr": "Erreur"
+    },
+    "menu.log_level.warn": {
+        "en": "Warn",
+        "fr": "Avertir"
+    },
+    "menu.log_level.info": {
+        "en": "Info",
+        "fr": "Info"
+    },
+    "menu.log_level.debug": {
+        "en": "Debug",
+        "fr": "Débogage"
+    },
+    "menu.log_level.trace": {
+        "en": "Trace",
+        "fr": "Trace"
     }
 }
