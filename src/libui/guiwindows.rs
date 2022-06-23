@@ -8,18 +8,7 @@
 //  Animats
 //  June 2022
 //
-/*
-use crate::{UiAssets, UiData};
-use super::guimenus;
-
-use egui::{menu, Frame, TextureId};
-use rend3::Renderer;
-use rend3_egui::EguiRenderRoutine;
-use std::sync::Arc;
-*/
 use std::collections::VecDeque;
-use crate::t;
-use once_cell::sync::OnceCell;
 
 /// All GUI windows persistent state.
 #[derive(Default)]
@@ -57,7 +46,9 @@ impl TextWindow {
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
-            dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
+            ////dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
+            dismiss_button: dismiss_button.map(|s| s.to_string())   // to string if present, else none
+
         }
     }
     
