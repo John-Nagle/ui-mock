@@ -47,7 +47,6 @@ pub struct TextWindow {
     pub is_open: bool,  // true if open
     message: Vec::<String>, // window text
     dismiss_button: Option::<String>, // for "OK" button if desired
-    dismissed: bool,
 }
 
 impl TextWindow {
@@ -59,7 +58,6 @@ impl TextWindow {
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
             dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
-            dismissed: false,
         }
     }
 }
@@ -67,33 +65,35 @@ impl TextWindow {
 impl GuiWindow for TextWindow { 
     /// Draw window of text
     fn draw(&mut self, ctx: &egui::Context) {
-        let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
-            .collapsible(false)
-            .open(&mut self.is_open);
-        window.show(ctx, |ui| {
-            //  Scroll area
-            //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
-            let text_style = egui::TextStyle::Body;
-            let row_height = ui.text_style_height(&text_style);
-            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
-            let total_rows = self.message.len();
-            egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
-                for row in row_range {
-                    if row >= self.message.len() { break }  // prevent scrolling off end
-                    ui.label(self.message[row].as_str());
-                }
-            });
-            //  Dismiss button, if present
-            if let Some(s) = &self.dismiss_button {
-                ui.vertical_centered(|ui| {
-                ////ui.horizontal(|ui| {
-                    if ui.add(egui::Button::new(s)).clicked() {
-                        self.dismissed = true;                       // dismiss
+        if self.is_open {
+            let mut dismissed = false;          // true if dismiss button pushed
+            let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
+                .collapsible(false)
+                .open(&mut self.is_open);
+            window.show(ctx, |ui| {
+                //  Scroll area
+                //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
+                let text_style = egui::TextStyle::Body;
+                let row_height = ui.text_style_height(&text_style);
+                // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
+                let total_rows = self.message.len();
+                egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
+                    for row in row_range {
+                        if row >= self.message.len() { break }  // prevent scrolling off end
+                        ui.label(self.message[row].as_str());
                     }
                 });
-            };
-        });
-        if self.dismissed { self.is_open = false; } // do here to avoid borrow clash
+                //  Dismiss button, if present
+                if let Some(s) = &self.dismiss_button {
+                    ui.vertical_centered(|ui| {
+                        if ui.add(egui::Button::new(s)).clicked() {
+                            dismissed = true;                       // dismiss
+                        }
+                    });
+                };
+            });
+            if dismissed { self.is_open = false; } // do here to avoid borrow clash
+        }
     }
     /// If this is in the dynamic widgets list, drop if retain is false.
     fn retain(&self) -> bool {
