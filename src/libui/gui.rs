@@ -17,6 +17,7 @@ use std::sync::Arc;
 ////#[macro_use]
 use crate::t;
 use once_cell::sync::OnceCell;
+use log::{LevelFilter};
 
 /// Grey background for button area.
 //  This really should be a gradient.
@@ -113,7 +114,16 @@ pub fn update_gui(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> boo
                         guimenus::menu_help_about(ui, data);
                     }
                  });
-                 ui.menu_button(t!("menu.developer", &data.lang), |ui| {                                       
+                 ui.menu_button(t!("menu.developer", &data.lang), |ui| {   
+                    //  Log level setting submenu
+                    ui.menu_button(t!("menu.developer.log_level", &data.lang), |ui| {
+                        ui.radio_value(&mut data.log_level, LevelFilter::Off, t!("menu.log_level.off", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Error, t!("menu.log_level.error", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Warn, t!("menu.log_level.warn", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Info, t!("menu.log_level.info", &data.lang)); 
+                        ui.radio_value(&mut data.log_level, LevelFilter::Debug, t!("menu.log_level.debug", &data.lang));   
+                        ui.radio_value(&mut data.log_level, LevelFilter::Trace, t!("menu.log_level.trace", &data.lang));                  
+                    });                                    
                     //  Replay file menu. Only enabled if compiled with replay feature.
                     //  This is for security of metaverse content.
                     #[cfg (feature="replay")]

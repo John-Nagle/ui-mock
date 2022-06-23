@@ -19,6 +19,7 @@ use std::sync::Arc;
 ////#[macro_use]
 use libui::basicintl::Dictionary;
 use once_cell::sync::OnceCell;
+use log::{LevelFilter};
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
@@ -39,6 +40,7 @@ pub struct UiData {
     version: String,
     lang: Dictionary,                        // 2-letter language code
     dark_mode: bool,                         // true if in dark mode
+    log_level: LevelFilter,                  // logging level
     //  Windows
     gui_windows: GuiWindows,                 // all the fixed windows
     message_window: MessageWindow, // miscellaneous messages
@@ -195,6 +197,7 @@ impl rend3_framework::App for Ui {
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
         let dark_mode = true; // ***TEMP*** force dark mode as default
+        let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
         let message_window = MessageWindow::new("Messages", t!("window.messages", lang), MESSAGE_SCROLLBACK_LIMIT);
@@ -210,6 +213,7 @@ impl rend3_framework::App for Ui {
             version,
             lang,
             dark_mode,
+            log_level,
             message_window,
             gui_windows: Default::default(),
         });
