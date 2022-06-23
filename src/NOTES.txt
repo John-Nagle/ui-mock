@@ -108,4 +108,9 @@ Message window is scrolling OK.
 TODO before merge.
 - Everything needed for playback  
   - Open playback file
-  - Set log level.
+  - Set log level.  [DONE]
+  - General purpose popup dialogs.
+  
+2022-06-23
+
+  Implemented "OK" box with msg. Need to rethink how closing works.

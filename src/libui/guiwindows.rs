@@ -35,7 +35,8 @@ impl GuiWindows {
 }
 
 trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context);
+    fn draw(&mut self, ctx: &egui::Context);    // called every frame
+    fn retain(&self) -> bool { true }           // override and set to false when done
 }
 
 /// Text window, with noninteractive content.
@@ -45,16 +46,20 @@ pub struct TextWindow {
     id: egui::Id,  // unique ID
     pub is_open: bool,  // true if open
     message: Vec::<String>, // window text
+    dismiss_button: Option::<String>, // for "OK" button if desired
+    dismissed: bool,
 }
 
 impl TextWindow {
     /// Create persistent text window, multiline
-    pub fn new(id: &str, title: &str, message: &[&str]) -> Self {
+    pub fn new(id: &str, title: &str, message: &[&str], dismiss_button: Option::<&str>) -> Self {
         TextWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
+            dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
+            dismissed: false,
         }
     }
 }
@@ -66,6 +71,7 @@ impl GuiWindow for TextWindow {
             .collapsible(false)
             .open(&mut self.is_open);
         window.show(ctx, |ui| {
+            //  Scroll area
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
@@ -77,7 +83,21 @@ impl GuiWindow for TextWindow {
                     ui.label(self.message[row].as_str());
                 }
             });
+            //  Dismiss button, if present
+            if let Some(s) = &self.dismiss_button {
+                ui.vertical_centered(|ui| {
+                ////ui.horizontal(|ui| {
+                    if ui.add(egui::Button::new(s)).clicked() {
+                        self.dismissed = true;                       // dismiss
+                    }
+                });
+            };
         });
+        if self.dismissed { self.is_open = false; } // do here to avoid borrow clash
+    }
+    /// If this is in the dynamic widgets list, drop if retain is false.
+    fn retain(&self) -> bool {
+        self.is_open
     }
 }
 
