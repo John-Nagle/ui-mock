@@ -58,7 +58,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             let cpu_count = format!("{}: {}", t!("message.cpu_count", data.lang), sys.cpus().len());
             msgs.push(cpu_count.as_str());
             msgs.push(COPYRIGHT);                               // copyright notice
-            let about_window = TextWindow::new("about window", t!("menu.help.about", &data.lang), &msgs, Some("Ok"));
+            let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", &data.lang), &msgs, Some(t!("menu.ok", &data.lang)));
             data.gui_windows.about_window = Some(about_window);
         }
     }

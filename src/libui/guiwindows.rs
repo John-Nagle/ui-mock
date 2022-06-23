@@ -9,23 +9,58 @@
 //  June 2022
 //
 use std::collections::VecDeque;
+use anyhow::{anyhow, Error};
+
 
 /// All GUI windows persistent state.
 #[derive(Default)]
 pub struct GuiWindows {
     pub about_window: Option<TextWindow>,            // Help->About
+    pub temporary_windows: Vec<Box<dyn GuiWindow>>,
+    pub msg_ok: String,                             // translated OK message
+    pub unique_id: usize,                           // unique ID, serial
 }
 
 impl GuiWindows {
     /// Draw all live windows
     pub fn draw(&mut self, ctx: &egui::Context) {
+        //  Semi-permanent windows
         if let Some(w) = &mut self.about_window { w.draw(ctx) }
+        //  Temporary windows
+        for w in &mut self.temporary_windows { w.draw(ctx) }  // draw all temporaries
+        self.temporary_windows.retain(|w| w.retain());  // keep only live ones
+    }
+    
+    /// General window add
+    pub fn add_window(&mut self, window: Box<dyn GuiWindow>) -> Result<(), Error> {
+        //  Check for duplicate window
+        for w in &self.temporary_windows {
+            if w.get_id() == window.get_id() {
+                return Err(anyhow!("Duplicate id for window"));
+            }
+        }
+        self.temporary_windows.push(window);
+        Ok(())
+    }
+    
+    pub fn get_unique_id(&mut self) -> egui::Id {
+        self.unique_id += 1;                    // serial number increment
+        egui::Id::new(self.unique_id)           // unique egui Id
+    }
+    
+    /// Add error message popup.
+    //  Handle common errors       
+    pub fn add_error_window(&mut self, title: &str, message: &[&str]) {
+        //  Create a window with text and an "OK" button.
+        let w = TextWindow::new(self.get_unique_id(), title, message, Some(self.msg_ok.as_str()));
+        self.add_window(Box::new(w)).expect("Duplicate error msg ID");  // had better not be a duplicate
     }
 }
 
-trait GuiWindow {
+pub trait GuiWindow {
     fn draw(&mut self, ctx: &egui::Context);    // called every frame
     fn retain(&self) -> bool { true }           // override and set to false when done
+    fn get_id(&self) -> egui::Id;               // get ID of window
 }
 
 /// Text window, with noninteractive content.
@@ -40,9 +75,9 @@ pub struct TextWindow {
 
 impl TextWindow {
     /// Create persistent text window, multiline
-    pub fn new(id: &str, title: &str, message: &[&str], dismiss_button: Option::<&str>) -> Self {
+    pub fn new(id: egui::Id, title: &str, message: &[&str], dismiss_button: Option::<&str>) -> Self {
         TextWindow {
-            id: egui::Id::new(id),
+            id,
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
@@ -96,6 +131,11 @@ impl GuiWindow for TextWindow {
     fn retain(&self) -> bool {
         self.is_open
     }
+    
+    //  Access ID
+    fn get_id(&self) -> egui::Id {
+        self.id
+    }   
 }
 
 /// A scrolling text message window.
