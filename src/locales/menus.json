@@ -100,6 +100,14 @@
         "en": "Number of CPUs",
         "fr": "Nombre de processeurs centraux"
     },
+    "window.internet_error": {
+        "en": "Internet problem",
+        "fr": "Problème Internet"
+    },
+    "message.web_error": {
+        "en": "Unable to open web page",
+        "fr": "Impossible d’ouvrir la page Web"
+    },
     "menu.log_level.off": {
         "en": "Off",
         "fr": "Désactivé"

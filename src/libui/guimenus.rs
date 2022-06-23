@@ -30,9 +30,17 @@ pub fn menu_quit(_ui: &mut Ui, data: &mut UiData) {
 }
 
 /// Help->Help
-pub fn menu_help_manual(_ui: &mut Ui, _data: &mut UiData) {
+pub fn menu_help_manual(_ui: &mut Ui, data: &mut UiData) {
     //  Open help page in browser
-    webbrowser::open(HELP_PAGE).expect("failed to open URL");   // ***MAKE THIS NON-FATAL***
+    match webbrowser::open(HELP_PAGE) {
+        Ok(_) => {},
+        Err(e) => {
+            //  Popup if trouble
+            let errmsg = format!("{:?}",e);
+            let messages = [t!("message.web_error", &data.lang), errmsg.as_str()];
+            data.gui_windows.add_error_window(t!("window.internet_error", &data.lang), &messages);
+        }
+    }
 }
 pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
     //  Create window if necessary
