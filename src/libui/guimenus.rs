@@ -38,7 +38,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
     //  Create window if necessary
     match &mut data.gui_windows.about_window {
         Some(w) => {
-            w.is_open = true;      // reopen
+            w.reopen();      // reopen window that was already built
         }
         None => {
             //  Generate system information dump
@@ -47,7 +47,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             let mut msgs = Vec::new();
             let version = format!("{}: {}", t!("message.version", data.lang), data.version);
             msgs.push(version.as_str());
-            msgs.push(COPYRIGHT);
+           
             use sysinfo::SystemExt;
             let mut sys = sysinfo::System::new_all();           // get system information
             sys.refresh_all();
@@ -57,6 +57,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             msgs.push(system_memory.as_str());
             let cpu_count = format!("{}: {}", t!("message.cpu_count", data.lang), sys.cpus().len());
             msgs.push(cpu_count.as_str());
+            msgs.push(COPYRIGHT);                               // copyright notice
             let about_window = TextWindow::new("about window", t!("menu.help.about", &data.lang), &msgs, Some("Ok"));
             data.gui_windows.about_window = Some(about_window);
         }

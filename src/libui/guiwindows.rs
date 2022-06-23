@@ -44,7 +44,7 @@ trait GuiWindow {
 pub struct TextWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
-    pub is_open: bool,  // true if open
+    is_open: bool,  // true if open
     message: Vec::<String>, // window text
     dismiss_button: Option::<String>, // for "OK" button if desired
 }
@@ -60,6 +60,11 @@ impl TextWindow {
             dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
         }
     }
+    
+    /// Reopen previously closed window, with old contents.
+    pub fn reopen(&mut self) {
+        self.is_open = true;
+    }
 }
 
 impl GuiWindow for TextWindow { 
@@ -68,8 +73,9 @@ impl GuiWindow for TextWindow {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
-                .collapsible(false)
-                .open(&mut self.is_open);
+                .collapsible(false);
+            //  Only add window close button in title bar if no "OK" button.
+            let window = if self.dismiss_button.is_none() { window.open(&mut self.is_open) } else { window };
             window.show(ctx, |ui| {
                 //  Scroll area
                 //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
