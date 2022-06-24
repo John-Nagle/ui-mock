@@ -20,8 +20,9 @@ const COPYRIGHT: &str = "© 2022 Animats";
 
 //
 /// Avatar->Preferences
-pub fn manu_preferences(_ui: &mut Ui, _data: &mut UiData) {
-    //  ***MORE***
+pub fn manu_preferences(_ui: &mut Ui, data: &mut UiData) {
+    //  Unimplemented
+    data.gui_windows.add_error_window(t!("menu.unimplemented", &data.lang), &[t!("menu.unimplemented", &data.lang)]);
 }
 
 /// Avatar->Quit
@@ -54,8 +55,7 @@ pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
             //  Need to create new window
             let mut msgs = Vec::new();
             let version = format!("{}: {}", t!("message.version", data.lang), data.version);
-            msgs.push(version.as_str());
-           
+            msgs.push(version.as_str());          
             use sysinfo::SystemExt;
             let mut sys = sysinfo::System::new_all();           // get system information
             sys.refresh_all();

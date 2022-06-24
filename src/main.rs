@@ -42,7 +42,7 @@ pub struct UiData {
     dark_mode: bool,                         // true if in dark mode
     log_level: LevelFilter,                  // logging level
     //  Windows
-    gui_windows: GuiWindows,                 // all the fixed windows
+    gui_windows: GuiWindows,         // all the fixed windows
     message_window: MessageWindow, // miscellaneous messages
 }
 
@@ -201,6 +201,7 @@ impl rend3_framework::App for Ui {
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
         let message_window = MessageWindow::new("Messages", t!("window.messages", lang), MESSAGE_SCROLLBACK_LIMIT);
+        let gui_windows = GuiWindows::new(&lang);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -215,7 +216,7 @@ impl rend3_framework::App for Ui {
             dark_mode,
             log_level,
             message_window,
-            gui_windows: Default::default(),
+            gui_windows,
         });
     }
 

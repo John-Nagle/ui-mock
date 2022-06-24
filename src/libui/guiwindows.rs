@@ -10,18 +10,35 @@
 //
 use std::collections::VecDeque;
 use anyhow::{anyhow, Error};
+use super::basicintl::Dictionary;
+use crate::t;
+use once_cell::sync::OnceCell;
 
 
 /// All GUI windows persistent state.
 #[derive(Default)]
 pub struct GuiWindows {
+    //  Fixed, reopenable windows.
     pub about_window: Option<TextWindow>,            // Help->About
-    pub temporary_windows: Vec<Box<dyn GuiWindow>>,
-    pub msg_ok: String,                             // translated OK message
-    pub unique_id: usize,                           // unique ID, serial
+    //  Disposable dynamic windows
+    temporary_windows: Vec<Box<dyn GuiWindow>>,
+    msg_ok: String,                             // translated OK message
+    unique_id: usize,                           // unique ID, serial
 }
 
 impl GuiWindows {
+
+    /// Usual new
+    pub fn new(lang: &Dictionary) -> GuiWindows {
+        //  Some common words need translations handy
+        GuiWindows {
+            about_window: None,
+            temporary_windows: Vec::new(),
+            msg_ok: t!("menu.ok", lang).to_string(),
+            unique_id: 0
+        }
+    }
+
     /// Draw all live windows
     pub fn draw(&mut self, ctx: &egui::Context) {
         //  Semi-permanent windows
