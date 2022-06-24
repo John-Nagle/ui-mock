@@ -27,19 +27,14 @@ pub struct UiData {
     _directional_handle: rend3::types::DirectionalLightHandle,
 
     egui_routine: rend3_egui::EguiRenderRoutine,
-    ////platform: egui_winit_platform::Platform,
     start_time: instant::Instant,
-    last_interaction_time: instant::Instant, // time of last user interaction
-    //  Windows
+
+    //  The 2D GUI
     gui_state: GuiState,                        // state of the GUI
-    ////message_window: MessageWindow,          // miscellaneous messages
 }
 
 impl UiData {
-    /// Call this for anything that indicates the GUI should be awakened to show menus.
-    pub fn wake_up_gui(&mut self) {
-        self.last_interaction_time = instant::Instant::now();
-    }
+
 }
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
@@ -176,7 +171,6 @@ impl rend3_framework::App for Ui {
         self.assets.rust_logo = libui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
 
         let start_time = instant::Instant::now();
-        let last_interaction_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
         let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
         let lang = Dictionary::get_translation(&[locale_file])
@@ -195,6 +189,7 @@ impl rend3_framework::App for Ui {
             version,                        // because we need version of main program, not libs
             dark_mode,
             log_level,
+            menu_display_secs: MENU_DISPLAY_SECS,
         };
         let gui_state = GuiState::new(params, platform);     // all the fixed and popup windows
         self.data = Some(UiData {
@@ -203,7 +198,6 @@ impl rend3_framework::App for Ui {
             _directional_handle,
             egui_routine,
             start_time,
-            last_interaction_time,
             gui_state,
         });
     }
@@ -237,11 +231,11 @@ impl rend3_framework::App for Ui {
                 data.gui_state.platform.begin_frame();
 
                 // Insert egui commands here
-                let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
+                let show_menus = data.gui_state.if_gui_awake();
                 let mut inuse = libui::draw(&self.assets, &mut data.gui_state, show_menus); // draws the GUI
                 inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
                 if inuse {
-                    data.wake_up_gui();
+                    data.gui_state.wake_up_gui();
                 }
                 let egui::FullOutput {
                     shapes,
@@ -250,7 +244,7 @@ impl rend3_framework::App for Ui {
                     ..
                 } = data.gui_state.platform.end_frame(Some(window));
                 if !platform_output.events.is_empty() {
-                    data.wake_up_gui(); // reset GUI idle time.
+                    data.gui_state.wake_up_gui(); // reset GUI idle time.
                     data.gui_state.message_window.add_line(format!(
                         "Platform events: {:?}, {} shapes.",
                         platform_output.events,
@@ -321,14 +315,14 @@ impl rend3_framework::App for Ui {
                 }
                 winit::event::WindowEvent::Focused(gained) => {
                     if gained {
-                        data.wake_up_gui();
+                        data.gui_state.wake_up_gui();
                     } // make menus reappear on focus
                 }
                 winit::event::WindowEvent::CursorEntered { .. } => {
-                    data.wake_up_gui(); // either entering or leaving makes menus reappear
+                    data.gui_state.wake_up_gui(); // either entering or leaving makes menus reappear
                 }
                 winit::event::WindowEvent::CursorLeft { .. } => {
-                    data.wake_up_gui();
+                    data.gui_state.wake_up_gui();
                 }
                 _ => {}
             },

@@ -22,6 +22,7 @@ pub struct GuiParams {
     pub lang: Dictionary,                           // translation dictionary for chosen language
     pub dark_mode: bool,                            // true if in dark mode
     pub log_level: LevelFilter,                     // logging level
+    pub menu_display_secs: u64,                     // (secs) display menus for this long
 }
 
 
@@ -39,7 +40,8 @@ pub struct GuiState {
     msg_ok: String,                             // translated OK message
     //  Misc.
     unique_id: usize,                           // unique ID, serial
-    pub quit: bool,                                 // global quit flag
+    pub quit: bool,                             // global quit flag
+    last_interaction_time: instant::Instant,    // time of last user 2D interaction
 }
 
 impl GuiState {
@@ -58,6 +60,7 @@ impl GuiState {
             msg_ok,
             unique_id: 0,
             quit: false,
+            last_interaction_time: instant::Instant::now()           
         }
     }
 
@@ -99,6 +102,16 @@ impl GuiState {
         //  Create a window with text and an "OK" button.
         let w = TextWindow::new(self.get_unique_id(), title, message, Some(self.msg_ok.as_str()));
         self.add_window(Box::new(w)).expect("Duplicate error msg ID");  // had better not be a duplicate
+    }
+    
+    /// Call this for anything that indicates the GUI should be awakened to show menus.
+    pub fn wake_up_gui(&mut self) {
+        self.last_interaction_time = instant::Instant::now();
+    }
+    
+    /// Should GUI be shown?
+    pub fn if_gui_awake(&self) -> bool {
+        self.last_interaction_time.elapsed().as_secs() < self.params.menu_display_secs
     }
 }
 

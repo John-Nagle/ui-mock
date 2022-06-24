@@ -9,7 +9,6 @@
 use crate::t;
 use egui::Ui;
 use super::guiwindows::{GuiState, TextWindow};
-use sysinfo;
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -20,7 +19,7 @@ const COPYRIGHT: &str = "© 2022 Animats";
 /// Avatar->Preferences
 pub fn manu_preferences(_ui: &mut Ui, state: &mut GuiState) {
     //  Unimplemented
-    state.add_error_window(t!("menu.unimplemented", &state.get_lang()), &[t!("menu.unimplemented", &state.get_lang())]);
+    state.add_error_window(t!("menu.unimplemented", state.get_lang()), &[t!("menu.unimplemented", state.get_lang())]);
 }
 
 /// Avatar->Quit
@@ -36,8 +35,8 @@ pub fn menu_help_manual(_ui: &mut Ui, state: &mut GuiState) {
         Err(e) => {
             //  Popup if trouble
             let errmsg = format!("{:?}",e);
-            let messages = [t!("message.web_error", &state.get_lang()), errmsg.as_str()];
-            state.add_error_window(t!("window.internet_error", &state.get_lang()), &messages);
+            let messages = [t!("message.web_error", state.get_lang()), errmsg.as_str()];
+            state.add_error_window(t!("window.internet_error", state.get_lang()), &messages);
         }
     }
 }
@@ -64,7 +63,7 @@ pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
             let cpu_count = format!("{}: {}", t!("message.cpu_count", state.get_lang()), sys.cpus().len());
             msgs.push(cpu_count.as_str());
             msgs.push(COPYRIGHT);                               // copyright notice
-            let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", &state.get_lang()), &msgs, Some(t!("menu.ok", &state.get_lang())));
+            let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", state.get_lang()), &msgs, Some(t!("menu.ok", state.get_lang())));
             state.about_window = Some(about_window);
         }
     }
@@ -75,7 +74,7 @@ pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
 pub fn menu_open_replay(_ui: &mut Ui, state: &mut GuiState) {
     // Open menu entry
     if let Some(path) = rfd::FileDialog::new()
-        .set_title(t!("title.open_replay", &state.get_lang()))
+        .set_title(t!("title.open_replay", state.get_lang()))
         .add_filter("json", &["json"])
         .pick_file()
     {
