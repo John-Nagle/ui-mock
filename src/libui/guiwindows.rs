@@ -13,6 +13,8 @@ use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use crate::t;
+/// Configuration
+const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
@@ -24,13 +26,12 @@ pub struct GuiParams {
 
 
 /// All GUI windows persistent state.
-#[derive(Default)]
 pub struct GuiState {
     //  Data needed in GUI
     pub params: GuiParams,                   // starting params
     //  Fixed, reopenable windows.
     pub about_window: Option<TextWindow>,            // Help->About
-    pub message_window: Option<MessageWindow>,              // miscellaneous messages ***TEMP***
+    pub message_window: MessageWindow,       // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
     temporary_windows: Vec<Box<dyn GuiWindow>>,
     msg_ok: String,                             // translated OK message
@@ -41,8 +42,10 @@ impl GuiState {
 
     /// Usual new
     pub fn new(params: GuiParams) -> GuiState {
+        let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         //  Some common words need translations handy
         GuiState {
+            message_window,
             params,
             about_window: None,
             temporary_windows: Vec::new(),

@@ -13,7 +13,6 @@
 //  June 2022
 //
 mod libui;
-use libui::guiwindows::{MessageWindow};
 use libui::{GuiState, GuiParams};
 use std::sync::Arc;
 use libui::basicintl::Dictionary;
@@ -21,7 +20,6 @@ use log::{LevelFilter};
 
 /// Configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
-const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -198,7 +196,6 @@ impl rend3_framework::App for Ui {
         let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
-        let message_window = MessageWindow::new("Messages", t!("window.messages", lang), MESSAGE_SCROLLBACK_LIMIT);
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
@@ -264,7 +261,7 @@ impl rend3_framework::App for Ui {
                 } = data.platform.end_frame(Some(window));
                 if !platform_output.events.is_empty() {
                     data.wake_up_gui(); // reset GUI idle time.
-                    data.message_window.add_line(format!(
+                    data.gui_state.message_window.add_line(format!(
                         "Platform events: {:?}, {} shapes.",
                         platform_output.events,
                         shapes.len()
