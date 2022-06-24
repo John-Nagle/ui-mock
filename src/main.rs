@@ -13,8 +13,8 @@
 //  June 2022
 //
 mod libui;
-////use libui::guimenus::{update_gui};
-use libui::guiwindows::{MessageWindow, GuiWindows};
+use libui::guiwindows::{MessageWindow};
+use libui::{GuiState, GuiParams};
 use std::sync::Arc;
 use libui::basicintl::Dictionary;
 use log::{LevelFilter};
@@ -34,14 +34,14 @@ pub struct UiData {
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
     quit: bool,                              // set to true to exit program
-    //  Configuration
-    version: String,
-    lang: Dictionary,                        // 2-letter language code
-    dark_mode: bool,                         // true if in dark mode
-    log_level: LevelFilter,                  // logging level
+    //  Data needed in GUI
+    ////version: String,
+    ////lang: Dictionary,                        // 2-letter language code
+    ////dark_mode: bool,                         // true if in dark mode
+    ////log_level: LevelFilter,                  // logging level
     //  Windows
-    gui_windows: GuiWindows,         // all the fixed windows
-    message_window: MessageWindow, // miscellaneous messages
+    gui_state: GuiState,                        // state of the GUI
+    ////message_window: MessageWindow,          // miscellaneous messages
 }
 
 impl UiData {
@@ -199,7 +199,15 @@ impl rend3_framework::App for Ui {
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
                                                                             //  Window setup
         let message_window = MessageWindow::new("Messages", t!("window.messages", lang), MESSAGE_SCROLLBACK_LIMIT);
-        let gui_windows = GuiWindows::new(&lang);     // all the fixed and popup windows
+        //  Initialization data for the GUI.
+        //  Just what's needed to bring the GUI up initially
+        let params = GuiParams {
+            lang,
+            version,                        // because we need version of main program, not libs
+            dark_mode,
+            log_level,
+        };
+        let gui_state = GuiState::new(params);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -209,12 +217,7 @@ impl rend3_framework::App for Ui {
             start_time,
             last_interaction_time,
             quit,
-            version,
-            lang,
-            dark_mode,
-            log_level,
-            message_window,
-            gui_windows,
+            gui_state,
         });
     }
 
@@ -248,7 +251,7 @@ impl rend3_framework::App for Ui {
 
                 // Insert egui commands here
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
-                let mut inuse = libui::draw(&self.assets, data, show_menus); // draws the GUI
+                let mut inuse = libui::draw(&self.assets, &mut data.gui_state, show_menus); // draws the GUI
                 inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
                 if inuse {
                     data.wake_up_gui();

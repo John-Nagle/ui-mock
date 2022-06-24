@@ -10,30 +10,43 @@
 //
 use std::collections::VecDeque;
 use anyhow::{anyhow, Error};
+use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use crate::t;
+
+/// Initial values needed to initialize the GUI.
+pub struct GuiParams {
+    pub version: String,                            // main program version
+    pub lang: Dictionary,                           // translation dictionary for chosen language
+    pub dark_mode: bool,                            // true if in dark mode
+    pub log_level: LevelFilter,                     // logging level
+}
 
 
 /// All GUI windows persistent state.
 #[derive(Default)]
-pub struct GuiWindows {
+pub struct GuiState {
+    //  Data needed in GUI
+    pub params: GuiParams,                   // starting params
     //  Fixed, reopenable windows.
     pub about_window: Option<TextWindow>,            // Help->About
+    pub message_window: Option<MessageWindow>,              // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
     temporary_windows: Vec<Box<dyn GuiWindow>>,
     msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
 }
 
-impl GuiWindows {
+impl GuiState {
 
     /// Usual new
-    pub fn new(lang: &Dictionary) -> GuiWindows {
+    pub fn new(params: GuiParams) -> GuiState {
         //  Some common words need translations handy
-        GuiWindows {
+        GuiState {
+            params,
             about_window: None,
             temporary_windows: Vec::new(),
-            msg_ok: t!("menu.ok", lang).to_string(),
+            msg_ok: t!("menu.ok", params.lang).to_string(),
             unique_id: 0
         }
     }
@@ -59,9 +72,15 @@ impl GuiWindows {
         Ok(())
     }
     
+    /// Get a unique ID, starting from 1.
     pub fn get_unique_id(&mut self) -> egui::Id {
         self.unique_id += 1;                    // serial number increment
         egui::Id::new(self.unique_id)           // unique egui Id
+    }
+    
+    /// Get translations for current language
+    pub fn get_lang(&self) -> &Dictionary {
+        &self.params.lang
     }
     
     /// Add error message popup.
@@ -97,7 +116,6 @@ impl TextWindow {
             title: title.to_string(),
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
-            ////dismiss_button: match dismiss_button { Some(s) => Some(s.to_string()), _ => None },
             dismiss_button: dismiss_button.map(|s| s.to_string())   // to string if present, else none
 
         }

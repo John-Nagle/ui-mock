@@ -8,7 +8,8 @@
 //  Animats
 //  June 2022
 //
-use crate::{UiAssets, UiData};
+use crate::{UiAssets};  // ***TEMP***
+use super::guiwindows::{GuiState};
 use super::guiactions;
 use egui::{menu, Frame};
 use crate::t;
@@ -32,12 +33,12 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
+pub fn draw(assets: &UiAssets, state: &mut GuiState, show_menus: bool) -> bool {
     profiling::scope!("Gui");
                            
     // Insert egui commands here
     let ctx = data.platform.context();
-    if data.dark_mode {
+    if state.params.dark_mode {
         ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
     } else {
         ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
@@ -47,68 +48,68 @@ pub fn draw(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
             menu::bar(ui, |ui| {
-                ui.menu_button(t!("menu.avatar", &data.lang), |ui| {                                       
+                ui.menu_button(t!("menu.avatar", state.get_lang()), |ui| {                                       
                     // Avatar menu
-                    if ui.button(t!("menu.avatar.preferences", &data.lang)).clicked() {
+                    if ui.button(t!("menu.avatar.preferences", state.get_lang())).clicked() {
                         // Preferences menu entry
-                        guiactions::manu_preferences(ui, data);
+                        guiactions::manu_preferences(ui, state);
                     }
 
-                    if ui.button(t!("menu.avatar.quit", &data.lang)).clicked() {
-                        guiactions::menu_quit(ui, data);
+                    if ui.button(t!("menu.avatar.quit", state.get_lang())).clicked() {
+                        guiactions::menu_quit(ui, state);
                     }
                 });
-                ui.menu_button(t!("menu.comm", &data.lang), |ui| {
+                ui.menu_button(t!("menu.comm", state.get_lang()), |ui| {
                     //  ***MORE***
                     // Help menu
-                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
                     }
                 });
-                ui.menu_button(t!("menu.world", &data.lang), |ui| {
+                ui.menu_button(t!("menu.world", state.get_lang()), |ui| {
                     //  ***MORE***
                     // Help menu
-                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
                     }
                 });
-                ui.menu_button(t!("menu.content", &data.lang), |ui| {
+                ui.menu_button(t!("menu.content", state.get_lang()), |ui| {
                     //  ***MORE***
                     // Help menu
-                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
                     }
                 });        
-                ui.menu_button(t!("menu.help", &data.lang), |ui| {
+                ui.menu_button(t!("menu.help", state.get_lang()), |ui| {
                     // Help menu
-                    if ui.button(t!("menu.help", &data.lang)).clicked() {
-                        guiactions::menu_help_manual(ui, data);
+                    if ui.button(t!("menu.help", state.get_lang())).clicked() {
+                        guiactions::menu_help_manual(ui, state);
                     }
-                    if ui.button(t!("menu.help.about", &data.lang)).clicked() {
+                    if ui.button(t!("menu.help.about", state.get_lang())).clicked() {
                         // About menu entry
-                        guiactions::menu_help_about(ui, data);
+                        guiactions::menu_help_about(ui, state);
                     }
                  });
-                 ui.menu_button(t!("menu.developer", &data.lang), |ui| {   
+                 ui.menu_button(t!("menu.developer", state.get_lang()), |ui| {   
                     //  Log level setting submenu
-                    ui.menu_button(t!("menu.developer.log_level", &data.lang), |ui| {
-                        ui.radio_value(&mut data.log_level, LevelFilter::Off, t!("menu.log_level.off", &data.lang));
-                        ui.radio_value(&mut data.log_level, LevelFilter::Error, t!("menu.log_level.error", &data.lang));
-                        ui.radio_value(&mut data.log_level, LevelFilter::Warn, t!("menu.log_level.warn", &data.lang));
-                        ui.radio_value(&mut data.log_level, LevelFilter::Info, t!("menu.log_level.info", &data.lang)); 
-                        ui.radio_value(&mut data.log_level, LevelFilter::Debug, t!("menu.log_level.debug", &data.lang));   
-                        ui.radio_value(&mut data.log_level, LevelFilter::Trace, t!("menu.log_level.trace", &data.lang));                  
+                    ui.menu_button(t!("menu.developer.log_level", state.get_lang()), |ui| {
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Off, t!("menu.log_level.off", state.get_lang()));
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Error, t!("menu.log_level.error", state.get_lang()));
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Warn, t!("menu.log_level.warn", state.get_lang()));
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Info, t!("menu.log_level.info", state.get_lang())); 
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Debug, t!("menu.log_level.debug", state.get_lang()));   
+                        ui.radio_value(&mut state.params.log_level, LevelFilter::Trace, t!("menu.log_level.trace", state.get_lang()));                  
                     });                                    
                     //  Replay file menu. Only enabled if compiled with replay feature.
                     //  This is for security of metaverse content.
                     #[cfg (feature="replay")]
-                    if ui.button(t!("menu.developer.open_replay", &data.lang)).clicked() {
+                    if ui.button(t!("menu.developer.open_replay", state.get_lang())).clicked() {
                         // Open menu entry
-                        guiactions::menu_open_replay(ui, data);
+                        guiactions::menu_open_replay(ui, state);
                     }
                     #[cfg (feature="replay")]
-                    if ui.button(t!("menu.developer.save_replay", &data.lang)).clicked() {
+                    if ui.button(t!("menu.developer.save_replay", state.get_lang())).clicked() {
                         // Open menu entry
-                        guiactions::menu_open_replay(ui, data);
+                        guiactions::menu_open_replay(ui, state);
                     }
-                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
                     }
 
                 });
@@ -136,8 +137,8 @@ pub fn draw(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
             });
     }
     //  Non-menu items
-    data.message_window.new_window(&ctx);   // dummy test window
-    data.gui_windows.draw(&ctx); // all the standard windows
+    state.message_window.new_window(&ctx);   // dummy test window
+    state.draw(&ctx); // all the standard windows
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
 }
