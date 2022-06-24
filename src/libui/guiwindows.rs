@@ -35,7 +35,9 @@ pub struct GuiState {
     //  Disposable dynamic windows
     temporary_windows: Vec<Box<dyn GuiWindow>>,
     msg_ok: String,                             // translated OK message
+    //  Misc.
     unique_id: usize,                           // unique ID, serial
+    quit: bool,                                 // global quit flag
 }
 
 impl GuiState {
@@ -50,7 +52,8 @@ impl GuiState {
             about_window: None,
             temporary_windows: Vec::new(),
             msg_ok: t!("menu.ok", params.lang).to_string(),
-            unique_id: 0
+            unique_id: 0,
+            quit: false,
         }
     }
 

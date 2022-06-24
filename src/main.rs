@@ -213,7 +213,6 @@ impl rend3_framework::App for Ui {
             platform,
             start_time,
             last_interaction_time,
-            quit,
             gui_state,
         });
     }
@@ -311,7 +310,7 @@ impl rend3_framework::App for Ui {
                 // Dispatch a render using the built up rendergraph!
                 graph.execute(renderer, frame, cmd_bufs, &ready);
                 //  Exit if all done.
-                if data.quit {
+                if data.gui_state.quit {
                     control_flow(winit::event_loop::ControlFlow::Exit);
                 } else {
                     control_flow(winit::event_loop::ControlFlow::Poll);
