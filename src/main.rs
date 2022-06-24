@@ -13,9 +13,8 @@
 //  June 2022
 //
 mod libui;
-use libui::{GuiState, GuiParams};
+use libui::{GuiState, GuiParams, Dictionary};
 use std::sync::Arc;
-use libui::basicintl::Dictionary;
 use log::{LevelFilter};
 
 /// Configuration
