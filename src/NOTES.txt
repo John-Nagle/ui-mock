@@ -109,9 +109,20 @@ TODO before merge.
 - Everything needed for playback  
   - Open playback file
   - Set log level.  [DONE]
-  - General purpose popup dialogs.
-  - Make "Help" failure non-fatal.
+  - General purpose popup dialogs. [DONE]
+  - Make "Help" failure non-fatal. [DONE]
   
 2022-06-23
+
+Looking ahead:
+   System states:
+      IDLE - not doing anything with 3D.
+        -> CONNECTED, REPLAY
+      CONNECTED - connected to remote 
+        -> SHUTDOWN
+      REPLAY - replaying from a file
+        -> SHUTDOWN
+      SHUTDOWN - cleaning up.
+        -> IDLE
 
   Implemented "OK" box with msg. Need to rethink how closing works.[DONE]

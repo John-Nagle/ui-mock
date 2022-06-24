@@ -12,7 +12,6 @@ use std::collections::VecDeque;
 use anyhow::{anyhow, Error};
 use super::basicintl::Dictionary;
 use crate::t;
-use once_cell::sync::OnceCell;
 
 
 /// All GUI windows persistent state.

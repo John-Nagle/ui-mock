@@ -1,6 +1,7 @@
-//  basicintl.rs -- Very basic internationalization system.
+///  basicintl.rs -- Very basic internationalization system.
 //
 //  Suitable for use with "egui", which needs a lookup on every frame.
+//  Very low overhead.
 //
 //  Animats
 //  June, 2022
@@ -28,7 +29,7 @@ macro_rules! t {
     ($s:expr,$dict:expr) => {
         // macro expands this
         {
-            static MSG: OnceCell<&str> = OnceCell::new();
+            static MSG: once_cell::sync::OnceCell<&str> = once_cell::sync::OnceCell::new();
             let s: &str = MSG.get_or_init(|| {
                 $dict.translate($s) // first time only
             });

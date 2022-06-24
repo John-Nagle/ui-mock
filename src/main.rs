@@ -13,12 +13,10 @@
 //  June 2022
 //
 mod libui;
-use libui::gui::{update_gui};
+////use libui::guimenus::{update_gui};
 use libui::guiwindows::{MessageWindow, GuiWindows};
 use std::sync::Arc;
-////#[macro_use]
 use libui::basicintl::Dictionary;
-use once_cell::sync::OnceCell;
 use log::{LevelFilter};
 
 /// Configuration
@@ -184,7 +182,7 @@ impl rend3_framework::App for Ui {
 
         //  Icon loading
         let image_bytes = include_bytes!("images/rust-logo-128x128-blk.png");
-        self.assets.rust_logo = libui::gui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
+        self.assets.rust_logo = libui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
 
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
@@ -250,7 +248,7 @@ impl rend3_framework::App for Ui {
 
                 // Insert egui commands here
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
-                let mut inuse = update_gui(&self.assets, data, show_menus); // draws the GUI
+                let mut inuse = libui::draw(&self.assets, data, show_menus); // draws the GUI
                 inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
                 if inuse {
                     data.wake_up_gui();

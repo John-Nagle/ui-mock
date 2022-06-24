@@ -1,87 +1,144 @@
 //
-//  giumenus.rs -- GUI menu actions
+//  guimenus.rs -- window and menu layout.
+//
+//  Top menu bar, and a bottom button bar.
+//  Both disappear when not used for a while, for
+//  a clean game screen.
 //
 //  Animats
-//  June, 2022
+//  June 2022
 //
-//  These are called from the render thread. Do not spend much time here.
-//
-use crate::UiData;
+use crate::{UiAssets, UiData};
+use super::guiactions;
+use egui::{menu, Frame};
 use crate::t;
-use once_cell::sync::OnceCell;
-use egui::Ui;
-use super::guiwindows::{TextWindow};
-use sysinfo;
+use log::{LevelFilter};
 
-/// Configuration
-const HELP_PAGE: &str =
-    "https://github.com/John-Nagle/ui-mock#ui-mock---mockup-of-a-game-type-user-interface";
-const COPYRIGHT: &str = "© 2022 Animats";
+/// Grey background for button area.
+//  This really should be a gradient.
+const TRANSLUCENT_GREY_ALPHA: u8 = 48;
+const TRANSLUCENT_GREY: u8 = 32;
+const TRANSLUCENT_GREY_COLOR: u8 =
+    ((TRANSLUCENT_GREY_ALPHA as u16 * TRANSLUCENT_GREY as u16) / 256) as u8;
+const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premultiplied(
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_COLOR,
+    TRANSLUCENT_GREY_ALPHA,
+);
 
-//
-/// Avatar->Preferences
-pub fn manu_preferences(_ui: &mut Ui, data: &mut UiData) {
-    //  Unimplemented
-    data.gui_windows.add_error_window(t!("menu.unimplemented", &data.lang), &[t!("menu.unimplemented", &data.lang)]);
-}
 
-/// Avatar->Quit
-pub fn menu_quit(_ui: &mut Ui, data: &mut UiData) {
-    data.quit = true;                   // normal exit
-}
 
-/// Help->Help
-pub fn menu_help_manual(_ui: &mut Ui, data: &mut UiData) {
-    //  Open help page in browser
-    match webbrowser::open(HELP_PAGE) {
-        Ok(_) => {},
-        Err(e) => {
-            //  Popup if trouble
-            let errmsg = format!("{:?}",e);
-            let messages = [t!("message.web_error", &data.lang), errmsg.as_str()];
-            data.gui_windows.add_error_window(t!("window.internet_error", &data.lang), &messages);
-        }
+/// Update the GUI. Called on each frame.
+//  Returns true if the GUI is active and should not disappear.
+#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+pub fn draw(assets: &UiAssets, data: &mut UiData, show_menus: bool) -> bool {
+    profiling::scope!("Gui");
+                           
+    // Insert egui commands here
+    let ctx = data.platform.context();
+    if data.dark_mode {
+        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+    } else {
+        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
     }
-}
-pub fn menu_help_about(_ui: &mut Ui, data: &mut UiData) {
-    //  Create window if necessary
-    match &mut data.gui_windows.about_window {
-        Some(w) => {
-            w.reopen();      // reopen window that was already built
-        }
-        None => {
-            //  Generate system information dump
-            let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option
-            //  Need to create new window
-            let mut msgs = Vec::new();
-            let version = format!("{}: {}", t!("message.version", data.lang), data.version);
-            msgs.push(version.as_str());          
-            use sysinfo::SystemExt;
-            let mut sys = sysinfo::System::new_all();           // get system information
-            sys.refresh_all();
-            let os_info = format!("{}: {}, {}", t!("message.os_version", data.lang), if_unknown(sys.name()), if_unknown(sys.long_os_version()));
-            msgs.push(os_info.as_str());
-            let system_memory = format!("{}: {:?}", t!("message.system_memory", data.lang), sys.total_memory());
-            msgs.push(system_memory.as_str());
-            let cpu_count = format!("{}: {}", t!("message.cpu_count", data.lang), sys.cpus().len());
-            msgs.push(cpu_count.as_str());
-            msgs.push(COPYRIGHT);                               // copyright notice
-            let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", &data.lang), &msgs, Some(t!("menu.ok", &data.lang)));
-            data.gui_windows.about_window = Some(about_window);
-        }
+    //  Top menu bar
+
+    if show_menus {
+        egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
+            menu::bar(ui, |ui| {
+                ui.menu_button(t!("menu.avatar", &data.lang), |ui| {                                       
+                    // Avatar menu
+                    if ui.button(t!("menu.avatar.preferences", &data.lang)).clicked() {
+                        // Preferences menu entry
+                        guiactions::manu_preferences(ui, data);
+                    }
+
+                    if ui.button(t!("menu.avatar.quit", &data.lang)).clicked() {
+                        guiactions::menu_quit(ui, data);
+                    }
+                });
+                ui.menu_button(t!("menu.comm", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+                });
+                ui.menu_button(t!("menu.world", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+                });
+                ui.menu_button(t!("menu.content", &data.lang), |ui| {
+                    //  ***MORE***
+                    // Help menu
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+                });        
+                ui.menu_button(t!("menu.help", &data.lang), |ui| {
+                    // Help menu
+                    if ui.button(t!("menu.help", &data.lang)).clicked() {
+                        guiactions::menu_help_manual(ui, data);
+                    }
+                    if ui.button(t!("menu.help.about", &data.lang)).clicked() {
+                        // About menu entry
+                        guiactions::menu_help_about(ui, data);
+                    }
+                 });
+                 ui.menu_button(t!("menu.developer", &data.lang), |ui| {   
+                    //  Log level setting submenu
+                    ui.menu_button(t!("menu.developer.log_level", &data.lang), |ui| {
+                        ui.radio_value(&mut data.log_level, LevelFilter::Off, t!("menu.log_level.off", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Error, t!("menu.log_level.error", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Warn, t!("menu.log_level.warn", &data.lang));
+                        ui.radio_value(&mut data.log_level, LevelFilter::Info, t!("menu.log_level.info", &data.lang)); 
+                        ui.radio_value(&mut data.log_level, LevelFilter::Debug, t!("menu.log_level.debug", &data.lang));   
+                        ui.radio_value(&mut data.log_level, LevelFilter::Trace, t!("menu.log_level.trace", &data.lang));                  
+                    });                                    
+                    //  Replay file menu. Only enabled if compiled with replay feature.
+                    //  This is for security of metaverse content.
+                    #[cfg (feature="replay")]
+                    if ui.button(t!("menu.developer.open_replay", &data.lang)).clicked() {
+                        // Open menu entry
+                        guiactions::menu_open_replay(ui, data);
+                    }
+                    #[cfg (feature="replay")]
+                    if ui.button(t!("menu.developer.save_replay", &data.lang)).clicked() {
+                        // Open menu entry
+                        guiactions::menu_open_replay(ui, data);
+                    }
+                    if ui.button(t!("menu.unimplemented", &data.lang)).clicked() {
+                    }
+
+                });
+            });
+        });
+
+        //  Bottom button panel
+        egui::TopBottomPanel::bottom("bottom_panel")
+            .frame(Frame::none().fill(TRANSLUCENT_GREY_COLOR32))
+            .show(&ctx, |ui| {
+                ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
+                if ui
+                    .add(
+                        egui::widgets::ImageButton::new(
+                            (*assets).rust_logo,
+                            egui::Vec2::splat(64.0),
+                        )
+                        .frame(true),
+                    )
+                    .clicked()
+                {
+                    println!("Clicked on Rust button");
+                }
+                ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
+            });
     }
+    //  Non-menu items
+    data.message_window.new_window(&ctx);   // dummy test window
+    data.gui_windows.draw(&ctx); // all the standard windows
+    //  Finish
+    ctx.is_pointer_over_area() // True if GUI is in use
 }
 
-/// Developer->Open Replay
-#[cfg (feature="replay")]
-pub fn menu_open_replay(_ui: &mut Ui, data: &mut UiData) {
-    // Open menu entry
-    if let Some(path) = rfd::FileDialog::new()
-        .set_title(t!("title.open_replay", &data.lang))
-        .add_filter("json", &["json"])
-        .pick_file()
-    {
-        let picked_path = Some(path.display().to_string());
-        log::warn!("File picked: {}", picked_path.unwrap());
-    }
-}
