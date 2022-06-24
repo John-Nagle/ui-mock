@@ -31,12 +31,6 @@ pub struct UiData {
     platform: egui_winit_platform::Platform,
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
-    quit: bool,                              // set to true to exit program
-    //  Data needed in GUI
-    ////version: String,
-    ////lang: Dictionary,                        // 2-letter language code
-    ////dark_mode: bool,                         // true if in dark mode
-    ////log_level: LevelFilter,                  // logging level
     //  Windows
     gui_state: GuiState,                        // state of the GUI
     ////message_window: MessageWindow,          // miscellaneous messages
@@ -184,7 +178,6 @@ impl rend3_framework::App for Ui {
 
         let start_time = instant::Instant::now();
         let last_interaction_time = instant::Instant::now();
-        let quit = false;
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
         let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
         let lang = Dictionary::get_translation(&[locale_file])

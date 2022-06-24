@@ -37,7 +37,7 @@ pub struct GuiState {
     msg_ok: String,                             // translated OK message
     //  Misc.
     unique_id: usize,                           // unique ID, serial
-    quit: bool,                                 // global quit flag
+    pub quit: bool,                                 // global quit flag
 }
 
 impl GuiState {
