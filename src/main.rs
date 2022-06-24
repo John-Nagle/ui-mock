@@ -28,7 +28,7 @@ pub struct UiData {
     _directional_handle: rend3::types::DirectionalLightHandle,
 
     egui_routine: rend3_egui::EguiRenderRoutine,
-    platform: egui_winit_platform::Platform,
+    ////platform: egui_winit_platform::Platform,
     start_time: instant::Instant,
     last_interaction_time: instant::Instant, // time of last user interaction
     //  Windows
@@ -64,7 +64,7 @@ pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: 
     const NEAR_EDGE: f32 = 5.0; // if within this many pixels of top or bottom
                                 ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
     let inner_size = window.inner_size(); // sizes of window
-    let ctx = data.platform.context();
+    let ctx = data.gui_state.platform.context();
     if let Some(pos) = ctx.pointer_interact_pos() {
         // check for pointer at top or bottom of window
         ////println!("pos: {:?}, height: {}", pos, inner_size.height);
@@ -197,13 +197,12 @@ impl rend3_framework::App for Ui {
             dark_mode,
             log_level,
         };
-        let gui_state = GuiState::new(params);     // all the fixed and popup windows
+        let gui_state = GuiState::new(params, platform);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
             _directional_handle,
             egui_routine,
-            platform,
             start_time,
             last_interaction_time,
             gui_state,
@@ -226,17 +225,17 @@ impl rend3_framework::App for Ui {
         let data = self.data.as_mut().unwrap();
 
         //  This is where EGUI handles 2D UI events.
-        data.platform.handle_event(&event);
-        if data.platform.captures_event(&event) {
+        data.gui_state.platform.handle_event(&event);
+        if data.gui_state.platform.captures_event(&event) {
             return; // 2D UI consumed this event.
         }
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
-                data.platform
+                data.gui_state.platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
-                data.platform.begin_frame();
+                data.gui_state.platform.begin_frame();
 
                 // Insert egui commands here
                 let show_menus = data.last_interaction_time.elapsed().as_secs() < MENU_DISPLAY_SECS;
@@ -250,7 +249,7 @@ impl rend3_framework::App for Ui {
                     textures_delta,
                     platform_output,
                     ..
-                } = data.platform.end_frame(Some(window));
+                } = data.gui_state.platform.end_frame(Some(window));
                 if !platform_output.events.is_empty() {
                     data.wake_up_gui(); // reset GUI idle time.
                     data.gui_state.message_window.add_line(format!(
@@ -260,12 +259,12 @@ impl rend3_framework::App for Ui {
                     )); // ***TEMP***
                 }
 
-                let paint_jobs = data.platform.context().tessellate(shapes);
+                let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
 
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
-                    context: data.platform.context(),
+                    context: data.gui_state.platform.context(),
                 };
                 profiling::scope!("3D");
                 // Get a frame

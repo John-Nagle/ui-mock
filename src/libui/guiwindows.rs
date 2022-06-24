@@ -29,6 +29,8 @@ pub struct GuiParams {
 pub struct GuiState {
     //  Data needed in GUI
     pub params: GuiParams,                   // starting params
+    //  Platform data for context
+    pub platform: egui_winit_platform::Platform,
     //  Fixed, reopenable windows.
     pub about_window: Option<TextWindow>,            // Help->About
     pub message_window: MessageWindow,       // miscellaneous messages ***TEMP***
@@ -43,10 +45,11 @@ pub struct GuiState {
 impl GuiState {
 
     /// Usual new
-    pub fn new(params: GuiParams) -> GuiState {
+    pub fn new(params: GuiParams, platform: egui_winit_platform::Platform) -> GuiState {
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         //  Some common words need translations handy
         GuiState {
+            platform,
             message_window,
             params,
             about_window: None,

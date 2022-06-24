@@ -27,8 +27,16 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
     TRANSLUCENT_GREY_COLOR,
     TRANSLUCENT_GREY_ALPHA,
 );
-
-
+/*
+/// Set dark mode if desired.
+pub fn set_dark_mode(ctx: egui::Context, dark_mode: bool) {
+    if state.params.dark_mode {
+        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+    } else {
+        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
+    }
+}
+*/
 
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
@@ -37,7 +45,7 @@ pub fn draw(assets: &UiAssets, state: &mut GuiState, show_menus: bool) -> bool {
     profiling::scope!("Gui");
                            
     // Insert egui commands here
-    let ctx = data.platform.context();
+    let ctx = state.platform.context();
     if state.params.dark_mode {
         ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
     } else {
