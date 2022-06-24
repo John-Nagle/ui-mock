@@ -97,14 +97,17 @@ pub fn draw(assets: &UiAssets, state: &mut GuiState, show_menus: bool) -> bool {
                  });
                  ui.menu_button(t!("menu.developer", state.get_lang()), |ui| {   
                     //  Log level setting submenu
-                    ui.menu_button(t!("menu.developer.log_level", state.get_lang()), |ui| {
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Off, t!("menu.log_level.off", state.get_lang()));
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Error, t!("menu.log_level.error", state.get_lang()));
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Warn, t!("menu.log_level.warn", state.get_lang()));
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Info, t!("menu.log_level.info", state.get_lang())); 
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Debug, t!("menu.log_level.debug", state.get_lang()));   
-                        ui.radio_value(&mut state.params.log_level, LevelFilter::Trace, t!("menu.log_level.trace", state.get_lang()));                  
-                    });                                    
+                    let lang = state.get_lang();
+                    let mut log_level = state.params.log_level; // avoid multiple partial borrow of same struct
+                    ui.menu_button(t!("menu.developer.log_level", lang), |ui| {
+                        ui.radio_value(&mut log_level, LevelFilter::Off, t!("menu.log_level.off", lang));
+                        ui.radio_value(&mut log_level, LevelFilter::Error, t!("menu.log_level.error", lang));
+                        ui.radio_value(&mut log_level, LevelFilter::Warn, t!("menu.log_level.warn", lang));
+                        ui.radio_value(&mut log_level, LevelFilter::Info, t!("menu.log_level.info", lang)); 
+                        ui.radio_value(&mut log_level, LevelFilter::Debug, t!("menu.log_level.debug", lang));   
+                        ui.radio_value(&mut log_level, LevelFilter::Trace, t!("menu.log_level.trace", lang));                  
+                    });
+                    state.params.log_level = log_level;     // update log level                                  
                     //  Replay file menu. Only enabled if compiled with replay feature.
                     //  This is for security of metaverse content.
                     #[cfg (feature="replay")]

@@ -48,13 +48,14 @@ impl GuiState {
     pub fn new(params: GuiParams, platform: egui_winit_platform::Platform) -> GuiState {
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         //  Some common words need translations handy
+        let msg_ok =  t!("menu.ok", &params.lang).to_string();
         GuiState {
             platform,
             message_window,
             params,
             about_window: None,
             temporary_windows: Vec::new(),
-            msg_ok: t!("menu.ok", params.lang).to_string(),
+            msg_ok,
             unique_id: 0,
             quit: false,
         }
