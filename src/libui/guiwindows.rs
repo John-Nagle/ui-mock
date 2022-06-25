@@ -169,12 +169,20 @@ impl GuiWindow for TextWindow {
                 let row_height = ui.text_style_height(&text_style);
                 // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
                 let total_rows = self.message.len();
-                egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
-                    for row in row_range {
-                        if row >= self.message.len() { break }  // prevent scrolling off end
-                        ui.label(self.message[row].as_str());
-                    }
-                });
+                if total_rows == 1 {
+                    //  Single-line message, center it.
+                    ui.vertical_centered(|ui| {
+                        ui.label(self.message[0].as_str());
+                    });
+                } else {
+                    //  Multi-line message, can become scrollable.
+                    egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
+                        for row in row_range {
+                            if row >= self.message.len() { break }  // prevent scrolling off end
+                            ui.label(self.message[row].as_str());
+                        }
+                    });
+                };
                 //  Dismiss button, if present
                 if let Some(s) = &self.dismiss_button {
                     ui.vertical_centered(|ui| {
