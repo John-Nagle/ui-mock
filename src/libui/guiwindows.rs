@@ -12,6 +12,7 @@ use std::collections::VecDeque;
 use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
+use super::guiutil;
 use crate::t;
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
@@ -49,6 +50,8 @@ impl GuiState {
     /// Usual new
     pub fn new(params: GuiParams, platform: egui_winit_platform::Platform) -> GuiState {
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
+        //  Set up defaults
+       guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
         GuiState {

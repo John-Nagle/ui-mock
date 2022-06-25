@@ -17,6 +17,6 @@ mod guiutil;
 pub use guimenus::{draw};
 pub use guiwindows::{GuiParams, GuiState};
 /// Utility functions.
-pub use guiutil::{load_canned_icon};
+pub use guiutil::{load_canned_icon, set_default_styles};
 /// Internationalization
 pub use basicintl::{Dictionary};

@@ -126,3 +126,27 @@ Looking ahead:
         -> IDLE
 
   Implemented "OK" box with msg. Need to rethink how closing works.[DONE]
+  
+  2022-06-24
+  
+     enum MainState{
+     }
+  
+     Need a user event type for the main event queue.
+     enum GuiEvent {
+        OpenReplay(String),
+        SaveReplay(String),
+        Connect(ConnectInfo),
+        Quit
+    }
+    
+    Initial button set
+    
+    Chat (opens chat window if closed)
+    Walk/Run/Fly/Sit/TP (unimplemented message)
+    Messages (opens message console window if closed)
+    Inventory (unimplemented)
+    Clothing (unimplemented)
+    
+    
+    
