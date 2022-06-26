@@ -26,20 +26,42 @@ pub struct GuiParams {
     pub menu_display_secs: u64,                     // (secs) display menus for this long
 }
 
+/// GUI states.
+//  The main states of the system.
+//  This is a state machine
+#[derive(Debug, Copy, Clone)]
+enum SystemMode {
+    Start,  // idle, waiting for grid selection
+            // -> Login, Replay. Exit
+    Login,  // login dialog is up.
+            // -> Connected, Start
+    Connecting, // Connecting to server
+            // -> Connected, Start
+    Connected, // Fully connected, all menus live
+            // -> Shutdown
+    Replay, // in replay mode, some menus live
+            // -> Shutdown
+    Shutdown, // shutting down and cleaning up
+            // -> Exit, Start
+    Exit, // Program exits
+}
+
 
 /// All GUI windows persistent state.
 pub struct GuiState {
     //  Data needed in GUI
-    pub params: GuiParams,                   // starting params
+    pub params: GuiParams,                      // starting params
     //  Platform data for context
     pub platform: egui_winit_platform::Platform,
+    //  Primary system mode
+    system_mode: SystemMode,                // primary operating mode
     //  Fixed, reopenable windows.
-    pub about_window: Option<TextWindow>,            // Help->About
-    pub message_window: MessageWindow,       // miscellaneous messages ***TEMP***
+    pub about_window: Option<TextWindow>,       // Help->About
+    pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
     temporary_windows: Vec<Box<dyn GuiWindow>>,
-    msg_ok: String,                             // translated OK message
     //  Misc.
+    msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
     pub quit: bool,                             // global quit flag
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
@@ -63,7 +85,8 @@ impl GuiState {
             msg_ok,
             unique_id: 0,
             quit: false,
-            last_interaction_time: instant::Instant::now()           
+            last_interaction_time: instant::Instant::now(),
+            system_mode: SystemMode::Start,          
         }
     }
 
@@ -115,6 +138,15 @@ impl GuiState {
     /// Should GUI be shown?
     pub fn if_gui_awake(&self) -> bool {
         self.last_interaction_time.elapsed().as_secs() < self.params.menu_display_secs
+    }
+    
+    pub fn change_mode(&mut self, new_mode: SystemMode) {
+        log::info!("System state change: {:?} -> {:?}", self.system_mode, new_mode);
+        self.system_mode = new_mode;                    // do state change
+    }
+    
+    pub fn get_mode(&self) -> SystemMode {
+        self.system_mode
     }
 }
 

@@ -116,14 +116,17 @@ TODO before merge.
 
 Looking ahead:
    System states:
-      IDLE - not doing anything with 3D.
-        -> CONNECTED, REPLAY
+      START- not doing anything with 3D.
+        -> LOGIN, REPLAY, EXIT
+      LOGIN -> Login screen is up
+        -> CONNECTED,
       CONNECTED - connected to remote 
         -> SHUTDOWN
       REPLAY - replaying from a file
         -> SHUTDOWN
       SHUTDOWN - cleaning up.
-        -> IDLE
+        -> START
+      EXIT - Final exit
 
   Implemented "OK" box with msg. Need to rethink how closing works.[DONE]
   
