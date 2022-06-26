@@ -14,6 +14,7 @@ use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
 use crate::t;
+use rend3::{ExtendedAdapterInfo};
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
@@ -24,6 +25,7 @@ pub struct GuiParams {
     pub dark_mode: bool,                            // true if in dark mode
     pub log_level: LevelFilter,                     // logging level
     pub menu_display_secs: u64,                     // (secs) display menus for this long
+    pub gpu_info: ExtendedAdapterInfo,              // GPU info
 }
 
 /// GUI states.

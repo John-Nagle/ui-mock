@@ -100,6 +100,14 @@
         "en": "Number of CPUs",
         "fr": "Nombre de processeurs centraux"
     },
+    "message.gpu_name": {
+        "en": "Graphics device",
+        "fr": "Périphérique graphique"
+    },
+    "message.graphics_system": {
+        "en": "Graphics system",
+        "fr": "Système graphique"
+    },
     "window.internet_error": {
         "en": "Internet problem",
         "fr": "Problème Internet"

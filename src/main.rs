@@ -181,7 +181,8 @@ impl rend3_framework::App for Ui {
         let dark_mode = true; // ***TEMP*** force dark mode as default
         let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
-                                                                            //  Window setup
+        let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
+        println!("Adapter info: {:?}", adapter_info);   // ***TEMP***                                                                       
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
@@ -190,6 +191,7 @@ impl rend3_framework::App for Ui {
             dark_mode,
             log_level,
             menu_display_secs: MENU_DISPLAY_SECS,
+            gpu_info: adapter_info,             // GPU info
         };
         let gui_state = GuiState::new(params, platform);     // all the fixed and popup windows
         self.data = Some(UiData {
