@@ -1,5 +1,5 @@
 //
-//  gui.rs -- window and menu layout.
+//  guiwindows.rs -- window and menu layout.
 //
 //  Top menu bar, and a bottom button bar.
 //  Both disappear when not used for a while, for
@@ -15,8 +15,19 @@ use super::basicintl::Dictionary;
 use super::guiutil;
 use crate::t;
 use rend3::{ExtendedAdapterInfo};
+use crossbeam_channel::{select, Receiver, Sender};
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
+
+/// User events sent to the main event loop
+pub enum GuiEvent {
+    OpenReplay(String),                             // open a replay file
+    SaveReplay(String),                             // save into a replay file
+    ////Login(ConnectInfo),                         // login dialog result
+    ErrorMessage(Vec<String>),                      // pops up an error mesage dialog
+    Quit                                            // shut down and exit
+}
+pub type BoxedGuiEvent = Box<GuiEvent>;
 
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {

@@ -139,7 +139,7 @@ Looking ahead:
      enum GuiEvent {
         OpenReplay(String),
         SaveReplay(String),
-        Connect(ConnectInfo),
+        Login(ConnectInfo),
         Quit
     }
     
@@ -150,6 +150,14 @@ Looking ahead:
     Messages (opens message console window if closed)
     Inventory (unimplemented)
     Clothing (unimplemented)
+    
+2022-06-26
+
+TODO:
+   1. Grid selection and login mockup.
+   2. State machine to enable and disable menus.
+   3. Return results from menus via winit events.
+   4. Do something about file picker going to background?
     
     
     
