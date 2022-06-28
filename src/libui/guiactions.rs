@@ -8,7 +8,7 @@
 //
 use crate::t;
 use egui::Ui;
-use super::guiwindows::{GuiState, TextWindow};
+use super::guiwindows::{GuiState, GuiEvent, TextWindow};
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -87,5 +87,8 @@ pub fn menu_open_replay(_ui: &mut Ui, state: &mut GuiState) {
     {
         let picked_path = Some(path.display().to_string());
         log::warn!("File picked: {}", picked_path.unwrap());
+        //  Send to the main event loop for action.
+        let replay_event = GuiEvent::OpenReplay(path);
+        let _ = state.send_gui_event(replay_event); // if we can't send, we must be shutting down
     }
 }

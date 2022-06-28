@@ -9,6 +9,7 @@
 //  June 2022
 //
 use std::collections::VecDeque;
+use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
@@ -20,14 +21,14 @@ use crossbeam_channel::{select, Receiver, Sender};
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
 /// User events sent to the main event loop
+#[derive(Debug, Clone)]
 pub enum GuiEvent {
-    OpenReplay(String),                             // open a replay file
-    SaveReplay(String),                             // save into a replay file
+    OpenReplay(PathBuf),                            // open a replay file
+    SaveReplay(PathBuf),                            // save into a replay file
     ////Login(ConnectInfo),                         // login dialog result
     ErrorMessage(Vec<String>),                      // pops up an error mesage dialog
     Quit                                            // shut down and exit
 }
-pub type BoxedGuiEvent = Box<GuiEvent>;
 
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
@@ -78,6 +79,8 @@ pub struct GuiState {
     unique_id: usize,                           // unique ID, serial
     pub quit: bool,                             // global quit flag
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
+    pub event_send_channel: crossbeam_channel::Sender<GuiEvent>,
+    pub event_recv_channel: crossbeam_channel::Receiver<GuiEvent>,
 }
 
 impl GuiState {
@@ -89,6 +92,7 @@ impl GuiState {
        guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
+        let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
         GuiState {
             platform,
             message_window,
@@ -99,7 +103,9 @@ impl GuiState {
             unique_id: 0,
             quit: false,
             last_interaction_time: instant::Instant::now(),
-            system_mode: SystemMode::Start,          
+            system_mode: SystemMode::Start,
+            event_send_channel,
+            event_recv_channel        
         }
     }
 
@@ -160,6 +166,13 @@ impl GuiState {
     
     pub fn get_mode(&self) -> SystemMode {
         self.system_mode
+    }
+    
+    /// Sends a user event to the event loop.
+    //  This ought to use winit events, but we can't do that yet
+    //  because of bug https://github.com/BVE-Reborn/rend3/issues/406
+    pub fn send_gui_event(&self, event: GuiEvent) -> Result<(), Error> {
+        Ok(self.event_send_channel.send(event)?)    // send
     }
 }
 

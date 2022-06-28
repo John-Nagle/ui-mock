@@ -15,7 +15,7 @@ mod guiutil;
 
 /// The main draw function. Called on every frame.
 pub use guimenus::{draw};
-pub use guiwindows::{GuiParams, GuiState, GuiEvent, BoxedGuiEvent};
+pub use guiwindows::{GuiParams, GuiState, GuiEvent};
 /// Utility functions.
 pub use guiutil::{load_canned_icon, set_default_styles};
 /// Internationalization

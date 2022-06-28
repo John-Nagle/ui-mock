@@ -224,6 +224,13 @@ impl rend3_framework::App for Ui {
         if data.gui_state.platform.captures_event(&event) {
             return; // 2D UI consumed this event.
         }
+        
+        //  Handle any user events.
+        //  Temporarily uses separate queue due to
+        //  bug https://github.com/BVE-Reborn/rend3/issues/406
+        for ev in data.gui_state.event_recv_channel.try_iter() {
+            println!("User event: {:?}", ev);       // ***TEMP***
+        }
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
