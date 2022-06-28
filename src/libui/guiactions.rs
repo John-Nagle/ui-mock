@@ -24,7 +24,7 @@ pub fn manu_preferences(_ui: &mut Ui, state: &mut GuiState) {
 
 /// Avatar->Quit
 pub fn menu_quit(_ui: &mut Ui, state: &mut GuiState) {
-    state.quit = true;                   // normal exit
+    let _ = state.send_gui_event(GuiEvent::Quit); // tell main loop to quit
 }
 
 /// Help->Help

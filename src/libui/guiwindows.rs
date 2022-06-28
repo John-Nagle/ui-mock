@@ -26,7 +26,7 @@ pub enum GuiEvent {
     OpenReplay(PathBuf),                            // open a replay file
     SaveReplay(PathBuf),                            // save into a replay file
     ////Login(ConnectInfo),                         // login dialog result
-    ErrorMessage(Vec<String>),                      // pops up an error mesage dialog
+    ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
     Quit                                            // shut down and exit
 }
 
@@ -77,7 +77,6 @@ pub struct GuiState {
     //  Misc.
     msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
-    pub quit: bool,                             // global quit flag
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
     pub event_send_channel: crossbeam_channel::Sender<GuiEvent>,
     pub event_recv_channel: crossbeam_channel::Receiver<GuiEvent>,
@@ -101,7 +100,6 @@ impl GuiState {
             temporary_windows: Vec::new(),
             msg_ok,
             unique_id: 0,
-            quit: false,
             last_interaction_time: instant::Instant::now(),
             system_mode: SystemMode::Start,
             event_send_channel,
@@ -147,6 +145,11 @@ impl GuiState {
         //  Create a window with text and an "OK" button.
         let w = TextWindow::new(self.get_unique_id(), title, message, Some(self.msg_ok.as_str()));
         self.add_window(Box::new(w)).expect("Duplicate error msg ID");  // had better not be a duplicate
+    }
+    
+    /// Pop up "unimplemented" message.
+    pub fn unimplemented_msg(&mut self) {
+        self.add_error_window(t!("menu.unimplemented", self.get_lang()), &[t!("menu.unimplemented", self.get_lang())]);
     }
     
     /// Call this for anything that indicates the GUI should be awakened to show menus.

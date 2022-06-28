@@ -13,7 +13,7 @@
 //  June 2022
 //
 mod libui;
-use libui::{GuiState, GuiParams, Dictionary};
+use libui::{GuiState, GuiParams, GuiEvent, Dictionary};
 use std::sync::Arc;
 use log::{LevelFilter};
 
@@ -28,6 +28,7 @@ pub struct UiData {
 
     egui_routine: rend3_egui::EguiRenderRoutine,
     start_time: instant::Instant,
+    quit: bool,                                 // global quit flag
 
     //  The 2D GUI
     gui_state: GuiState,                        // state of the GUI
@@ -50,6 +51,30 @@ pub struct UiAssets {
 pub struct Ui {
     data: Option<UiData>,
     assets: UiAssets,
+}
+
+impl Ui {
+    /// Handle user-created event.
+    //  This is how the GUI and other parts of the
+    //  system communicate with the main event loop.
+    pub fn handle_user_event(&mut self, event: GuiEvent) {
+        let data = self.data.as_mut().unwrap();
+        match event {
+            GuiEvent::OpenReplay(_path_buf) => {     // open a replay file
+                data.gui_state.unimplemented_msg(); // ***TEMP***
+            }
+            GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
+                data.gui_state.unimplemented_msg(); // ***TEMP***
+            }
+            GuiEvent::ErrorMessage((title, messages)) => {   // display message
+                let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
+                data.gui_state.add_error_window(&title, &msgs);
+            }
+            GuiEvent::Quit => {
+                data.quit = true;                   // force quit              
+            }                                       // shut down and exit
+        }
+    }
 }
 
 /// True if cursor is at the top or bottom of the screen in full screen mode.
@@ -201,6 +226,7 @@ impl rend3_framework::App for Ui {
             egui_routine,
             start_time,
             gui_state,
+            quit: false,
         });
     }
 
@@ -217,19 +243,27 @@ impl rend3_framework::App for Ui {
         control_flow: impl FnOnce(winit::event_loop::ControlFlow),
     ) {
         profiling::scope!("Event");
-        let data = self.data.as_mut().unwrap();
 
+
+        //  Handle any user events.
+        //  Temporarily uses separate queue due to
+        //  bug https://github.com/BVE-Reborn/rend3/issues/406
+        {   let data = self.data.as_mut().unwrap();
+            if !data.gui_state.event_recv_channel.is_empty() {    // if events queued
+                //  Get all events, avoiding double borrow.
+                let events: Vec<GuiEvent> = data.gui_state.event_recv_channel.try_iter().collect(); 
+                for ev in events {
+                    println!("User event: {:?}", ev);       // ***TEMP***
+                    self.handle_user_event(ev);
+                }
+            }
+        }
+              
+        let data = self.data.as_mut().unwrap();
         //  This is where EGUI handles 2D UI events.
         data.gui_state.platform.handle_event(&event);
         if data.gui_state.platform.captures_event(&event) {
             return; // 2D UI consumed this event.
-        }
-        
-        //  Handle any user events.
-        //  Temporarily uses separate queue due to
-        //  bug https://github.com/BVE-Reborn/rend3/issues/406
-        for ev in data.gui_state.event_recv_channel.try_iter() {
-            println!("User event: {:?}", ev);       // ***TEMP***
         }
 
         match event {
@@ -304,7 +338,7 @@ impl rend3_framework::App for Ui {
                 // Dispatch a render using the built up rendergraph!
                 graph.execute(renderer, frame, cmd_bufs, &ready);
                 //  Exit if all done.
-                if data.gui_state.quit {
+                if data.quit {
                     control_flow(winit::event_loop::ControlFlow::Exit);
                 } else {
                     control_flow(winit::event_loop::ControlFlow::Poll);
