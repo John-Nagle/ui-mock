@@ -16,7 +16,6 @@ use super::basicintl::Dictionary;
 use super::guiutil;
 use crate::t;
 use rend3::{ExtendedAdapterInfo};
-use crossbeam_channel::{select, Receiver, Sender};
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
