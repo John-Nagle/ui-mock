@@ -24,6 +24,7 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message win
 pub enum GuiEvent {
     OpenReplay(PathBuf),                            // open a replay file
     SaveReplay(PathBuf),                            // save into a replay file
+    LoginTo(GridSelectParams),                      // ask for login params
     ////Login(ConnectInfo),                         // login dialog result
     ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
     Quit                                            // shut down and exit
@@ -353,8 +354,9 @@ impl GridSelectWindow {
     }
         
     /// Draw window of text
-    pub fn new_window(&self, ctx: &egui::Context) {
+    pub fn new_window(&self, ctx: &egui::Context)-> Option<GridSelectParams> {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
+        let mut result = None;  // what, if anything, was clicked upon
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
@@ -374,10 +376,11 @@ impl GridSelectWindow {
                     )
                     .clicked()
                     {
-                        println!("Clicked on grid select button");
+                        result = Some(grid.clone());
                     }
                 }
             });
         });
+        result      // selected grid, or None
     }
 }

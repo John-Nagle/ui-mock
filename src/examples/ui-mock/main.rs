@@ -56,6 +56,9 @@ impl Ui {
             GuiEvent::OpenReplay(_path_buf) => {     // open a replay file
                 data.gui_state.unimplemented_msg(); // ***TEMP***
             }
+            GuiEvent::LoginTo(grid) => {
+                println!("Now log into this: {}", grid.name);
+            }
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
                 data.gui_state.unimplemented_msg(); // ***TEMP***
             }

@@ -8,7 +8,7 @@
 //  Animats
 //  June 2022
 //
-use super::guiwindows::{GuiState, SystemMode};
+use super::guiwindows::{GuiState, GuiEvent, SystemMode};
 use super::guiactions;
 use egui::{menu, Frame};
 use crate::t;
@@ -26,20 +26,18 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
     TRANSLUCENT_GREY_COLOR,
     TRANSLUCENT_GREY_ALPHA,
 );
-/*
-/// Set dark mode if desired.
-pub fn set_dark_mode(ctx: egui::Context, dark_mode: bool) {
-    if state.params.dark_mode {
-        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
-    } else {
-        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
-    }
-}
-*/
 
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
     profiling::scope!("Gui");
+    //  Do dark mode for all states.
+    {   let ctx = state.platform.context();
+        if state.params.dark_mode {
+            ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+        } else {
+            ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
+        }
+    }
     //  Select appropriate GUI for current mode.
     match state.get_mode() {
         SystemMode::Start => {
@@ -76,25 +74,20 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
         
     }
 }
-
-
-
-
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw_start(state: &mut GuiState) {                          
     // Insert egui commands here
     let ctx = state.platform.context();
-    if state.params.dark_mode {
-        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
-    } else {
-        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
-    }
     //  Draw the splash screen with a big set of alternative metaverses.
     //
     egui::TopBottomPanel::top("start_screen").show(&ctx, |ui| {
-        state.grid_select_window.new_window(&ctx);   // dummy test window
+        if let Some(grid) = state.grid_select_window.new_window(&ctx) {  // dummy test window
+            //  A grid has been selected
+            let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
+            state.change_mode(SystemMode::Login);
+        }     
         state.draw(&ctx); // all the standard windows
     });
 }
@@ -111,13 +104,7 @@ pub fn draw_login(state: &mut GuiState) {
 pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {                          
     // Insert egui commands here
     let ctx = state.platform.context();
-    if state.params.dark_mode {
-        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
-    } else {
-        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
-    }
     //  Top menu bar
-
     if show_menus {
         egui::TopBottomPanel::top("menu_bar").show(&ctx, |ui| {
             menu::bar(ui, |ui| {
