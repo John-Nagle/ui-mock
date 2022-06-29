@@ -365,6 +365,17 @@ impl GridSelectWindow {
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.label(&grid.name);
+                    if ui.add(
+                        egui::widgets::ImageButton::new(
+                            grid.picture_bar,
+                            egui::Vec2::splat(64.0),
+                        )
+                        .frame(true),
+                    )
+                    .clicked()
+                    {
+                        println!("Clicked on grid select button");
+                    }
                 }
             });
         });

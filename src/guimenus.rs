@@ -96,7 +96,6 @@ pub fn draw_start(state: &mut GuiState) {
     egui::TopBottomPanel::top("start_screen").show(&ctx, |ui| {
         state.grid_select_window.new_window(&ctx);   // dummy test window
         state.draw(&ctx); // all the standard windows
-    
     });
 }
 
