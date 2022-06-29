@@ -1,5 +1,5 @@
 [package]
-name = "ui-mock"
+name = "libui"
 version = "0.1.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
@@ -23,6 +23,13 @@ tracy = ["tracy-client", "profiling/profile-with-tracy"]
 #   Feature "replay" enables saving and reloading the viewer state.
 #   This should not be enabled in production builds for content security.
 replay = []
+
+#   UDP replayer - replays UDP captures and outputs a huge JSON file
+#   which can be displayed by another program
+
+[[example]]
+name = "ui-mock"
+path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
 glam = {version = "0.20.0", features = ["bytemuck", "serde"]}	

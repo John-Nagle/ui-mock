@@ -12,8 +12,8 @@
 //  Animats
 //  June 2022
 //
-mod libui;
-use libui::{GuiState, GuiParams, GuiEvent, Dictionary};
+use libui;
+use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, Dictionary};
 use std::sync::Arc;
 use log::{LevelFilter};
 
@@ -40,17 +40,10 @@ impl UiData {
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
-/// Assets used in displaying the GUI.
-#[derive(Default)]
-pub struct UiAssets {
-    rust_logo: egui::TextureId,
-}
-
 /// The application.
 #[derive(Default)]
 pub struct Ui {
     data: Option<UiData>,
-    assets: UiAssets,
 }
 
 impl Ui {
@@ -192,8 +185,8 @@ impl rend3_framework::App for Ui {
             });
 
         //  Icon loading
-        let image_bytes = include_bytes!("images/rust-logo-128x128-blk.png");
-        self.assets.rust_logo = libui::load_canned_icon(image_bytes, &mut egui_routine, renderer);
+        let image_bytes = include_bytes!("../../images/rust-logo-128x128-blk.png");
+        let assets = GuiAssets{ rust_logo: libui::load_canned_icon(image_bytes, &mut egui_routine, renderer) };
 
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
@@ -218,7 +211,7 @@ impl rend3_framework::App for Ui {
             menu_display_secs: MENU_DISPLAY_SECS,
             gpu_info: adapter_info,             // GPU info
         };
-        let gui_state = GuiState::new(params, platform);     // all the fixed and popup windows
+        let gui_state = GuiState::new(params, assets, platform);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -275,7 +268,7 @@ impl rend3_framework::App for Ui {
 
                 // Insert egui commands here
                 let show_menus = data.gui_state.if_gui_awake();
-                let mut inuse = libui::draw(&self.assets, &mut data.gui_state, show_menus); // draws the GUI
+                let mut inuse = libui::draw(&mut data.gui_state, show_menus); // draws the GUI
                 inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
                 if inuse {
                     data.gui_state.wake_up_gui();

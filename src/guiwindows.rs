@@ -40,11 +40,17 @@ pub struct GuiParams {
     pub gpu_info: ExtendedAdapterInfo,              // GPU info
 }
 
+/// Assets used in displaying the GUI.
+#[derive(Default)]
+pub struct GuiAssets {
+    pub rust_logo: egui::TextureId,
+}
+
 /// GUI states.
 //  The main states of the system.
 //  This is a state machine
 #[derive(Debug, Copy, Clone)]
-enum SystemMode {
+pub enum SystemMode {
     Start,  // idle, waiting for grid selection
             // -> Login, Replay. Exit
     Login,  // login dialog is up.
@@ -65,6 +71,8 @@ enum SystemMode {
 pub struct GuiState {
     //  Data needed in GUI
     pub params: GuiParams,                      // starting params
+    //  Assets - images, etc.
+    pub assets: GuiAssets,
     //  Platform data for context
     pub platform: egui_winit_platform::Platform,
     //  Primary system mode
@@ -85,7 +93,7 @@ pub struct GuiState {
 impl GuiState {
 
     /// Usual new
-    pub fn new(params: GuiParams, platform: egui_winit_platform::Platform) -> GuiState {
+    pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform) -> GuiState {
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         //  Set up defaults
        guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
@@ -96,6 +104,7 @@ impl GuiState {
             platform,
             message_window,
             params,
+            assets,
             about_window: None,
             temporary_windows: Vec::new(),
             msg_ok,

@@ -8,7 +8,6 @@
 //  Animats
 //  June 2022
 //
-use crate::{UiAssets};  // ***TEMP***
 use super::guiwindows::{GuiState};
 use super::guiactions;
 use egui::{menu, Frame};
@@ -41,7 +40,7 @@ pub fn set_dark_mode(ctx: egui::Context, dark_mode: bool) {
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw(assets: &UiAssets, state: &mut GuiState, show_menus: bool) -> bool {
+pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
     profiling::scope!("Gui");
                            
     // Insert egui commands here
@@ -135,7 +134,7 @@ pub fn draw(assets: &UiAssets, state: &mut GuiState, show_menus: bool) -> bool {
                 if ui
                     .add(
                         egui::widgets::ImageButton::new(
-                            (*assets).rust_logo,
+                            state.assets.rust_logo,
                             egui::Vec2::splat(64.0),
                         )
                         .frame(true),
