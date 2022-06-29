@@ -8,7 +8,7 @@
 //  Animats
 //  June 2022
 //
-use super::guiwindows::{GuiState};
+use super::guiwindows::{GuiState, SystemMode};
 use super::guiactions;
 use egui::{menu, Frame};
 use crate::t;
@@ -37,12 +37,77 @@ pub fn set_dark_mode(ctx: egui::Context, dark_mode: bool) {
 }
 */
 
-/// Update the GUI. Called on each frame.
-//  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
     profiling::scope!("Gui");
-                           
+    //  Select appropriate GUI for current mode.
+    match state.get_mode() {
+        SystemMode::Start => {
+            //  Start state. Show available metaverses.
+            draw_start(state);
+            true
+        }
+        SystemMode::Connecting => {
+            //  Connecting -- display map or something while connecting
+            //  ***MORE***
+            true
+        }
+        SystemMode::Connected => {
+            //  Connected - fully running.
+            draw_connected(state, show_menus)
+        }
+        SystemMode::Replay => {
+            draw_connected(state, show_menus)
+        }
+        SystemMode::Login => {
+            draw_login(state);
+            true
+        }
+        SystemMode::Shutdown => {
+            //  Do shutdown stuff
+            //  Switch to exit mode
+            state.change_mode(SystemMode::Exit);
+            true
+        }
+        SystemMode::Exit => {
+            println!("Why are we in exit mode and still running?");
+            true
+        }
+        
+    }
+}
+
+
+
+
+/// Update the GUI. Called on each frame.
+//  Returns true if the GUI is active and should not disappear.
+#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+pub fn draw_start(state: &mut GuiState) {                          
+    // Insert egui commands here
+    let ctx = state.platform.context();
+    if state.params.dark_mode {
+        ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+    } else {
+        ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
+    }
+    //  Draw the splash screen with a big set of alternative metaverses.
+    //
+    egui::TopBottomPanel::top("start_screen").show(&ctx, |ui| {
+    
+    });
+}
+
+/// Update the GUI. Called on each frame.
+//  Returns true if the GUI is active and should not disappear.
+#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+pub fn draw_login(state: &mut GuiState) {          
+    panic!("Unimplemented"); 
+}
+
+
+#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {                          
     // Insert egui commands here
     let ctx = state.platform.context();
     if state.params.dark_mode {

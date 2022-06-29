@@ -13,7 +13,7 @@
 //  June 2022
 //
 use libui;
-use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, Dictionary};
+use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, GridSelectParams, Dictionary};
 use std::sync::Arc;
 use log::{LevelFilter};
 
@@ -185,8 +185,11 @@ impl rend3_framework::App for Ui {
             });
 
         //  Icon loading
-        let image_bytes = include_bytes!("../../images/rust-logo-128x128-blk.png");
-        let assets = GuiAssets{ rust_logo: libui::load_canned_icon(image_bytes, &mut egui_routine, renderer) };
+        let rust_image_bytes = include_bytes!("../../images/rust-logo-128x128-blk.png");
+        let assets = GuiAssets { 
+            rust_logo: libui::load_canned_icon(rust_image_bytes, &mut egui_routine, renderer),
+            replay_logo: libui::load_canned_icon(rust_image_bytes, &mut egui_routine, renderer),    //  ***TEMP***
+            };
 
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
@@ -200,7 +203,8 @@ impl rend3_framework::App for Ui {
         let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
-        println!("Adapter info: {:?}", adapter_info);   // ***TEMP***                                                                       
+        println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
+        let grid_select_params = get_grid_select_params(&assets);                                                                
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
@@ -210,6 +214,7 @@ impl rend3_framework::App for Ui {
             log_level,
             menu_display_secs: MENU_DISPLAY_SECS,
             gpu_info: adapter_info,             // GPU info
+            grid_select_params,
         };
         let gui_state = GuiState::new(params, assets, platform);     // all the fixed and popup windows
         self.data = Some(UiData {
@@ -434,4 +439,17 @@ fn create_mesh() -> rend3::types::Mesh {
         .with_indices(index_data.to_vec())
         .build()
         .unwrap()
+}
+
+/// Dummy of get grid select params.
+//  These will come from a file in future,
+//  with an entry for each supported metaverse.
+fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
+    let replay_file_dummy_grid = GridSelectParams {
+        name: "Replay file".to_string(),
+        picture_bar: assets.replay_logo,
+        web_url: "https://www.animats.com/viewer".to_string(),
+        login_url: None,
+    };
+    vec![replay_file_dummy_grid]
 }

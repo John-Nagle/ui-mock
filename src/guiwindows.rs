@@ -37,12 +37,14 @@ pub struct GuiParams {
     pub log_level: LevelFilter,                     // logging level
     pub menu_display_secs: u64,                     // (secs) display menus for this long
     pub gpu_info: ExtendedAdapterInfo,              // GPU info
+    pub grid_select_params: Vec<GridSelectParams>,  // grid info
 }
 
 /// Assets used in displaying the GUI.
 #[derive(Default)]
 pub struct GuiAssets {
     pub rust_logo: egui::TextureId,
+    pub replay_logo: egui::TextureId,
 }
 
 /// GUI states.
@@ -52,7 +54,7 @@ pub struct GuiAssets {
 pub enum SystemMode {
     Start,  // idle, waiting for grid selection
             // -> Login, Replay. Exit
-    Login,  // login dialog is up.
+    Login,  // login di	alog is up.
             // -> Connected, Start
     Connecting, // Connecting to server
             // -> Connected, Start
@@ -77,6 +79,7 @@ pub struct GuiState {
     //  Primary system mode
     system_mode: SystemMode,                // primary operating mode
     //  Fixed, reopenable windows.
+    pub grid_select_window: GridSelectWindow,   // used at start
     pub about_window: Option<TextWindow>,       // Help->About
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
@@ -93,15 +96,18 @@ impl GuiState {
 
     /// Usual new
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform) -> GuiState {
+        //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
+        let grid_select_window = GridSelectWindow::new("Grid select", t!("grid.select", &params.lang), params.grid_select_params.clone());
         //  Set up defaults
-       guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
+        guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
         let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
         GuiState {
             platform,
             message_window,
+            grid_select_window,
             params,
             assets,
             about_window: None,
@@ -111,7 +117,7 @@ impl GuiState {
             last_interaction_time: instant::Instant::now(),
             system_mode: SystemMode::Start,
             event_send_channel,
-            event_recv_channel        
+            event_recv_channel,    
         }
     }
 
@@ -312,6 +318,53 @@ impl MessageWindow {
                     if row >= self.lines.len() { break }
                     let text = &self.lines[row];
                     ui.label(text);
+                }
+            });
+        });
+    }
+}
+
+/// Basic info about a grid for the splash page
+#[derive(Debug, Clone)]
+pub struct GridSelectParams {
+    pub name: String,
+    pub picture_bar: egui::TextureId,
+    pub web_url: String,
+    pub login_url: Option<String>,              // if none, this is a replay  
+}
+
+/// The grid selection window.
+//  Appears at startup.
+//  The persistent part
+pub struct GridSelectWindow {
+    title: String, // title of window
+    id: egui::Id,  // unique ID
+    grids: Vec<GridSelectParams>, // available grids
+}
+
+impl GridSelectWindow {
+    /// Create scrollable message window
+    pub fn new(id: &str, title: &str, grids: Vec<GridSelectParams>) -> Self {
+        GridSelectWindow {
+            id: egui::Id::new(id),
+            title: title.to_string(),
+            grids
+        }        
+    }
+        
+    /// Draw window of text
+    pub fn new_window(&self, ctx: &egui::Context) {
+        let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
+        window.show(ctx, |ui| {
+            //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
+            let text_style = egui::TextStyle::Body;
+            let row_height = ui.text_style_height(&text_style);
+            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
+            //  Add image and website link to each row
+            egui::ScrollArea::vertical().show_rows(ui, row_height, self.grids.len(), |ui, row_range| {
+                for row in row_range {
+                    let grid = &self.grids[row];
+                    ui.label(&grid.name);
                 }
             });
         });
