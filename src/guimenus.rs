@@ -187,7 +187,7 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
                 if ui
                     .add(
                         egui::widgets::ImageButton::new(
-                            state.assets.rust_logo,
+                            state.assets.web_icon,  // placeholder for now
                             egui::Vec2::splat(64.0),
                         )
                         .frame(true),

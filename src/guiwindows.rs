@@ -44,8 +44,11 @@ pub struct GuiParams {
 /// Assets used in displaying the GUI.
 #[derive(Default)]
 pub struct GuiAssets {
-    pub rust_logo: egui::TextureId,
-    pub replay_logo: egui::TextureId,
+    pub web_icon: egui::TextureId,
+    pub replay_bar: egui::TextureId,
+    //  ***TEMP*** will be loaded from file at startup
+    pub placeholder_a_bar: egui::TextureId,
+    pub placeholder_b_bar: egui::TextureId,
 }
 
 /// GUI states.

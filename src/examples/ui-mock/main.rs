@@ -188,10 +188,13 @@ impl rend3_framework::App for Ui {
             });
 
         //  Icon loading
-        let rust_image_bytes = include_bytes!("../../images/rust-logo-128x128-blk.png");
+        let web_icon_bytes = include_bytes!("../../images/iconweb.png");
         let assets = GuiAssets { 
-            rust_logo: libui::load_canned_icon(rust_image_bytes, &mut egui_routine, renderer),
-            replay_logo: libui::load_canned_icon(rust_image_bytes, &mut egui_routine, renderer),    //  ***TEMP***
+            web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
+            //  ***TEMP*** until this stuff gets loaded at run time.
+            replay_bar: libui::load_canned_icon(include_bytes!("../../images/replaybar.png"), &mut egui_routine, renderer),    
+            placeholder_a_bar: libui::load_canned_icon(include_bytes!("../../images/placeholdera.png"), &mut egui_routine, renderer), 
+            placeholder_b_bar: libui::load_canned_icon(include_bytes!("../../images/placeholderb.png"), &mut egui_routine, renderer), 
             };
 
         let start_time = instant::Instant::now();
@@ -448,11 +451,27 @@ fn create_mesh() -> rend3::types::Mesh {
 //  These will come from a file in future,
 //  with an entry for each supported metaverse.
 fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
+    println!("Loading grid select params"); // ***TEMP***
+    println!("Replay file"); // ***TEMP***
     let replay_file_dummy_grid = GridSelectParams {
         name: "Replay file".to_string(),
-        picture_bar: assets.replay_logo,
+        picture_bar: assets.replay_bar,
         web_url: "https://www.animats.com/viewer".to_string(),
         login_url: None,
     };
-    vec![replay_file_dummy_grid]
+    println!("Placeholder A"); // ***TEMP***
+    let placeholder_a = GridSelectParams {
+        name: "Second Life".to_string(),
+        picture_bar: assets.placeholder_a_bar,
+        web_url: "https://www.secondlife.com/viewer".to_string(),
+        login_url: Some("https://login.aditi.lindenlab.com/cgi-bin/login.cgi".to_string()),
+    };
+    println!("Placeholder B"); // ***TEMP***
+    let placeholder_b = GridSelectParams {
+        name: "OsGrid".to_string(),
+        picture_bar: assets.placeholder_b_bar,
+        web_url: "https://www.osgrid.org".to_string(),
+        login_url: Some("http://login.osgrid.org".to_string()),
+    };
+    vec![replay_file_dummy_grid, placeholder_a, placeholder_b]
 }
