@@ -112,6 +112,10 @@
         "en": "Internet problem",
         "fr": "Problème Internet"
     },
+    "window.grid_select" : {
+        "en": "Select metaverse grid",
+        "fr": "Sélectionner une grille de métavers"
+    },
     "message.web_error": {
         "en": "Unable to open web page",
         "fr": "Impossible d’ouvrir la page Web"

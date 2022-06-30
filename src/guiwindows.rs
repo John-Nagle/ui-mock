@@ -102,7 +102,7 @@ impl GuiState {
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform) -> GuiState {
         //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
-        let grid_select_window = GridSelectWindow::new("Grid select", t!("grid.select", &params.lang), params.grid_select_params.clone());
+        let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
         //  Set up defaults
         guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         //  Some common words need translations handy
@@ -343,15 +343,17 @@ pub struct GridSelectParams {
 pub struct GridSelectWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
+    web_icon: egui::TextureId,  // icon for web button
     grids: Vec<GridSelectParams>, // available grids
 }
 
 impl GridSelectWindow {
     /// Create scrollable message window
-    pub fn new(id: &str, title: &str, grids: Vec<GridSelectParams>) -> Self {
+    pub fn new(id: &str, title: &str, assets: &GuiAssets, grids: Vec<GridSelectParams>) -> Self {
         GridSelectWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
+            web_icon: assets.web_icon,
             grids
         }        
     }
@@ -363,24 +365,49 @@ impl GridSelectWindow {
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
-            let row_height = ui.text_style_height(&text_style);
-            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
+            ////let row_height = ui.text_style_height(&text_style);
+            let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
             //  Add image and website link to each row
             egui::ScrollArea::vertical().show_rows(ui, row_height, self.grids.len(), |ui, row_range| {
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.label(&grid.name);
-                    if ui.add(
-                        egui::widgets::ImageButton::new(
-                            grid.picture_bar,
-                            egui::Vec2::splat(64.0),
+                    ui.horizontal(|ui| {
+                        //  Grid select
+                        if ui.add(
+                            egui::widgets::ImageButton::new(
+                                grid.picture_bar,
+                                egui::Vec2::new(1024.0,128.0),
+                                )
+                            .frame(true),
                         )
-                        .frame(true),
-                    )
-                    .clicked()
-                    {
-                        result = Some(grid.clone());
-                    }
+                        .clicked()
+                        {
+                            result = Some(grid.clone());
+                        }
+                        //  Grid page open
+                        if ui.add(
+                            egui::widgets::ImageButton::new(
+                                self.web_icon,
+                                egui::Vec2::new(128.0,128.0),
+                                )
+                            .frame(true),
+                        )
+                        .clicked()
+                        {   //  Clicking on web icon opens web page for that grid
+                            match webbrowser::open(&grid.web_url) {
+                                Ok(_) => {},
+                                Err(e) => {
+                                    //  Popup if trouble
+                                    /* ***MORE*** need access to state
+                                    let errmsg = format!("{:?}",e);
+                                    let messages = [t!("message.web_error", state.get_lang()), errmsg.as_str()];
+                                    state.add_error_window(t!("window.internet_error", state.get_lang()), &messages);
+                                    */
+                                }
+                            }
+                        }
+                    });
                 }
             });
         });
