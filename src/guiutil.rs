@@ -21,7 +21,6 @@ pub fn load_canned_icon(
     renderer: &Arc<Renderer>,
 ) -> TextureId {
     //Images
-    println!("Load canned icon: {} bytes", image_bytes.len());  // ***TEMP***
     let image_image = image::load_from_memory(image_bytes).unwrap();
     let image_rgba = image_image.as_rgba8().unwrap().clone().into_raw();
     let dimensions = image_image.dimensions();

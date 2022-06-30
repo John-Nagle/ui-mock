@@ -360,7 +360,7 @@ impl GridSelectWindow {
         
     /// Draw window of text
     pub fn draw(&self, ctx: &egui::Context)-> Option<GridSelectParams> {
-        let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
+        let window = egui::containers::Window::new(self.title.as_str()).id(self.id).collapsible(false);
         let mut result = None;  // what, if anything, was clicked upon
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows

@@ -209,7 +209,7 @@ impl rend3_framework::App for Ui {
         let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
-        println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
+        ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
         let grid_select_params = get_grid_select_params(&assets);                                                                
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
@@ -451,22 +451,18 @@ fn create_mesh() -> rend3::types::Mesh {
 //  These will come from a file in future,
 //  with an entry for each supported metaverse.
 fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
-    println!("Loading grid select params"); // ***TEMP***
-    println!("Replay file"); // ***TEMP***
     let replay_file_dummy_grid = GridSelectParams {
         name: "Replay file".to_string(),
         picture_bar: assets.replay_bar,
         web_url: "https://www.animats.com/viewer".to_string(),
         login_url: None,
     };
-    println!("Placeholder A"); // ***TEMP***
     let placeholder_a = GridSelectParams {
         name: "Second Life".to_string(),
         picture_bar: assets.placeholder_a_bar,
         web_url: "https://www.secondlife.com/viewer".to_string(),
         login_url: Some("https://login.aditi.lindenlab.com/cgi-bin/login.cgi".to_string()),
     };
-    println!("Placeholder B"); // ***TEMP***
     let placeholder_b = GridSelectParams {
         name: "OsGrid".to_string(),
         picture_bar: assets.placeholder_b_bar,

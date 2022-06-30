@@ -76,13 +76,15 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
 }
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
-#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+//
+//  The start screen. A scrolling list of big image buttons, one
+//  for each metaverse.
 pub fn draw_start(state: &mut GuiState) {                          
     // Insert egui commands here
     let ctx = state.platform.context();
     //  Draw the splash screen with a big set of alternative metaverses.
     //
-    egui::TopBottomPanel::top("start_screen").show(&ctx, |ui| {
+    egui::CentralPanel::default().show(&ctx, |ui| {
         if let Some(grid) = state.grid_select_window.draw(&ctx) {  // dummy test window
             //  A grid has been selected
             let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
