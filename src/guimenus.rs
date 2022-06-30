@@ -83,7 +83,7 @@ pub fn draw_start(state: &mut GuiState) {
     //  Draw the splash screen with a big set of alternative metaverses.
     //
     egui::TopBottomPanel::top("start_screen").show(&ctx, |ui| {
-        if let Some(grid) = state.grid_select_window.new_window(&ctx) {  // dummy test window
+        if let Some(grid) = state.grid_select_window.draw(&ctx) {  // dummy test window
             //  A grid has been selected
             let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
             state.change_mode(SystemMode::Login);
@@ -200,7 +200,7 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
             });
     }
     //  Non-menu items
-    state.message_window.new_window(&ctx);   // dummy test window
+    state.message_window.draw(&ctx);   // dummy test window
     state.draw(&ctx); // all the standard windows
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
