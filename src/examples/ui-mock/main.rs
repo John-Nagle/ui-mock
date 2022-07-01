@@ -13,7 +13,7 @@
 //  June 2022
 //
 use libui;
-use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, GridSelectParams, Dictionary};
+use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, Dictionary};
 use std::sync::Arc;
 use log::{LevelFilter};
 
@@ -57,7 +57,12 @@ impl Ui {
                 data.gui_state.unimplemented_msg(); // ***TEMP***
             }
             GuiEvent::LoginTo(grid) => {
-                println!("Now log into this: {}", grid.name);
+                //  Grid has been selected, now try to log in.
+                if data.gui_state.get_mode() == SystemMode::Login {
+                    data.gui_state.selected_grid = Some(grid);  // set the selected grid
+                } else {
+                    log::error!("Login request to {} while in state {:?}", grid.name, data.gui_state.get_mode());
+                }
             }
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
                 data.gui_state.unimplemented_msg(); // ***TEMP***

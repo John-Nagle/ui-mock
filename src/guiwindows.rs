@@ -54,11 +54,11 @@ pub struct GuiAssets {
 /// GUI states.
 //  The main states of the system.
 //  This is a state machine
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum SystemMode {
     Start,  // idle, waiting for grid selection
             // -> Login, Replay. Exit
-    Login,  // login di	alog is up.
+    Login,  // login dialog is up.
             // -> Connected, Start
     Connecting, // Connecting to server
             // -> Connected, Start
@@ -82,6 +82,8 @@ pub struct GuiState {
     pub platform: egui_winit_platform::Platform,
     //  Primary system mode
     system_mode: SystemMode,                // primary operating mode
+    //  Selected grid
+    pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub about_window: Option<TextWindow>,       // Help->About
@@ -120,6 +122,7 @@ impl GuiState {
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
             system_mode: SystemMode::Start,
+            selected_grid: None,
             event_send_channel,
             event_recv_channel,    
         }

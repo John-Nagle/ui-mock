@@ -85,20 +85,60 @@ pub fn draw_start(state: &mut GuiState) {
     //  Draw the splash screen with a big set of alternative metaverses.
     //
     egui::CentralPanel::default().show(&ctx, |ui| {
-        if let Some(grid) = state.grid_select_window.draw(&ctx) {  // dummy test window
-            //  A grid has been selected
-            let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
-            state.change_mode(SystemMode::Login);
-        }     
+        if state.selected_grid.is_none() {                           // if no grid selected
+            if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
+                //  A grid has been selected
+                let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
+                state.change_mode(SystemMode::Login);
+            }
+        } else {
+            //  Something is wrong if we're in start state with a selected grid
+            log::error!("In START state with a grid selected.");    // probably previous bad shutdown
+            state.change_mode(SystemMode::Shutdown);                // force a shutdown
+        }  
         state.draw(&ctx); // all the standard windows
+    });
+}
+
+/// Login to a grid
+pub fn draw_grid_login(state: &mut GuiState) {
+    let ctx = state.platform.context();
+    //  Top menu bar
+    egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
+        if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
+            state.selected_grid = None;                 // clear grid selection
+            state.change_mode(SystemMode::Start);       // back to start state
+        }
+    });
+}
+
+/// File picker for replay file
+pub fn draw_replay_file_pick(state: &mut GuiState) {
+    let ctx = state.platform.context();
+    //  Top menu bar
+    egui::TopBottomPanel::top("replay_file_container").show(&ctx, |ui| {
+        if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
+            state.selected_grid = None;                 // clear grid selection
+            state.change_mode(SystemMode::Start);       // back to start state
+        }
     });
 }
 
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw_login(state: &mut GuiState) {          
-    panic!("Unimplemented"); 
+pub fn draw_login(state: &mut GuiState) {       
+    if let Some(grid) = &state.selected_grid {
+        if let Some(login_url) = &grid.login_url {
+            //  Actual login, need username/password.
+            draw_grid_login(state)
+        } else {
+            draw_replay_file_pick(state)
+        }
+    } else {
+        //  This might happen as a transient state.
+        log::error!("Why are we in login state with no grid selected?");
+    } 
 }
 
 
