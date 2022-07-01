@@ -80,15 +80,18 @@ pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
 #[cfg (feature="replay")]
 pub fn menu_open_replay(_ui: &mut Ui, state: &mut GuiState) {
     // Open menu entry
-    if let Some(path) = rfd::FileDialog::new()
+    let replay_path_opt = if let Some(path) = rfd::FileDialog::new()
         .set_title(t!("title.open_replay", state.get_lang()))
         .add_filter("json", &["json"])
         .pick_file()
     {
         let picked_path = Some(path.display().to_string());
         log::warn!("File picked: {}", picked_path.unwrap());
+        Some(path)  // user selection
+    } else {
+        None        // no user selection
+    };
         //  Send to the main event loop for action.
-        let replay_event = GuiEvent::OpenReplay(path);
-        let _ = state.send_gui_event(replay_event); // if we can't send, we must be shutting down
-    }
+    let _ = state.send_gui_event(GuiEvent::OpenReplay(replay_path_opt)); // if we can't send, we must be shutting down
+
 }

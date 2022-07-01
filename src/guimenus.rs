@@ -117,10 +117,7 @@ pub fn draw_replay_file_pick(state: &mut GuiState) {
     let ctx = state.platform.context();
     //  Top menu bar
     egui::TopBottomPanel::top("replay_file_container").show(&ctx, |ui| {
-        if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
-            state.selected_grid = None;                 // clear grid selection
-            state.change_mode(SystemMode::Start);       // back to start state
-        }
+        guiactions::menu_open_replay(ui, state)     // use the file picker
     });
 }
 

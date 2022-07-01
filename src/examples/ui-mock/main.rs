@@ -53,8 +53,10 @@ impl Ui {
     pub fn handle_user_event(&mut self, event: GuiEvent) {
         let data = self.data.as_mut().unwrap();
         match event {
-            GuiEvent::OpenReplay(_path_buf) => {     // open a replay file
+            GuiEvent::OpenReplay(path_buf) => {     // open a replay file
+                println!("Open replay: {:?}", path_buf); // ***TEMP***
                 data.gui_state.unimplemented_msg(); // ***TEMP***
+                data.gui_state.change_mode(SystemMode::Connected);
             }
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.

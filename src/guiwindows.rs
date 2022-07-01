@@ -22,7 +22,7 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message win
 /// User events sent to the main event loop
 #[derive(Debug, Clone)]
 pub enum GuiEvent {
-    OpenReplay(PathBuf),                            // open a replay file
+    OpenReplay(Option<PathBuf>),                    // open a replay file
     SaveReplay(PathBuf),                            // save into a replay file
     LoginTo(GridSelectParams),                      // ask for login params
     ////Login(ConnectInfo),                         // login dialog result
