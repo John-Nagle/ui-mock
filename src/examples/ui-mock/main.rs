@@ -53,10 +53,19 @@ impl Ui {
     pub fn handle_user_event(&mut self, event: GuiEvent) {
         let data = self.data.as_mut().unwrap();
         match event {
-            GuiEvent::OpenReplay(path_buf) => {     // open a replay file
-                println!("Open replay: {:?}", path_buf); // ***TEMP***
-                data.gui_state.unimplemented_msg(); // ***TEMP***
-                data.gui_state.change_mode(SystemMode::Connected);
+            GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
+                match path_buf_opt {
+                    Some(path_buf) => {
+                        println!("Open replay: {:?}", path_buf); // ***TEMP***
+                        //  ***NEED TO PASS path_buf and grid to startup and actually go***
+                        data.gui_state.change_mode(SystemMode::Connected);
+                    }
+                    None => {
+                        //  User cancelled replay. Back to ground state.
+                        data.gui_state.selected_grid = None;            // cancel grid selection
+                        data.gui_state.change_mode(SystemMode::Start);  // back to starting state
+                    }
+                }
             }
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.
