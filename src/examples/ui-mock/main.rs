@@ -451,23 +451,28 @@ fn create_mesh() -> rend3::types::Mesh {
 //  These will come from a file in future,
 //  with an entry for each supported metaverse.
 fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
-    let replay_file_dummy_grid = GridSelectParams {
+    let mut grids = Vec::new();
+    grids.push(GridSelectParams {
         name: "Replay file".to_string(),
         picture_bar: assets.replay_bar,
         web_url: "https://www.animats.com/viewer".to_string(),
         login_url: None,
-    };
-    let placeholder_a = GridSelectParams {
+    });
+    grids.push(GridSelectParams {
         name: "Second Life".to_string(),
         picture_bar: assets.placeholder_a_bar,
-        web_url: "https://www.secondlife.com/viewer".to_string(),
+        web_url: "https://www.secondlife.com".to_string(),
         login_url: Some("https://login.aditi.lindenlab.com/cgi-bin/login.cgi".to_string()),
-    };
-    let placeholder_b = GridSelectParams {
+    });
+    grids.push(GridSelectParams {
         name: "OsGrid".to_string(),
         picture_bar: assets.placeholder_b_bar,
         web_url: "https://www.osgrid.org".to_string(),
         login_url: Some("http://login.osgrid.org".to_string()),
-    };
-    vec![replay_file_dummy_grid, placeholder_a, placeholder_b]
+    });
+    /*  ***TEST ONLY*** to test scrolling. Not working right in egui 0.17
+    let work = &grids[0].clone();   // ***TEMP***
+    for _ in 0..10 { grids.push(work.clone());}  // ***TEMP*** forcing scrolling
+    */
+    grids
 }

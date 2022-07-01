@@ -362,6 +362,7 @@ impl GridSelectWindow {
     pub fn draw(&self, ctx: &egui::Context)-> Option<GridSelectParams> {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
             .anchor(egui::Align2::CENTER_TOP, egui::Vec2::ZERO)
+            ////.auto_sized()
             .collapsible(false);
         let mut result = None;  // what, if anything, was clicked upon
         window.show(ctx, |ui| {
@@ -371,6 +372,7 @@ impl GridSelectWindow {
             let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
             //  Add image and website link to each row
             egui::ScrollArea::vertical().show_rows(ui, row_height, self.grids.len(), |ui, row_range| {
+                ////println!("Rows: {:?} of {}", row_range, self.grids.len());  // ***TEMP***
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.label(&grid.name);
