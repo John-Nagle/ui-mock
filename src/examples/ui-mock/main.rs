@@ -50,7 +50,7 @@ impl Ui {
     /// Handle user-created event.
     //  This is how the GUI and other parts of the
     //  system communicate with the main event loop.
-    pub fn handle_user_event(&mut self, event: GuiEvent) {
+    pub fn handle_user_event(&mut self, window: &winit::window::Window, event: GuiEvent) {
         let data = self.data.as_mut().unwrap();
         match event {
             GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
@@ -76,7 +76,7 @@ impl Ui {
                         //  No grid URL, so this is a replay file selection, not a login.
                         //  File pick is done with the platform's native file picker, asynchronously.
                         //  File pickers are special - they authorize the program to access the file at the system level.
-                        GuiState::pick_replay_file_async(&mut data.gui_state); // use the file picker
+                        GuiState::pick_replay_file_async(&mut data.gui_state, window); // use the file picker
                     }                   
                 } else {
                     log::error!("Login request to {} while in state {:?}", grid.name, data.gui_state.get_mode());
@@ -281,7 +281,7 @@ impl rend3_framework::App for Ui {
                 let events: Vec<GuiEvent> = data.gui_state.event_recv_channel.try_iter().collect(); 
                 for ev in events {
                     println!("User event: {:?}", ev);       // ***TEMP***
-                    self.handle_user_event(ev);
+                    self.handle_user_event(window, ev);
                 }
             }
         }

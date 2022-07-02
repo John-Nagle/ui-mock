@@ -207,8 +207,8 @@ impl GuiState {
         Ok(channel.send(event)?)    // send
     } 
     //  Open replay file dialog, async version.
-    pub fn pick_replay_file_async(&mut self) {
-        pick_replay_file_async(self)
+    pub fn pick_replay_file_async(&mut self, window: &winit::window::Window) {
+        pick_replay_file_async(self, window)
     }
 }
 
@@ -437,7 +437,7 @@ impl GridSelectWindow {
 
 /// Pick replay file, async form
 #[cfg (feature="replay")]
-pub fn pick_replay_file_async(state: &mut GuiState) {
+pub fn pick_replay_file_async(state: &mut GuiState, window: &winit::window::Window) {
     fn execute<F: std::future::Future<Output = ()> + Send + 'static>(f: F) {
         // this is stupid... use any executor of your choice instead
         std::thread::spawn(move || futures::executor::block_on(f));
@@ -447,7 +447,8 @@ pub fn pick_replay_file_async(state: &mut GuiState) {
     //  Pop up the file dialog
     let task = rfd::AsyncFileDialog::new()
         .set_title(t!("title.open_replay", state.get_lang()))
-        .add_filter("json", &["json"])   
+        .add_filter("json", &["json"])
+        .set_parent(window)
         .pick_file();
     // Await somewhere else
     execute(async move {
