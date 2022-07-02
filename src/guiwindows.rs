@@ -198,6 +198,18 @@ impl GuiState {
     pub fn send_gui_event(&self, event: GuiEvent) -> Result<(), Error> {
         Ok(self.event_send_channel.send(event)?)    // send
     }
+    /// Access to channel, mostly for inter-thread sending.
+    pub fn get_send_channel(&self) -> &crossbeam_channel::Sender<GuiEvent> {
+        &self.event_send_channel        
+    }
+    /// Send, given channel
+    pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<GuiEvent>, event: GuiEvent) -> Result<(), Error> {
+        Ok(channel.send(event)?)    // send
+    } 
+    //  Open replay file dialog, async version.
+    pub fn pick_replay_file_async(&mut self) {
+        pick_replay_file_async(self)
+    }
 }
 
 pub trait GuiWindow {
@@ -370,12 +382,12 @@ impl GridSelectWindow {
         let mut result = None;  // what, if anything, was clicked upon
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
-            let text_style = egui::TextStyle::Body;
+            ////let text_style = egui::TextStyle::Body;
             ////let row_height = ui.text_style_height(&text_style);
             let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
             //  Add image and website link to each row
             egui::ScrollArea::vertical().show_rows(ui, row_height, self.grids.len(), |ui, row_range| {
-                ////println!("Rows: {:?} of {}", row_range, self.grids.len());  // ***TEMP***
+                println!("Rows: {:?} of {}, row height {}", row_range, self.grids.len(), row_height);  // ***TEMP***
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.label(&grid.name);
@@ -420,4 +432,39 @@ impl GridSelectWindow {
         });
         result      // selected grid, or None
     }
+}
+
+/// Pick replay file, async form
+#[cfg (feature="replay")]
+pub fn pick_replay_file_async(state: &mut GuiState) {
+    let channel = state.get_send_channel().clone(); // save send channel
+    //  Pop up the file dialog
+    let task = rfd::AsyncFileDialog::new()
+        .set_title(t!("title.open_replay", state.get_lang()))
+        .add_filter("json", &["json"])   
+        .pick_file();
+    // Await somewhere else
+    execute(async move {
+        let file = task.await;              // wait for dialog completion
+        let replay_path_opt = if let Some(file) = file {
+            // If you are on native platform you can just get the path
+            println!("{:?}", file.path());
+
+            // If you care about wasm support you just read() the file
+            ////file.read().await;
+            log::warn!("File picked: {:?}", file.path());
+            Some(file.path().to_path_buf())
+        } else {
+            None
+        };
+        //  Send dialog result to the main event loop for action.
+        let _ = GuiState::send_gui_event_on_channel(&channel, GuiEvent::OpenReplay(replay_path_opt)); // if we can't send, we must be shutting down
+    });
+}
+
+use std::future::Future;
+
+fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
+    // this is stupid... use any executor of your choice instead
+    std::thread::spawn(move || futures::executor::block_on(f));
 }

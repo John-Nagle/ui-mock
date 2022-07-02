@@ -13,7 +13,6 @@ use egui::FontFamily::{Proportional};
 use egui::TextStyle::{Button, Small, Heading, Body, Name, Monospace};
 use egui::FontId;
 
-
 /// Load an icon at compile time. Image is built into executable.
 pub fn load_canned_icon(
     image_bytes: &[u8],
@@ -55,3 +54,5 @@ pub fn set_default_styles(ctx: &Context) {
     // Mutate global style with above changes
     ctx.set_style(style);
 }
+
+

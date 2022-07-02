@@ -70,7 +70,14 @@ impl Ui {
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.
                 if data.gui_state.get_mode() == SystemMode::Login {
+                    let is_file_pick = grid.login_url.is_none();
                     data.gui_state.selected_grid = Some(grid);  // set the selected grid
+                    if is_file_pick {
+                        //  No grid URL, so this is a replay file selection, not a login.
+                        //  File pick is done with the platform's native file picker, asynchronously.
+                        //  File pickers are special - they authorize the program to access the file at the system level.
+                        GuiState::pick_replay_file_async(&mut data.gui_state); // use the file picker
+                    }                   
                 } else {
                     log::error!("Login request to {} while in state {:?}", grid.name, data.gui_state.get_mode());
                 }

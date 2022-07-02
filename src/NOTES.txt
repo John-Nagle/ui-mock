@@ -154,10 +154,15 @@ Looking ahead:
 2022-06-26
 
 TODO:
-   1. Grid selection and login mockup.
-   2. State machine to enable and disable menus.
-   3. Return results from menus via winit events.
-   4. Do something about file picker going to background?
+   1. Grid selection and login mockup.  [DONE]
+   2. State machine to enable and disable menus. [DONE]
+   3. Return results from menus via winit events. [DONE]
+   4. Do something about file picker going to background.
+   
+2022-06-29
+
+- Combine state changes and events in some way, while keeping them in sync.
+- Find out why scrolling of picture buttons is broken.
     
     
     

@@ -117,7 +117,7 @@ pub fn draw_replay_file_pick(state: &mut GuiState) {
     let ctx = state.platform.context();
     //  Top menu bar
     egui::TopBottomPanel::top("replay_file_container").show(&ctx, |ui| {
-        guiactions::menu_open_replay(ui, state)     // use the file picker
+        ////guiactions::menu_open_replay_async(ui, state)     // use the file picker
     });
 }
 
