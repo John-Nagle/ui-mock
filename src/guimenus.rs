@@ -198,22 +198,12 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
                         ui.radio_value(&mut log_level, LevelFilter::Debug, t!("menu.log_level.debug", lang));   
                         ui.radio_value(&mut log_level, LevelFilter::Trace, t!("menu.log_level.trace", lang));                  
                     });
-                    state.params.log_level = log_level;     // update log level                                  
-                    //  Replay file menu. Only enabled if compiled with replay feature.
-                    //  This is for security of metaverse content.
-                    #[cfg (feature="replay")]
-                    if ui.button(t!("menu.developer.open_replay", state.get_lang())).clicked() {
-                        // Open menu entry
-                        guiactions::menu_open_replay(ui, state);
-                    }
+                    state.params.log_level = log_level;     // update log level   
                     #[cfg (feature="replay")]
                     if ui.button(t!("menu.developer.save_replay", state.get_lang())).clicked() {
                         // Open menu entry
-                        guiactions::menu_open_replay(ui, state);
+                        if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {}
                     }
-                    if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
-                    }
-
                 });
             });
         });

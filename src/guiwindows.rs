@@ -437,6 +437,11 @@ impl GridSelectWindow {
 /// Pick replay file, async form
 #[cfg (feature="replay")]
 pub fn pick_replay_file_async(state: &mut GuiState) {
+    fn execute<F: std::future::Future<Output = ()> + Send + 'static>(f: F) {
+        // this is stupid... use any executor of your choice instead
+        std::thread::spawn(move || futures::executor::block_on(f));
+    }
+
     let channel = state.get_send_channel().clone(); // save send channel
     //  Pop up the file dialog
     let task = rfd::AsyncFileDialog::new()
@@ -462,9 +467,3 @@ pub fn pick_replay_file_async(state: &mut GuiState) {
     });
 }
 
-use std::future::Future;
-
-fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
-    // this is stupid... use any executor of your choice instead
-    std::thread::spawn(move || futures::executor::block_on(f));
-}

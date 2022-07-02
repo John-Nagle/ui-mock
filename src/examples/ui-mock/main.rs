@@ -475,6 +475,8 @@ fn create_mesh() -> rend3::types::Mesh {
 //  with an entry for each supported metaverse.
 fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
     let mut grids = Vec::new();
+    //  Replay feature only if replay enabled
+    #[cfg (feature="replay")]
     grids.push(GridSelectParams {
         name: "Replay file".to_string(),
         picture_bar: assets.replay_bar,
