@@ -387,7 +387,7 @@ impl GridSelectWindow {
             let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
             //  Add image and website link to each row
             egui::ScrollArea::vertical().show_rows(ui, row_height, self.grids.len(), |ui, row_range| {
-                println!("Rows: {:?} of {}, row height {}", row_range, self.grids.len(), row_height);  // ***TEMP***
+                ////println!("Rows: {:?} of {}, row height {}", row_range, self.grids.len(), row_height);  // ***TEMP***
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.label(&grid.name);
@@ -417,6 +417,7 @@ impl GridSelectWindow {
                             match webbrowser::open(&grid.web_url) {
                                 Ok(_) => {},
                                 Err(e) => {
+                                    log::error!("Trouble trying to open web page \"{}\": {:?}", grid.web_url, e);
                                     //  Popup if trouble
                                     /* ***MORE*** need access to state
                                     let errmsg = format!("{:?}",e);

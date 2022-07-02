@@ -10,7 +10,7 @@ use image::GenericImageView;
 use egui::{Context, TextureId};
 use rend3_egui::EguiRenderRoutine;
 use egui::FontFamily::{Proportional};
-use egui::TextStyle::{Button, Small, Heading, Body, Name, Monospace};
+use egui::TextStyle::{Button, Small, Heading, Body, /*Name,*/ Monospace};
 use egui::FontId;
 
 /// Load an icon at compile time. Image is built into executable.
