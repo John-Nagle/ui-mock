@@ -84,7 +84,7 @@ pub fn draw_start(state: &mut GuiState) {
     let ctx = state.platform.context();
     //  Draw the splash screen with a big set of alternative metaverses.
     //
-    egui::CentralPanel::default().show(&ctx, |ui| {
+    egui::CentralPanel::default().show(&ctx, |_ui| {
         if state.selected_grid.is_none() {                           // if no grid selected
             if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
                 //  A grid has been selected
@@ -116,8 +116,11 @@ pub fn draw_grid_login(state: &mut GuiState) {
 pub fn draw_replay_file_pick(state: &mut GuiState) {
     let ctx = state.platform.context();
     //  Top menu bar
-    egui::TopBottomPanel::top("replay_file_container").show(&ctx, |ui| {
-        ////guiactions::menu_open_replay_async(ui, state)     // use the file picker
+    egui::CentralPanel::default().show(&ctx, |ui| {
+        //  Layering problem.
+        ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |ui| {
+            ui.label("If you can see this, there's a file open dialog hidden behind this window.");
+        })
     });
 }
 
@@ -126,7 +129,7 @@ pub fn draw_replay_file_pick(state: &mut GuiState) {
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw_login(state: &mut GuiState) {       
     if let Some(grid) = &state.selected_grid {
-        if let Some(login_url) = &grid.login_url {
+        if let Some(_login_url) = &grid.login_url {
             //  Actual login, need username/password.
             draw_grid_login(state)
         } else {
