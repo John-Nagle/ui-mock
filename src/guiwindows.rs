@@ -14,6 +14,7 @@ use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
+use super::guimenus;
 use crate::t;
 use rend3::{ExtendedAdapterInfo};
 /// Configuration
@@ -126,6 +127,36 @@ impl GuiState {
             event_send_channel,
             event_recv_channel,    
         }
+    }
+    
+    /// Draw all of GUI. Called at beginning of redraw event
+    pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedMesh>, egui::TexturesDelta) {
+        ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
+        self.platform.begin_frame();
+
+        // Insert egui commands here
+        let show_menus = self.if_gui_awake();
+        let mut inuse = guimenus::draw(self, show_menus); // draws the GUI
+        inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
+        if inuse {
+            self.wake_up_gui();
+        }
+        let egui::FullOutput {
+            shapes,
+            textures_delta,
+            platform_output,
+            ..
+        } = self.platform.end_frame(Some(window));
+        if !platform_output.events.is_empty() {
+            self.wake_up_gui(); // reset GUI idle time.
+            self.message_window.add_line(format!(
+                "Platform events: {:?}, {} shapes.",
+                platform_output.events,
+                shapes.len()
+            )); // ***TEMP***
+        }
+        //  Tesselate and retur paint jobs.
+        (self.platform.context().tessellate(shapes), textures_delta)    
     }
 
     /// Draw all live windows
@@ -467,5 +498,21 @@ pub fn pick_replay_file_async(state: &mut GuiState, window: &winit::window::Wind
         //  Send dialog result to the main event loop for action.
         let _ = GuiState::send_gui_event_on_channel(&channel, GuiEvent::OpenReplay(replay_path_opt)); // if we can't send, we must be shutting down
     });
+}
+
+/// True if cursor is at the top or bottom of the screen in full screen mode.
+//  This is how you get the menus back from a totally clean window.
+pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, ctx: &egui::Context) -> bool {
+    const NEAR_EDGE: f32 = 5.0; // if within this many pixels of top or bottom
+                                ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
+    let inner_size = window.inner_size(); // sizes of window
+    ////let ctx = data.gui_state.platform.context();
+    if let Some(pos) = ctx.pointer_interact_pos() {
+        // check for pointer at top or bottom of window
+        ////println!("pos: {:?}, height: {}", pos, inner_size.height);
+        pos.y < NEAR_EDGE || pos.y + NEAR_EDGE > (inner_size.height as f32)
+    } else {
+        false
+    }
 }
 

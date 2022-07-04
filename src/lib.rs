@@ -14,7 +14,7 @@ mod guiwindows;
 mod guiutil;
 
 /// The main draw function. Called on every frame.
-pub use guimenus::{draw};
+////pub use guimenus::{draw};
 pub use guiwindows::{GuiParams, GuiAssets, GuiState, GuiEvent, SystemMode, GridSelectParams};
 /// Utility functions.
 pub use guiutil::{load_canned_icon, set_default_styles};

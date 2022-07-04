@@ -96,21 +96,7 @@ impl Ui {
     }
 }
 
-/// True if cursor is at the top or bottom of the screen in full screen mode.
-//  This is how you get the menus back from a totally clean window.
-pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, data: &UiData) -> bool {
-    const NEAR_EDGE: f32 = 5.0; // if within this many pixels of top or bottom
-                                ////if !window.fullscreen().is_some() { return false; }               // only meaningful for full screen
-    let inner_size = window.inner_size(); // sizes of window
-    let ctx = data.gui_state.platform.context();
-    if let Some(pos) = ctx.pointer_interact_pos() {
-        // check for pointer at top or bottom of window
-        ////println!("pos: {:?}, height: {}", pos, inner_size.height);
-        pos.y < NEAR_EDGE || pos.y + NEAR_EDGE > (inner_size.height as f32)
-    } else {
-        false
-    }
-}
+
 
 /// This is an instance of the Rend3 application framework.
 impl rend3_framework::App for Ui {
@@ -298,6 +284,7 @@ impl rend3_framework::App for Ui {
                 profiling::scope!("Redraw.");
                 data.gui_state.platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
+                /*
                 data.gui_state.platform.begin_frame();
 
                 // Insert egui commands here
@@ -323,12 +310,14 @@ impl rend3_framework::App for Ui {
                 }
 
                 let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
-
+                */
+                let (paint_jobs, textures_delta) = data.gui_state.draw_all(&window);  // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
                     context: data.gui_state.platform.context(),
                 };
+
                 profiling::scope!("3D");
                 // Get a frame
                 let frame = rend3::util::output::OutputFrame::Surface {
