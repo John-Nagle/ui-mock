@@ -557,6 +557,7 @@ impl log::Log for MessageLogger {
     /// Log an error. Filtering has already taken place.
     fn log(&self, record: &log::Record<'_>) {
         // Format for display.
+        //  ***NEED TO TRIM LENGTH***
         let s = format!("{}:{} -- {}",
                 record.level(),
                 record.target(),
@@ -573,6 +574,7 @@ impl log::Log for MessageLogger {
 
 //  Logging to GUI
 impl SharedLogger for MessageLogger {
+    /// Access to level filter
     fn level(&self) -> LevelFilter {
         self.level_filter
     }
@@ -582,8 +584,9 @@ impl SharedLogger for MessageLogger {
         None                    // for now
     }
     
+    /// Return self, boxed. Required.
     fn as_log(self: Box<Self>) -> Box<dyn log::Log> {
-        panic!("Unimplemented");
+        Box::new(self)
     }
 }
 
