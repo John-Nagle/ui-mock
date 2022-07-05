@@ -537,16 +537,16 @@ pub struct MessageLogger {
 
 impl MessageLogger {
     //  Usual new
-    fn new(send_channel: crossbeam_channel::Sender::<GuiEvent>) -> MessageLogger {
-        MessageLogger {
+    pub fn new(level_filter: LevelFilter, send_channel: crossbeam_channel::Sender::<GuiEvent>) -> Box<dyn SharedLogger> {
+        Box::new(MessageLogger {
             send_channel: send_channel,
-            level_filter: LevelFilter::Error,
+            level_filter,
             enabled: true               // always on, actually
-        }
+        })
     }
     
     //  Set log level filter
-    fn set_level_filter(&mut self, level_filter: LevelFilter) {
+    pub fn set_level_filter(&mut self, level_filter: LevelFilter) {
         self.level_filter = level_filter;
     }
 }
