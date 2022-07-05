@@ -29,6 +29,7 @@ pub enum GuiEvent {
     LoginTo(GridSelectParams),                      // ask for login params
     ////Login(ConnectInfo),                         // login dialog result
     ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
+    LogMessage(String),                             // log to GUI
     Quit                                            // shut down and exit
 }
 
@@ -237,7 +238,12 @@ impl GuiState {
     /// Send, given channel
     pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<GuiEvent>, event: GuiEvent) -> Result<(), Error> {
         Ok(channel.send(event)?)    // send
-    } 
+    }
+    /// Display message in message window
+    pub fn add_msg(&mut self, s: String) {
+        self.message_window.add_line(s)
+    }
+    
     //  Open replay file dialog, async version.
     pub fn pick_replay_file_async(&mut self, window: &winit::window::Window) {
         pick_replay_file_async(self, window)
@@ -518,20 +524,57 @@ pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, ctx: &
 }
 
 /// Logging to GUI
+//  This is complicated by its having to outlive
+//  almost everything else. Even the GUI to which
+//  it is logging.
 pub struct MessageLogger {
+    send_channel: crossbeam_channel::Sender::<GuiEvent>,  // channel for sending messages
+    level_filter: LevelFilter,      // errors at this level and above appear for user
+    enabled: bool,                  // true if still enabled
+}
 
+impl MessageLogger {
+    //  Usual new
+    fn new(send_channel: crossbeam_channel::Sender::<GuiEvent>) -> MessageLogger {
+        MessageLogger {
+            send_channel: send_channel,
+            level_filter: LevelFilter::Error,
+            enabled: true               // always on, actually
+        }
+    }
+    
+    //  Set log level filter
+    fn set_level_filter(&mut self, level_filter: LevelFilter) {
+        self.level_filter = level_filter;
+    }
 }
 
 impl log::Log for MessageLogger {
-    fn enabled(&self, _: &log::Metadata<'_>) -> bool { todo!() }
-    fn log(&self, _: &log::Record<'_>) { todo!() }
-    fn flush(&self) { todo!() }
+    fn enabled(&self, _: &log::Metadata<'_>) -> bool {
+        self.enabled
+    }
+    
+    /// Log an error. Filtering has already taken place.
+    fn log(&self, record: &log::Record<'_>) {
+        // Format for display.
+        let s = format!("{}:{} -- {}",
+                record.level(),
+                record.target(),
+                record.args());
+        let event = GuiEvent::LogMessage(s);
+        if let Err(e) = GuiState::send_gui_event_on_channel(&self.send_channel, event) {
+            println!("Error {}:{} -- {} could not be sent to GUI: {:?}", record.level(), record.target(), record.args(), e);
+        }
+    }
+    
+    /// Flush - does nothing.
+    fn flush(&self) { }     // no need to flush here
 }
 
 //  Logging to GUI
 impl SharedLogger for MessageLogger {
     fn level(&self) -> LevelFilter {
-        panic!("Unimplemented");
+        self.level_filter
     }
     
     /// Access to config

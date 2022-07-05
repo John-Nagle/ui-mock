@@ -89,6 +89,9 @@ impl Ui {
                 let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
                 data.gui_state.add_error_window(&title, &msgs);
             }
+            GuiEvent::LogMessage(s) => {
+                data.gui_state.add_msg(s)
+            }
             GuiEvent::Quit => {
                 data.quit = true;                   // force quit              
             }                                       // shut down and exit
