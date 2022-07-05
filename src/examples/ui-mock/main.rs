@@ -55,22 +55,11 @@ impl Ui {
     pub fn new() -> Ui {
         //  The message channel which allows other things to send to the UI.
         let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
-        let ui = Ui {
+        Ui {
             data: None,
             event_recv_channel: Some(event_recv_channel),   // because it will be taken
             event_send_channel: event_send_channel.clone(),          
-        };
-        /*
-        //  Set up logging.
-        let _ = simplelog::CombinedLogger::init(
-            vec![
-                simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
-                ////WriteLogger::new(LevelFilter::Info, simplelog::Config::default(), File::create("my_rust_bin.log").unwrap())
-                MessageLogger::new(LevelFilter::Warn, event_send_channel),
-            ]
-        );  
-        */      
-        ui
+        }
     }
 
     /// Handle user-created event.

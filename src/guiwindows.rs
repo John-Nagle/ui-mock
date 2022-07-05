@@ -560,7 +560,7 @@ impl log::Log for MessageLogger {
     fn log(&self, record: &log::Record<'_>) {
         // Format for display.
         //  ***NEED TO TRIM LENGTH***
-        let s = format!("{}:{} -- {}",
+        let s = format!("[{}] ({}): {}",
                 record.level(),
                 record.target(),
                 record.args());
