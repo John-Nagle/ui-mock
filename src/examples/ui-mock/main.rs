@@ -41,12 +41,24 @@ impl UiData {
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// The application.
-#[derive(Default)]
 pub struct Ui {
     data: Option<UiData>,
+    //  UI event channel.
+    //  We have to do this at the outer level so the logger can access it early.
+    event_send_channel: crossbeam_channel::Sender<GuiEvent>, 
+    event_recv_channel: Option<crossbeam_channel::Receiver<GuiEvent>>,
 }
 
 impl Ui {
+    pub fn new() -> Ui {
+        let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
+        Ui {
+            data: None,
+            event_recv_channel: Some(event_recv_channel),   // because it will be taken
+            event_send_channel
+        }
+    }
+
     /// Handle user-created event.
     //  This is how the GUI and other parts of the
     //  system communicate with the main event loop.
@@ -234,7 +246,9 @@ impl rend3_framework::App for Ui {
             gpu_info: adapter_info,             // GPU info
             grid_select_params,
         };
-        let gui_state = GuiState::new(params, assets, platform);     // all the fixed and popup windows
+        let event_send_channel = self.event_send_channel.clone();
+        let event_recv_channel = self.event_recv_channel.take().unwrap();
+        let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -400,7 +414,7 @@ fn main() {
     assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
     profiling::scope!("Main");
     profiling::register_thread!();
-    let app = Ui::default();
+    let app = Ui::new();
     rend3_framework::start(
         app,
         winit::window::WindowBuilder::new()

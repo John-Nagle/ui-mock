@@ -104,7 +104,9 @@ pub struct GuiState {
 impl GuiState {
 
     /// Usual new
-    pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform) -> GuiState {
+    pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
+        event_send_channel: crossbeam_channel::Sender<GuiEvent>, 
+        event_recv_channel: crossbeam_channel::Receiver<GuiEvent>) -> GuiState {
         //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
@@ -112,7 +114,7 @@ impl GuiState {
         guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
-        let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
+        ////let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
         GuiState {
             platform,
             message_window,
