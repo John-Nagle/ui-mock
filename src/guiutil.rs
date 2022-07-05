@@ -55,4 +55,3 @@ pub fn set_default_styles(ctx: &Context) {
     ctx.set_style(style);
 }
 
-

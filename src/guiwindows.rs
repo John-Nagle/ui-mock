@@ -17,6 +17,7 @@ use super::guiutil;
 use super::guimenus;
 use crate::t;
 use rend3::{ExtendedAdapterInfo};
+use simplelog::{SharedLogger};
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
@@ -513,6 +514,33 @@ pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, ctx: &
         pos.y < NEAR_EDGE || pos.y + NEAR_EDGE > (inner_size.height as f32)
     } else {
         false
+    }
+}
+
+/// Logging to GUI
+pub struct MessageLogger {
+
+}
+
+impl log::Log for MessageLogger {
+    fn enabled(&self, _: &log::Metadata<'_>) -> bool { todo!() }
+    fn log(&self, _: &log::Record<'_>) { todo!() }
+    fn flush(&self) { todo!() }
+}
+
+//  Logging to GUI
+impl SharedLogger for MessageLogger {
+    fn level(&self) -> LevelFilter {
+        panic!("Unimplemented");
+    }
+    
+    /// Access to config
+    fn config(&self) -> Option<&simplelog::Config> {
+        None                    // for now
+    }
+    
+    fn as_log(self: Box<Self>) -> Box<dyn log::Log> {
+        panic!("Unimplemented");
     }
 }
 
