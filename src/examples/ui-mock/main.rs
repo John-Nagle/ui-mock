@@ -16,9 +16,12 @@ use libui;
 use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, Dictionary, MessageLogger};
 use std::sync::Arc;
 use log::{LevelFilter};
+use anyhow::{Error, Context, anyhow};
 
-/// Configuration
-const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
+/// Base level configuration
+const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
+const DEVELOPER: &str = "animats";              // used for directory generation - lower case
+const LOG_FILE_NAME: &str = "log.txt";          // name of log file
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -124,15 +127,19 @@ impl rend3_framework::App for Ui {
         SAMPLE_COUNT
     }
     
-    //  Don't register logger in the app.
-    fn register_logger(&mut self) { 
+    /// Register our loggers.
+    //  One logger goes to a file.
+    //  One logger goes to a window in the GUI
+    fn register_logger(&mut self) {
+        let log_file_name = get_log_file_name().expect("Unable to create a log file name");    // get appropriate name for platform
         let _ = simplelog::CombinedLogger::init(
             vec![
                 simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
-                ////WriteLogger::new(LevelFilter::Info, simplelog::Config::default(), File::create("my_rust_bin.log").unwrap())
+                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).unwrap()),
                 MessageLogger::new(LevelFilter::Warn, self.event_send_channel.clone()),
             ]
-        );          
+        ); 
+        log::warn!("Logging to {:?}", log_file_name);   // where the log is going         
     }
 
     /// Setup of the graphics environment
@@ -520,4 +527,25 @@ fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
     for _ in 0..10 { grids.push(work.clone());}  // ***TEMP*** forcing scrolling
     */
     grids
+}
+
+/// Get name of program.
+fn get_executable_name() -> String {
+    //  Get name of program. This is unreasonably difficult.
+    std::env::current_exe().unwrap().file_stem().unwrap().to_string_lossy().to_string().to_lowercase() // just to get program name
+}
+
+/// Get log path -- get file name for log
+fn get_log_file_name() -> Result<Box<std::path::PathBuf>, Error> {
+    let executable = get_executable_name();     // name of program
+    if let Some(proj_dirs) = directories::ProjectDirs::from("com", DEVELOPER,  &executable) {
+        let local_dir = proj_dirs.data_local_dir(); // directory into which logs will go
+        println!("Proj dirs data local dir: {:?}", local_dir); // ***TEMP***
+        std::fs::create_dir_all(local_dir).with_context(|| format!("Trouble creating logging directory: {:?}", local_dir))?;  // create any needed directories
+        let path = local_dir.join(LOG_FILE_NAME);      
+        println!("Log path: {:?}", path); // ***TEMP***
+        Ok(Box::new(path))
+    } else {
+        Err(anyhow!("Unable to determine project directories"))
+    }
 }
