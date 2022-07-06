@@ -131,11 +131,11 @@ impl rend3_framework::App for Ui {
     //  One logger goes to a file.
     //  One logger goes to a window in the GUI
     fn register_logger(&mut self) {
-        let log_file_name = get_log_file_name().expect("Unable to create a log file name");    // get appropriate name for platform
+        let log_file_name = get_log_file_name().expect("Unable to figure out where to put log files.");    // get appropriate name for platform
         let _ = simplelog::CombinedLogger::init(
             vec![
-                simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
-                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).unwrap()),
+                ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
+                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file")),
                 MessageLogger::new(LevelFilter::Warn, self.event_send_channel.clone()),
             ]
         ); 
