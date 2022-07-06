@@ -14,14 +14,13 @@
 //
 use libui;
 use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, Dictionary, MessageLogger};
+use libui::{get_log_file_name};
 use std::sync::Arc;
 use log::{LevelFilter};
-use anyhow::{Error, Context, anyhow};
+mod examplesupport;
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
-const DEVELOPER: &str = "animats";              // used for directory generation - lower case
-const LOG_FILE_NAME: &str = "log.txt";          // name of log file
 
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -165,7 +164,7 @@ impl rend3_framework::App for Ui {
         );
 
         // Create mesh and calculate smooth normals based on vertices
-        let mesh = create_mesh();
+        let mesh = examplesupport::create_cube_mesh();
 
         // Add mesh to renderer's world.
         //
@@ -444,58 +443,7 @@ fn main() {
     )
 }
 
-fn vertex(pos: [f32; 3]) -> glam::Vec3 {
-    glam::Vec3::from(pos)	
-}
 
-fn create_mesh() -> rend3::types::Mesh {
-    let vertex_positions = [
-        // far side (0.0, 0.0, 1.0)
-        vertex([-1.0, -1.0, 1.0]),
-        vertex([1.0, -1.0, 1.0]),
-        vertex([1.0, 1.0, 1.0]),
-        vertex([-1.0, 1.0, 1.0]),
-        // near side (0.0, 0.0, -1.0)
-        vertex([-1.0, 1.0, -1.0]),
-        vertex([1.0, 1.0, -1.0]),
-        vertex([1.0, -1.0, -1.0]),
-        vertex([-1.0, -1.0, -1.0]),
-        // right side (1.0, 0.0, 0.0)
-        vertex([1.0, -1.0, -1.0]),
-        vertex([1.0, 1.0, -1.0]),
-        vertex([1.0, 1.0, 1.0]),
-        vertex([1.0, -1.0, 1.0]),
-        // left side (-1.0, 0.0, 0.0)
-        vertex([-1.0, -1.0, 1.0]),
-        vertex([-1.0, 1.0, 1.0]),
-        vertex([-1.0, 1.0, -1.0]),
-        vertex([-1.0, -1.0, -1.0]),
-        // top (0.0, 1.0, 0.0)
-        vertex([1.0, 1.0, -1.0]),
-        vertex([-1.0, 1.0, -1.0]),
-        vertex([-1.0, 1.0, 1.0]),
-        vertex([1.0, 1.0, 1.0]),
-        // bottom (0.0, -1.0, 0.0)
-        vertex([1.0, -1.0, 1.0]),
-        vertex([-1.0, -1.0, 1.0]),
-        vertex([-1.0, -1.0, -1.0]),
-        vertex([1.0, -1.0, -1.0]),
-    ];
-
-    let index_data: &[u32] = &[
-        0, 1, 2, 2, 3, 0, // far
-        4, 5, 6, 6, 7, 4, // near
-        8, 9, 10, 10, 11, 8, // right
-        12, 13, 14, 14, 15, 12, // left
-        16, 17, 18, 18, 19, 16, // top
-        20, 21, 22, 22, 23, 20, // bottom
-    ];
-
-    rend3::types::MeshBuilder::new(vertex_positions.to_vec(), rend3::types::Handedness::Left)
-        .with_indices(index_data.to_vec())
-        .build()
-        .unwrap()
-}
 
 /// Dummy of get grid select params.
 //  These will come from a file in future,
@@ -529,23 +477,4 @@ fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
     grids
 }
 
-/// Get name of program.
-fn get_executable_name() -> String {
-    //  Get name of program. This is unreasonably difficult.
-    std::env::current_exe().unwrap().file_stem().unwrap().to_string_lossy().to_string().to_lowercase() // just to get program name
-}
 
-/// Get log path -- get file name for log
-fn get_log_file_name() -> Result<Box<std::path::PathBuf>, Error> {
-    let executable = get_executable_name();     // name of program
-    if let Some(proj_dirs) = directories::ProjectDirs::from("com", DEVELOPER,  &executable) {
-        let local_dir = proj_dirs.data_local_dir(); // directory into which logs will go
-        println!("Proj dirs data local dir: {:?}", local_dir); // ***TEMP***
-        std::fs::create_dir_all(local_dir).with_context(|| format!("Trouble creating logging directory: {:?}", local_dir))?;  // create any needed directories
-        let path = local_dir.join(LOG_FILE_NAME);      
-        println!("Log path: {:?}", path); // ***TEMP***
-        Ok(Box::new(path))
-    } else {
-        Err(anyhow!("Unable to determine project directories"))
-    }
-}
