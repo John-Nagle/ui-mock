@@ -78,7 +78,7 @@ dark-light = "0.2.2"
 directories = "4.0"
 # Performance monitoring
 tracy-client = {version = "0.13", optional = true }
-profiling = { version = "1", default-features = false }
+profiling = { version = "^1.0.6", default-features = false }
 # System information
 sysinfo = { version = "0.24", default-features = false }
 # Concurrency
