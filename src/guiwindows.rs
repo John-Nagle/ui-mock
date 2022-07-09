@@ -516,7 +516,8 @@ pub fn panic_dialog(title: &str, message: &str) {
         .set_title(title)
         .set_description(message)
         .set_buttons(rfd::MessageButtons::Ok)
-        .set_level(rfd::MessageLevel::Error);       
+        .set_level(rfd::MessageLevel::Error)
+        .show();       
 }
 
 /// True if cursor is at the top or bottom of the screen in full screen mode.
