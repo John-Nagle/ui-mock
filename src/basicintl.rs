@@ -11,6 +11,7 @@ use oxilangtag::LanguageTag;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Read;
+use std::path::PathBuf;
 
 //  If no locale info is available, pick one of these, in order, as available.
 const IMPERIAL_LANGUAGES: [&str; 3] = ["en", "cn", "ru"]; // should support at least one of these. May support more
@@ -50,30 +51,30 @@ pub struct Dictionary {
 
 impl Dictionary {
     /// Create the dictionary for one language.
-    pub fn new(files: &[&str], langid: &str) -> Result<Dictionary, Error> {
+    pub fn new(files: &[PathBuf], langid: &str) -> Result<Dictionary, Error> {
         let mut translations = HashMap::new();
         //  Add translations from all JSON files
         let mut languages = HashSet::new(); // list of languages
         for file in files {
             let translation_file = Self::read_translation_file(file)
-                .with_context(|| format!("Translation file: \"{}\"", file))?;
+                .with_context(|| format!("Translation file: {:?}", file))?;
             Self::validate_translation_file(&translation_file, &mut languages)
-                .with_context(|| format!("Translation file: \"{}\"", file))?;
+                .with_context(|| format!("Translation file: {:?}", file))?;
             Self::add_translations(&mut translations, &translation_file, langid)?;
-            log::info!("Loaded translations from {}", file); // note translations loaded
+            log::info!("Loaded translations from {:?}", file); // note translations loaded
         }
         Ok(Dictionary { translations })
     }
 
     /// Get list of available languages.
     //  Reading the first entry will tell us this, because all entries have to match.
-    pub fn get_language_list(files: &[&str]) -> Result<HashSet<String>, Error> {
+    pub fn get_language_list(files: &[PathBuf]) -> Result<HashSet<String>, Error> {
         if files.is_empty() {
             return Ok(HashSet::new()); // empty list, no translations available
         }
-        let file = files[0]; // we have at least one
-        let translation_file = Self::read_translation_file(file)
-            .with_context(|| format!("Translation file: \"{}\"", file))?;
+        let file = &files[0]; // we have at least one
+        let translation_file = Self::read_translation_file(&file)
+            .with_context(|| format!("Translation file: {:?}", file))?;
         //  Get the unordered list of available translations from the first entry.
         //  They all have to be the same, and that's checked.
         if let Some((_, v)) = translation_file.into_iter().next() {
@@ -89,10 +90,10 @@ impl Dictionary {
     }
 
     /// Read the JSON translation file tnto a Translationfile structure.
-    fn read_translation_file(filename: &str) -> Result<TranslationFile, Error> {
+    fn read_translation_file(filename: &PathBuf) -> Result<TranslationFile, Error> {
         //  Read one translations file
         let file = File::open(filename)
-            .with_context(|| anyhow!("Failed to open the translations file: {}", filename))?;
+            .with_context(|| anyhow!("Failed to open the translations file: {:?}", filename))?;
         let mut reader = std::io::BufReader::new(file);
         let mut content = String::new();
         reader
@@ -172,7 +173,7 @@ impl Dictionary {
     }
 
     /// Get translation dictionary
-    pub fn get_translation(locale_files: &[&str]) -> Result<Dictionary, Error> {
+    pub fn get_translation(locale_files: &[PathBuf]) -> Result<Dictionary, Error> {
         fn pick_default_language(available: &HashSet<String>) -> Result<String, Error> {
             for lang in IMPERIAL_LANGUAGES.iter() {
                 if available.contains(&lang.to_string()) {
@@ -220,9 +221,9 @@ impl Dictionary {
 
 #[test]
 fn test_translation() {
-    use once_cell::sync::OnceCell;
+    use std::str::FromStr;
     //  Initialize the dictionary
-    let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // test only
+    let locale_file = PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json")).unwrap(); // test only
     let dictionary: Dictionary = Dictionary::new(&[locale_file], "fr").unwrap(); // build translations for "fr".
                                                                                  
     //  Demonstrate that it only does the lookup once

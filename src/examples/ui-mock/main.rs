@@ -17,6 +17,7 @@ use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectPara
 use libui::{get_log_file_name};
 use std::sync::Arc;
 use log::{LevelFilter};
+use std::str::FromStr;
 mod examplesupport;
 
 /// Base level configuration
@@ -244,7 +245,7 @@ impl rend3_framework::App for Ui {
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
         let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
-        let lang = Dictionary::get_translation(&[locale_file])
+        let lang = Dictionary::get_translation(&vec![std::path::PathBuf::from_str(locale_file).unwrap()])
             .expect("Trouble loading language translation files"); // select language
                                                                    
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
