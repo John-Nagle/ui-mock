@@ -119,3 +119,4 @@ pub fn get_asset_dir(dev_asset_dir_opt: Option<&str>, asset_folder_name: &str) -
     }
     Err(anyhow!("Cannot find our asset directory {:?} in any usual place.", asset_folder_name))
 }
+

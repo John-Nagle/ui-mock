@@ -509,6 +509,16 @@ pub fn pick_replay_file_async(state: &mut GuiState, window: &winit::window::Wind
     });
 }
 
+/// We're in real trouble and the main GUI isn't running. Modal dialog.
+pub fn panic_dialog(title: &str, message: &str) {
+    //  Serious errors only. Only use when the main GUI is unavailable at startup
+    let _ = rfd::MessageDialog::new()
+        .set_title(title)
+        .set_description(message)
+        .set_buttons(rfd::MessageButtons::Ok)
+        .set_level(rfd::MessageLevel::Error);       
+}
+
 /// True if cursor is at the top or bottom of the screen in full screen mode.
 //  This is how you get the menus back from a totally clean window.
 pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, ctx: &egui::Context) -> bool {
