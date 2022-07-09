@@ -13,6 +13,7 @@ use egui::FontFamily::{Proportional};
 use egui::TextStyle::{Button, Small, Heading, Body, /*Name,*/ Monospace};
 use egui::FontId;
 use anyhow::{anyhow, Error, Context};
+use std::str::FromStr;
 
 const DEVELOPER: &str = "animats";              // used for directory generation - lower case
 const LOG_FILE_NAME: &str = "log.txt";          // name of log file
@@ -79,4 +80,42 @@ pub fn get_log_file_name() -> Result<Box<std::path::PathBuf>, Error> {
     } else {
         Err(anyhow!("Unable to determine project directories"))
     }
+}
+
+/// Get asset directory.
+///
+/// - First choice: EXECUTABLEDIR/ASSETFOLDERNAME
+/// - Second choice: EXECUTABLEDIR/PROGRAMNAME-ASSETFOLDERNAME
+/// - Third choice: DEVASSETDIR/ASSETFOLDERNAME
+//
+pub fn get_asset_dir(dev_asset_dir_opt: Option<&str>, asset_folder_name: &str) -> Result<Box<std::path::PathBuf>, Error> {
+    let mut executable_path = std::env::current_exe().unwrap().canonicalize()?; // path to executable
+    if !executable_path.exists() || !executable_path.is_file() {
+        return Err(anyhow!("Cannot find our own executable program file: {:?}", executable_path))
+    }
+
+    let executable_name = executable_path.file_stem().unwrap().to_string_lossy().to_string().to_lowercase(); // executable as lowercase
+    executable_path.pop();                  // reduce to directory containing executable
+    if !executable_path.exists() || !executable_path.is_dir() {
+        return Err(anyhow!("Cannot find our own executable program's directory: {:?}", executable_path))
+    }
+    //  We found the executable directory.
+    //  Try first choice: executabledir/assets
+    let choice1 = executable_path.join(asset_folder_name);
+    if choice1.exists() && choice1.is_dir() {
+        return Ok(Box::new(choice1));
+    }
+    //  Try second choice: executabledir/progname-assets
+    let choice2 = executable_path.join(executable_name + "-" + asset_folder_name);
+    if choice2.exists() && choice2.is_dir() {
+        return Ok(Box::new(choice2));
+    }
+    //  Try third choice. Only used during development.
+    if let Some(dev_asset_dir) = dev_asset_dir_opt {
+        let choice3 = std::path::PathBuf::from_str(dev_asset_dir)?.join(asset_folder_name);
+        if choice3.exists() && choice3.is_dir() {
+            return Ok(Box::new(choice3));
+        }
+    }
+    Err(anyhow!("Cannot find our asset directory {:?} in any usual place.", asset_folder_name))
 }
