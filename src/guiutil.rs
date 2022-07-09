@@ -110,9 +110,9 @@ pub fn get_asset_dir(dev_asset_dir_opt: Option<&str>, asset_folder_name: &str) -
     if choice2.exists() && choice2.is_dir() {
         return Ok(Box::new(choice2));
     }
-    //  Try third choice. Only used during development.
+    //  Try third choice. Only used during development. projectdir/src/assets
     if let Some(dev_asset_dir) = dev_asset_dir_opt {
-        let choice3 = std::path::PathBuf::from_str(dev_asset_dir)?.join(asset_folder_name);
+        let choice3 = std::path::PathBuf::from_str(dev_asset_dir)?.join("src").join(asset_folder_name);
         if choice3.exists() && choice3.is_dir() {
             return Ok(Box::new(choice3));
         }
