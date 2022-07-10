@@ -151,7 +151,10 @@ impl rend3_framework::App for Ui {
         surface_format: rend3::types::TextureFormat,
     ) {
         //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
+        ////window.set_visible(true); // ***TEMP TEST***
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
+        window.set_visible(true);
+        window.set_maximized(true);
         let window_size = window.inner_size();
 
         // Create the egui render routine
@@ -440,7 +443,7 @@ fn main() {
         app,
         winit::window::WindowBuilder::new()
             .with_title("UI mockup")
-            .with_maximized(true),
+            ////.with_visible(false),
     )
 }
 

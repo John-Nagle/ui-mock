@@ -182,5 +182,18 @@ Getting close to integration.
       - Need something like a weak pointer to SceneObject.
       - Still need to clean up SceneObject interface.
     
+2022-07-09
+
+    How to do model-view-controller with egui:
+    - The persistent part of a GUI element is a GuiWindow trait object.
+    - We need to be able to have GuiWindow objects receive messages from somewhere.
+    - Messages go to GuiState, which needs to find the relevant GuiWindow objects
+      and send to them.
+      - Use existing event channel. Can receive from other threads.
+        - Be careful not to monitor anything that updates fast.
+      - Request/response, or publish/subscribe?
+      - Linear search, or something more elaborate?
+        - Linear search with profiling of event processing.
+        - Number of events should be small.
     
     
