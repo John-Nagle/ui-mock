@@ -33,13 +33,13 @@ path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
 glam = {version = "0.21.2", features = ["bytemuck", "serde"]}	
-rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
-rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13"}
-rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
-rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
+rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
+rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e"}
+rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
+rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
 
 # Egui renderer integration
-rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
+rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
 
 # The egui immediate mode gui library
 egui = "0.18.1"
