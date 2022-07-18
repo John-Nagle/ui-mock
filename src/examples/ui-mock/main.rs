@@ -443,7 +443,8 @@ fn main() {
         app,
         winit::window::WindowBuilder::new()
             .with_title("UI mockup")
-            ////.with_visible(false),
+            .with_visible(true)    
+            .with_maximized(true)   // this is not effective on Linux/X11
     )
 }
 

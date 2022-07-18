@@ -82,6 +82,20 @@ pub fn get_log_file_name() -> Result<Box<std::path::PathBuf>, Error> {
     }
 }
 
+/// Get cache directory
+pub fn get_cache_dir() -> Result<Box<std::path::PathBuf>, Error> {
+    let executable = get_executable_name();     // name of program
+    if let Some(proj_dirs) = directories::ProjectDirs::from("com", DEVELOPER,  &executable) {
+        let cache_dir = proj_dirs.cache_dir(); // directory into which cached files will go
+        println!("Cache directory: {:?}", cache_dir); // ***TEMP***
+        std::fs::create_dir_all(cache_dir).with_context(|| format!("Trouble creating cache directory: {:?}", cache_dir))?;  // create any needed directories
+        Ok(Box::new(cache_dir.to_path_buf()))
+    } else {
+        Err(anyhow!("Unable to determine directories"))
+    }
+}
+
+
 /// Get asset directory.
 ///
 /// - First choice: EXECUTABLEDIR/ASSETFOLDERNAME
