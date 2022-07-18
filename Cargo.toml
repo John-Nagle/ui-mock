@@ -32,21 +32,21 @@ name = "ui-mock"
 path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
-glam = {version = "0.20.0", features = ["bytemuck", "serde"]}	
-rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+glam = {version = "0.21.2", features = ["bytemuck", "serde"]}	
+rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
+rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13"}
+rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
+rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
 
 # Egui renderer integration
-rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "61956d6e3cf1491148cd1b3c462485b33fae6d13" }
 
 # The egui immediate mode gui library
-egui = "0.17.0"
+egui = "0.18.1"
 # Backend-agnostic interface for writing apps using egui
 epi = "0.17.0"
 # Winit integration with egui
-egui_winit_platform = "0.14.0"
+egui_winit_platform = "0.15.0"
 # logging
 #### env_logger = { version = "0.9", default-features = false, features = ["termcolor", "atty"] }			
 # Importing png's
@@ -54,14 +54,13 @@ image = { version = "0.23.14", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
 instant = { version = "0.1", features = ["wasm-bindgen"] }
 
-# egui = "0.18.1"
 # winit = "0.26.1"
 # Windowing
 winit = "0.26"
 # Opening URL's
 webbrowser = "0.5.5"
 # Creating textures
-wgpu = "0.12"
+wgpu = "0.13"
 # File dialogs
 rfd = "0.8.3"
 futures = "0.3.21"

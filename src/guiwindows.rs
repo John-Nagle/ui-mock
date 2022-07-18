@@ -134,7 +134,7 @@ impl GuiState {
     }
     
     /// Draw all of GUI. Called at beginning of redraw event
-    pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedMesh>, egui::TexturesDelta) {
+    pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
         self.platform.begin_frame();
 
