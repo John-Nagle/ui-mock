@@ -417,7 +417,7 @@ impl GridSelectWindow {
     pub fn draw(&self, ctx: &egui::Context)-> Option<GridSelectParams> {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
             .anchor(egui::Align2::CENTER_TOP, egui::Vec2::ZERO)
-            ////.auto_sized()
+            .auto_sized()
             .collapsible(false);
         let mut result = None;  // what, if anything, was clicked upon
         window.show(ctx, |ui| {

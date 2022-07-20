@@ -317,6 +317,7 @@ impl rend3_framework::App for Ui {
         //  This is where EGUI handles 2D UI events.
         data.gui_state.platform.handle_event(&event);
         if data.gui_state.platform.captures_event(&event) {
+            ////println!("GUI captured event: {:?}", event);    // ***TEMP TEST***
             return; // 2D UI consumed this event.
         }
 
@@ -423,6 +424,10 @@ impl rend3_framework::App for Ui {
                 }
                 winit::event::WindowEvent::CursorLeft { .. } => {
                     data.gui_state.wake_up_gui();
+                }
+                winit::event::WindowEvent::KeyboardInput { input, .. } => {
+                    let _ = input;   // not yet used
+                    ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
                 }
                 _ => {}
             },
