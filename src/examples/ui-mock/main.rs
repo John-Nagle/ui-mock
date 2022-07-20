@@ -14,7 +14,7 @@
 //
 use libui;
 use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, Dictionary, MessageLogger};
-use libui::{get_log_file_name};
+use libui::{get_log_file_name, get_executable_name};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
@@ -155,6 +155,8 @@ impl rend3_framework::App for Ui {
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
         window.set_visible(true);
         window.set_maximized(true);
+        ////window.set_decorations(false);
+        ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
         let window_size = window.inner_size();
 
         // Create the egui render routine
@@ -447,9 +449,9 @@ fn main() {
     rend3_framework::start(
         app,
         winit::window::WindowBuilder::new()
-            .with_title("UI mockup")
-            .with_visible(true)    
-            .with_maximized(true)   // this is not effective on Linux/X11
+            .with_title(get_executable_name().as_str())
+            .with_visible(true) 
+            .with_maximized(true)   // this is not effective on Linux/X11. Has to be re-done at startup.
     )
 }
 
