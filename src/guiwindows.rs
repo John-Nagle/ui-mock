@@ -99,6 +99,8 @@ pub struct GuiState {
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
     pub event_send_channel: crossbeam_channel::Sender<GuiEvent>,
     pub event_recv_channel: crossbeam_channel::Receiver<GuiEvent>,
+    pub light_mode_visuals: egui::Visuals,          // light mode colors, etc.
+    pub dark_mode_visuals: egui::Visuals,           // dark mode colors, etc.
 }
 
 impl GuiState {
@@ -112,6 +114,12 @@ impl GuiState {
         let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
         //  Set up defaults
         guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
+        let light_mode_visuals = egui::Visuals::light();
+        let dark_mode_visuals = {
+            let mut visuals = egui::Visuals::dark();
+            visuals.override_text_color = Some(egui::Color32::WHITE);    // whiter text for dark mode. Usual default is too dim
+            visuals
+        };
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
         ////let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
@@ -129,7 +137,9 @@ impl GuiState {
             system_mode: SystemMode::Start,
             selected_grid: None,
             event_send_channel,
-            event_recv_channel,    
+            event_recv_channel,
+            light_mode_visuals,
+            dark_mode_visuals   
         }
     }
     

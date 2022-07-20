@@ -33,9 +33,9 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
     //  Do dark mode for all states.
     {   let ctx = state.platform.context();
         if state.params.dark_mode {
-            ctx.set_visuals(egui::Visuals::dark()); // dark mode if needed
+            ctx.set_visuals(state.dark_mode_visuals.clone());   // dark mode
         } else {
-            ctx.set_visuals(egui::Visuals::light()); // Switch to light mode
+            ctx.set_visuals(state.light_mode_visuals.clone()); // Switch to light mode (not used yet, because trouble finding out system mode)
         }
     }
     //  Select appropriate GUI for current mode.
@@ -226,7 +226,7 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
                     )
                     .clicked()
                 {
-                    println!("Clicked on Rust button");
+                    println!("Clicked on dummy button");
                 }
                 ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
             });
