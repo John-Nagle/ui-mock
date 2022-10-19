@@ -103,6 +103,7 @@ pub fn draw_start(state: &mut GuiState) {
 /// Login to a grid
 pub fn draw_grid_login(state: &mut GuiState) {
     let ctx = state.platform.context();
+
     //  Top menu bar
     egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
         if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
@@ -110,12 +111,28 @@ pub fn draw_grid_login(state: &mut GuiState) {
             state.change_mode(SystemMode::Start);       // back to start state
         }
     });
+
+    //  Central panel
+    egui::CentralPanel::default().show(&ctx, |ui| {
+        //  Login dialog
+        ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |ui| {
+            ui.with_layout(egui::Layout::top_down(egui::Align::Min), |ui| {
+                ////ui.label("Fill area");
+                ////if ui.button("test only").clicked() {}
+                ////if ui.button(t!("menu.cancel", state.get_lang())).clicked() {
+                    ////state.selected_grid = None;                 // clear grid selection
+                    ////state.change_mode(SystemMode::Start);       // back to start state
+                ////}
+            })
+        })
+    });
+    state.draw(&ctx); // all the standard windows
 }
 
 /// File picker for replay file
 pub fn draw_replay_file_pick(state: &mut GuiState) {
     let ctx = state.platform.context();
-    //  Top menu bar
+    //  Central panel
     egui::CentralPanel::default().show(&ctx, |ui| {
         //  Layering problem.
         ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |ui| {
@@ -141,7 +158,7 @@ pub fn draw_login(state: &mut GuiState) {
     } 
 }
 
-
+/// Draw menus for "connected" state - 3D system is live.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {                          
     // Insert egui commands here

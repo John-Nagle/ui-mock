@@ -13,7 +13,7 @@
 //  June 2022
 //
 use libui;
-use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, Dictionary, MessageLogger};
+use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger};
 use libui::{get_log_file_name, get_executable_name};
 use std::sync::Arc;
 use log::{LevelFilter};
@@ -89,13 +89,19 @@ impl Ui {
                 //  Grid has been selected, now try to log in.
                 if data.gui_state.get_mode() == SystemMode::Login {
                     let is_file_pick = grid.login_url.is_none();
-                    data.gui_state.selected_grid = Some(grid);  // set the selected grid
+                    data.gui_state.selected_grid = Some(grid.clone());  // set the selected grid
                     if is_file_pick {
                         //  No grid URL, so this is a replay file selection, not a login.
                         //  File pick is done with the platform's native file picker, asynchronously.
                         //  File pickers are special - they authorize the program to access the file at the system level.
                         GuiState::pick_replay_file_async(&mut data.gui_state, window); // use the file picker
-                    }                   
+                    } else {
+                        //  This is a login to a grid. Bring up login dialog window.
+                        let id = data.gui_state.get_unique_id();
+                        println!("Bring up login dialog"); // ***TEMP**8
+                        data.gui_state.add_window(Box::new(LoginDialogWindow::new(id, &grid))).unwrap();
+                        //  ***Initiate login dialog here***
+                    }                  
                 } else {
                     log::error!("Login request to {} while in state {:?}", grid.name, data.gui_state.get_mode());
                 }
