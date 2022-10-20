@@ -84,3 +84,5 @@ crossbeam-channel = "0.5"
 log = "0.4.17"
 simplelog = "0.10.0"
 anyhow = "1.0"
+# Security
+md5 = "0.7.0"

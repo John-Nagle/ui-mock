@@ -287,7 +287,6 @@ impl TextWindow {
             message: message.iter().map(|s| s.to_string()).collect(),  // array of String is needed
             is_open: true,  // start open
             dismiss_button: dismiss_button.map(|s| s.to_string())   // to string if present, else none
-
         }
     }
     
@@ -486,14 +485,30 @@ impl GridSelectWindow {
 }
 
 // ---------------
+//  Parameters required for login
+#[derive(Clone, Default)]
+pub struct LoginAuthParams {
+    user_name: String,
+    password: String,                   // erase this as soon as MD5 is computed
+    auth_token: Option<usize>           // future when 2FA implemented.
+}
+
+impl LoginAuthParams {
+
+    /// True if both user name and password are filled in
+    pub fn is_filled_in(&self) -> bool {
+        !self.user_name.trim().is_empty() && !self.password.trim().is_empty() 
+    }
+}
+
 /// Login dialog window.
 //  The persistent part
-//  ***UNUSED -- NEEDS WORK***
 pub struct LoginDialogWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
     is_open: bool,  // true if open
     grid: GridSelectParams, // info about grid
+    login_auth_params: LoginAuthParams, // data needed for login
 }
 
 impl LoginDialogWindow {
@@ -505,6 +520,7 @@ impl LoginDialogWindow {
             id,
             grid: grid.clone(),
             is_open: true,
+            login_auth_params: Default::default(),
         }
     }
     
@@ -520,44 +536,30 @@ impl GuiWindow for LoginDialogWindow {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
-                .collapsible(false);
+                .collapsible(false)
+                .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]);
             window.show(ctx, |ui| {
-                ui.label("Login goes here.");
-                ui.label("Password goes here.");
-            /*
-                //  Scroll area
-                //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
-                let text_style = egui::TextStyle::Body;
-                let row_height = ui.text_style_height(&text_style);
-                // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
-                let total_rows = self.message.len();
-                if total_rows == 1 {
-                    //  Single-line message, center it.
-                    ui.vertical_centered(|ui| {
-                        ui.label(self.message[0].as_str());
-                    });
-                } else {
-                    //  Multi-line message, can become scrollable.
-                    egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
-                        for row in row_range {
-                            if row >= self.message.len() { break }  // prevent scrolling off end
-                            ui.label(self.message[row].as_str());
-                        }
-                    });
-                };
-            */
+                ui.label("User name");
+                let _ = ui.text_edit_singleline(&mut self.login_auth_params.user_name);
+                ui.label("Password");
+                let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+   	             
                 
                 ui.vertical_centered(|ui| {
                     //  ***MORE*** need access to state***
                     ////if ui.add(egui::Button::new(t!("menu.cancel", state.get_lang()))).clicked() {
-                    if ui.add(egui::Button::new("Cancel")).clicked() {
+                    let filled_in = self.login_auth_params.is_filled_in();  // if form filled in
+                    if ui.add_enabled(filled_in, egui::Button::new("Login")).clicked() {
+                    ////if ui.add(egui::Button::new("Login")).clicked() {
                         dismissed = true;                       // dismiss
+                        //  ***NEED TO DO SOMETHING TO START LOGIN PROCESS***
                     }
                 });
             });
             if dismissed { self.is_open = false; } // do here to avoid borrow clash
         }
     }
+    
     /// If this is in the dynamic widgets list, drop if retain is false.
     fn retain(&self) -> bool {
         self.is_open
