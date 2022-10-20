@@ -43,6 +43,7 @@ rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0
 
 # The egui immediate mode gui library
 egui = "0.18.1"
+####egui = "0.19.0" ## ***NOTYET*** rend3 integration
 # Winit integration with egui
 egui_winit_platform = "0.15.0"
 # logging

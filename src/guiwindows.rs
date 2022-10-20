@@ -490,7 +490,7 @@ impl GridSelectWindow {
 pub struct LoginAuthParams {
     user_name: String,
     password: String,                   // erase this as soon as MD5 is computed
-    auth_token: Option<usize>           // future when 2FA implemented.
+    _auth_token: Option<usize>           // future when 2FA implemented.
 }
 
 impl LoginAuthParams {
@@ -538,12 +538,16 @@ impl GuiWindow for LoginDialogWindow {
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
                 .collapsible(false)
                 .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]);
-            window.show(ctx, |ui| {
-                ui.label("User name");
-                let _ = ui.text_edit_singleline(&mut self.login_auth_params.user_name);
-                ui.label("Password");
-                let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
-   	             
+            window.show(ctx, |ui| {             
+                egui::Grid::new("login box").show(ui, |ui| {   
+                    ui.label("Username");
+                    ////let _ = ui.text_edit_singleline(&mut self.login_auth_params.user_name); // need access to state for translations
+                    let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name).desired_width(200.0));
+                    ui.end_row();
+                    ui.label("Password");
+                    let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+                    ui.end_row();
+   	            });
                 
                 ui.vertical_centered(|ui| {
                     //  ***MORE*** need access to state***
