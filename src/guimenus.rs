@@ -218,7 +218,8 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
                         ui.radio_value(&mut log_level, LevelFilter::Debug, t!("menu.log_level.debug", lang));   
                         ui.radio_value(&mut log_level, LevelFilter::Trace, t!("menu.log_level.trace", lang));                  
                     });
-                    state.params.log_level = log_level;     // update log level   
+                    //  ***MOVE LOG LEVEL TO STATE*** params is read-only.
+                    ////state.params.log_level = log_level;     // update log level   
                     #[cfg (feature="replay")]
                     if ui.button(t!("menu.developer.save_replay", state.get_lang())).clicked() {
                         // Open menu entry
@@ -249,7 +250,7 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
             });
     }
     //  Non-menu items
-    state.message_window.draw(&ctx);   // dummy test window
+    state.message_window.draw(&ctx, &state.params);   // dummy test window
     state.draw(&ctx); // all the standard windows
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use

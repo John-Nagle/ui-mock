@@ -9,6 +9,7 @@
 //  June 2022
 //
 use std::collections::VecDeque;
+use std::rc::{Rc};
 use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
@@ -78,7 +79,7 @@ pub enum SystemMode {
 /// All GUI windows persistent state.
 pub struct GuiState {
     //  Data needed in GUI
-    pub params: GuiParams,                      // starting params
+    pub params: Rc<GuiParams>,                  // starting params
     //  Assets - images, etc.
     pub assets: GuiAssets,
     //  Platform data for context
@@ -127,7 +128,7 @@ impl GuiState {
             platform,
             message_window,
             grid_select_window,
-            params,
+            params: Rc::new(params),
             assets,
             about_window: None,
             temporary_windows: Vec::new(),
@@ -176,9 +177,9 @@ impl GuiState {
     /// Draw all live windows
     pub fn draw(&mut self, ctx: &egui::Context) {
         //  Semi-permanent windows
-        if let Some(w) = &mut self.about_window { w.draw(ctx) }
+        if let Some(w) = &mut self.about_window { w.draw(ctx, &self.params) }
         //  Temporary windows
-        for w in &mut self.temporary_windows { w.draw(ctx) }  // draw all temporaries
+        for w in &mut self.temporary_windows { w.draw(ctx, &self.params) }  // draw all temporaries
         self.temporary_windows.retain(|w| w.retain());  // keep only live ones
     }
     
@@ -193,7 +194,7 @@ impl GuiState {
         self.temporary_windows.push(window);
         Ok(())
     }
-    
+    	
     /// Get a unique ID, starting from 1.
     pub fn get_unique_id(&mut self) -> egui::Id {
         self.unique_id += 1;                    // serial number increment
@@ -263,7 +264,7 @@ impl GuiState {
 }
 
 pub trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context);    // called every frame
+    fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>);    // called every frame
     fn retain(&self) -> bool { true }           // override and set to false when done
     fn get_id(&self) -> egui::Id;               // get ID of window
 }
@@ -298,7 +299,7 @@ impl TextWindow {
 
 impl GuiWindow for TextWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context) {
+    fn draw(&mut self, ctx: &egui::Context, _params: &Rc<GuiParams>) {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -373,7 +374,7 @@ impl MessageWindow {
     }
     
     /// Draw window of text
-    pub fn draw(&self, ctx: &egui::Context) {
+    pub fn draw(&self, ctx: &egui::Context, _params: &Rc<GuiParams>) {
         let window = egui::containers::Window::new(self.title.as_str()).id(self.id);
         window.show(ctx, |ui| {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
@@ -471,7 +472,7 @@ impl GridSelectWindow {
                                     /* ***MORE*** need access to state
                                     let errmsg = format!("{:?}",e);
                                     let messages = [t!("message.web_error", state.get_lang()), errmsg.as_str()];
-                                    state.add_error_window(t!("window.internet_error", state.get_lang()), &messages);
+                                    state.add_error_window(t!("window.internet_error", params.;amg, &messages);
                                     */
                                 }
                             }
@@ -532,7 +533,7 @@ impl LoginDialogWindow {
 
 impl GuiWindow for LoginDialogWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context) {
+    fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>) {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -550,11 +551,8 @@ impl GuiWindow for LoginDialogWindow {
    	            });
                 
                 ui.vertical_centered(|ui| {
-                    //  ***MORE*** need access to state***
-                    ////if ui.add(egui::Button::new(t!("menu.cancel", state.get_lang()))).clicked() {
                     let filled_in = self.login_auth_params.is_filled_in();  // if form filled in
-                    if ui.add_enabled(filled_in, egui::Button::new("Login")).clicked() {
-                    ////if ui.add(egui::Button::new("Login")).clicked() {
+                    if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &params.lang))).clicked() {
                         dismissed = true;                       // dismiss
                         //  ***NEED TO DO SOMETHING TO START LOGIN PROCESS***
                     }

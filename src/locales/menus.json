@@ -71,7 +71,11 @@
     "menu.cancel": {
         "en": "Cancel",
         "fr": "Annuler"
-    },   
+    },
+    "menu.login": {
+        "en": "Login",
+        "fr": "Connectez-vous"
+    },    
     "window.messages": {
         "en": "Messages",
         "fr": "Messages"
