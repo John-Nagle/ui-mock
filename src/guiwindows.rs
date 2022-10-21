@@ -12,6 +12,7 @@ use std::collections::VecDeque;
 use std::rc::{Rc};
 use std::path::PathBuf;
 use anyhow::{anyhow, Error};
+use zeroize::Zeroize;
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
@@ -500,6 +501,10 @@ impl LoginAuthParams {
     pub fn is_filled_in(&self) -> bool {
         !self.user_name.trim().is_empty() && !self.password.trim().is_empty() 
     }
+    
+    pub fn zeroize(&mut self) {
+        self.password.zeroize();
+    }
 }
 
 /// Login dialog window.
@@ -553,6 +558,8 @@ impl GuiWindow for LoginDialogWindow {
                 ui.vertical_centered(|ui| {
                     let filled_in = self.login_auth_params.is_filled_in();  // if form filled in
                     if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &params.lang))).clicked() {
+                        let _password_md5 = md5::compute(&self.login_auth_params.password);  // get MD5 of password
+                        self.login_auth_params.zeroize();       // erase text password in memory
                         dismissed = true;                       // dismiss
                         //  ***NEED TO DO SOMETHING TO START LOGIN PROCESS***
                     }
