@@ -12,7 +12,7 @@ use std::collections::VecDeque;
 use std::rc::{Rc};
 use std::path::PathBuf;
 use anyhow::{anyhow, Error};
-use zeroize::Zeroize;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
@@ -488,10 +488,10 @@ impl GridSelectWindow {
 
 // ---------------
 //  Parameters required for login
-#[derive(Clone, Default)]
+#[derive(Default, ZeroizeOnDrop)]
 pub struct LoginAuthParams {
     user_name: String,
-    password: String,                   // erase this as soon as MD5 is computed
+    password: String,                   // zeroize this as soon as MD5 is computed
     _auth_token: Option<usize>           // future when 2FA implemented.
 }
 
