@@ -532,7 +532,7 @@ impl LoginDialogWindow {
             is_open: true,
             login_auth_params: Default::default(),
             remember_username: false,
-            remember_password: false,
+            remember_password: true,
         }
     }
     
@@ -556,18 +556,22 @@ impl GuiWindow for LoginDialogWindow {
             window.show(ctx, |ui| {             
                 egui::Grid::new("login box")
                 .min_col_width(MIMIMUM_TEXT_BOX_WIDTH)
-                .show(ui, |ui| {   
+                .show(ui, |ui| {
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.username", &params.lang));
-                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name));
+                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name)); 
                     });
-                    ui.checkbox(&mut self.remember_username, t!("menu.remember", &params.lang));
+                    ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
+                        ui.checkbox(&mut self.remember_username, t!("menu.remember", &params.lang));                           
+                    });                    
                     ui.end_row();
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.password", &params.lang));
                         let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
                     });
-                    ui.checkbox(&mut self.remember_password, t!("menu.remember", &params.lang));
+                    ui.with_layout(egui::Layout::right_to_left(), |ui| {    
+                        ui.checkbox(&mut self.remember_password, t!("menu.remember", &params.lang));
+                    });
                     ui.end_row();
    	            });
                 
