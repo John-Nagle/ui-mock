@@ -546,9 +546,11 @@ impl GuiWindow for LoginDialogWindow {
     /// Draw window of text
     fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>) {
         if self.is_open {
-            let mut dismissed = false;          // true if dismiss button pushed
+            let mut accepted = false;          // true if dismiss button pushed
+            let mut not_cancelled = true;
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
                 .collapsible(false)
+                .open(&mut not_cancelled)
                 .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]);
             window.show(ctx, |ui| {             
                 egui::Grid::new("login box").show(ui, |ui| {   
@@ -568,12 +570,13 @@ impl GuiWindow for LoginDialogWindow {
                     if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &params.lang))).clicked() {
                         let _password_md5 = md5::compute(&self.login_auth_params.password);  // get MD5 of password
                         self.login_auth_params.zeroize();       // erase text password in memory
-                        dismissed = true;                       // dismiss
+                        accepted = true;                       // dismiss
                         //  ***NEED TO DO SOMETHING TO START LOGIN PROCESS***
                     }
                 });
             });
-            if dismissed { self.is_open = false; } // do here to avoid borrow clash
+            //  ***NEED ACCESS TO STATE SO CAN SEND EVENTS***
+            if accepted || !not_cancelled { self.is_open = false; } // do here to avoid borrow clash
         }
     }
     
