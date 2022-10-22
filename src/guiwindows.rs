@@ -545,6 +545,7 @@ impl LoginDialogWindow {
 impl GuiWindow for LoginDialogWindow { 
     /// Draw window of text
     fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>) {
+        const MIMIMUM_TEXT_BOX_WIDTH: f32 = 200.0;
         if self.is_open {
             let mut accepted = false;          // true if dismiss button pushed
             let mut not_cancelled = true;
@@ -553,14 +554,19 @@ impl GuiWindow for LoginDialogWindow {
                 .open(&mut not_cancelled)
                 .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]);
             window.show(ctx, |ui| {             
-                egui::Grid::new("login box").show(ui, |ui| {   
-                    ui.label("Username");
-                    ////let _ = ui.text_edit_singleline(&mut self.login_auth_params.user_name); // need access to state for translations
-                    let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name).desired_width(200.0));
+                egui::Grid::new("login box")
+                .min_col_width(MIMIMUM_TEXT_BOX_WIDTH)
+                .show(ui, |ui| {   
+                    ui.horizontal(|ui| { 
+                        ui.label(t!("menu.username", &params.lang));
+                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name));
+                    });
                     ui.checkbox(&mut self.remember_username, t!("menu.remember", &params.lang));
                     ui.end_row();
-                    ui.label("Password");
-                    let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+                    ui.horizontal(|ui| { 
+                        ui.label(t!("menu.password", &params.lang));
+                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+                    });
                     ui.checkbox(&mut self.remember_password, t!("menu.remember", &params.lang));
                     ui.end_row();
    	            });

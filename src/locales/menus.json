@@ -76,6 +76,14 @@
         "en": "Login",
         "fr": "Connectez-vous"
     },
+    "menu.username": {
+        "en": "User name",
+        "fr": "Identifiant"
+    },
+    "menu.password": {
+        "en": "Password",
+        "fr": "Mot de passe"
+    },
     "menu.remember": {
         "en": "Remember",
         "fr": "Rappeler"
