@@ -75,7 +75,11 @@
     "menu.login": {
         "en": "Login",
         "fr": "Connectez-vous"
-    },    
+    },
+    "menu.remember": {
+        "en": "Remember",
+        "fr": "Rappeler"
+    },
     "window.messages": {
         "en": "Messages",
         "fr": "Messages"

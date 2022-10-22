@@ -486,8 +486,10 @@ impl GridSelectWindow {
     }
 }
 
-// ---------------
-//  Parameters required for login
+//  Parameters required for login.
+//  The password is zeroized as soon as it can be
+//  converted to MD5, and zeroized on drop if 
+//  auth is cancelled.
 #[derive(Default, ZeroizeOnDrop)]
 pub struct LoginAuthParams {
     user_name: String,
@@ -508,13 +510,15 @@ impl LoginAuthParams {
 }
 
 /// Login dialog window.
-//  The persistent part
+//  The persistent part.
 pub struct LoginDialogWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
     is_open: bool,  // true if open
     grid: GridSelectParams, // info about grid
     login_auth_params: LoginAuthParams, // data needed for login
+    remember_username: bool,
+    remember_password: bool,
 }
 
 impl LoginDialogWindow {
@@ -527,6 +531,8 @@ impl LoginDialogWindow {
             grid: grid.clone(),
             is_open: true,
             login_auth_params: Default::default(),
+            remember_username: false,
+            remember_password: false,
         }
     }
     
@@ -549,9 +555,11 @@ impl GuiWindow for LoginDialogWindow {
                     ui.label("Username");
                     ////let _ = ui.text_edit_singleline(&mut self.login_auth_params.user_name); // need access to state for translations
                     let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name).desired_width(200.0));
+                    ui.checkbox(&mut self.remember_username, t!("menu.remember", &params.lang));
                     ui.end_row();
                     ui.label("Password");
                     let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+                    ui.checkbox(&mut self.remember_password, t!("menu.remember", &params.lang));
                     ui.end_row();
    	            });
                 
