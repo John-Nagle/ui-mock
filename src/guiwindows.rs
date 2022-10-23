@@ -10,6 +10,7 @@
 //
 use std::collections::VecDeque;
 use std::rc::{Rc};
+use core::cell::RefCell;
 use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -76,6 +77,8 @@ pub enum SystemMode {
     Exit, // Program exits
 }
 
+type GuiWindowLink = Rc<RefCell<Box<dyn GuiWindow>>>;    // a bit much
+
 
 /// All GUI windows persistent state.
 pub struct GuiState {
@@ -94,7 +97,8 @@ pub struct GuiState {
     pub about_window: Option<TextWindow>,       // Help->About
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
-    temporary_windows: Vec<Box<dyn GuiWindow>>,
+    ////temporary_windows: Vec<Box<dyn GuiWindow>>,
+    temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
     msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
@@ -180,19 +184,20 @@ impl GuiState {
         //  Semi-permanent windows
         if let Some(w) = &mut self.about_window { w.draw(ctx, &self.params) }
         //  Temporary windows
-        for w in &mut self.temporary_windows { w.draw(ctx, &self.params) }  // draw all temporaries
-        self.temporary_windows.retain(|w| w.retain());  // keep only live ones
+        let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(|m| Rc::clone(m)).collect();
+        for w in &todo_list { w.borrow_mut().draw(ctx, &self.params) }  // draw all temporaries
+        self.temporary_windows.retain(|w| w.borrow().retain());  // keep only live ones
     }
     
     /// General window add
     pub fn add_window(&mut self, window: Box<dyn GuiWindow>) -> Result<(), Error> {
         //  Check for duplicate window
         for w in &self.temporary_windows {
-            if w.get_id() == window.get_id() {
+            if w.borrow().get_id() == window.get_id() {
                 return Err(anyhow!("Duplicate id for window"));
             }
         }
-        self.temporary_windows.push(window);
+        self.temporary_windows.push(Rc::new(RefCell::new(window)));
         Ok(())
     }
     	

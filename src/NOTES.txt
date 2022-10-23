@@ -195,5 +195,15 @@ Getting close to integration.
       - Linear search, or something more elaborate?
         - Linear search with profiling of event processing.
         - Number of events should be small.
+        
+2022-10-22
+
+   Basic stuff running.
+   Adding login dialog.
+   Ownership problem: GuiState owns both all the windows and the mutable state they need.
+   So, when a mutable window needs mutable access to the GUI  state, it's a double borrow.
+   Need to separate ownership of windows and GUI state.
+   But how? If both are members of a larger structure, it's still a double borrow.
+   
     
     
