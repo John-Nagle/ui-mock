@@ -42,36 +42,29 @@ pub fn menu_help_manual(_ui: &mut Ui, state: &mut GuiState) {
 }
 pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
     //  Create window if necessary
-    match &mut state.about_window {
-        Some(w) => {
-            w.reopen();      // reopen window that was already built
-        }
-        None => {
-            //  Generate system information dump
-            let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option
-            //  Need to create new window
-            let mut msgs = Vec::new();
-            let version = format!("{}: {}", t!("message.version", state.get_lang()), state.params.version);
-            msgs.push(version.as_str());          
-            use sysinfo::SystemExt;
-            let mut sys = sysinfo::System::new_all();           // get system information
-            //  System info
-            sys.refresh_all();
-            let os_info = format!("{}: {}, {}", t!("message.os_version", state.get_lang()), if_unknown(sys.name()), if_unknown(sys.long_os_version()));
-            msgs.push(os_info.as_str());
-            //  CPU info
-            let system_memory = format!("{}: {:?}", t!("message.system_memory", state.get_lang()), sys.total_memory());
-            msgs.push(system_memory.as_str());
-            let cpu_count = format!("{}: {}", t!("message.cpu_count", state.get_lang()), sys.cpus().len());
-            msgs.push(cpu_count.as_str());
-            //  Graphics subsystem info
-            let gpu_name = format!("{}: {:?}, {}", t!("message.gpu_name", state.get_lang()), state.params.gpu_info.device_type, state.params.gpu_info.name);
-            msgs.push(gpu_name.as_str());
-            let graphics_system = format!("{}: {:?}", t!("message.graphics_system", state.get_lang()), state.params.gpu_info.backend);
-            msgs.push(graphics_system.as_str());
-            msgs.push(COPYRIGHT);                               // copyright notice
-            let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", state.get_lang()), &msgs, Some(t!("menu.ok", state.get_lang())));
-            state.about_window = Some(about_window);
-        }
-    }
+    //  Generate system information dump
+    let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option
+    //  Need to create new window
+    let mut msgs = Vec::new();
+    let version = format!("{}: {}", t!("message.version", state.get_lang()), state.params.version);
+    msgs.push(version.as_str());          
+    use sysinfo::SystemExt;
+    let mut sys = sysinfo::System::new_all();           // get system information
+    //  System info
+    sys.refresh_all();
+    let os_info = format!("{}: {}, {}", t!("message.os_version", state.get_lang()), if_unknown(sys.name()), if_unknown(sys.long_os_version()));
+    msgs.push(os_info.as_str());
+    //  CPU info
+    let system_memory = format!("{}: {:?}", t!("message.system_memory", state.get_lang()), sys.total_memory());
+    msgs.push(system_memory.as_str());
+    let cpu_count = format!("{}: {}", t!("message.cpu_count", state.get_lang()), sys.cpus().len());
+    msgs.push(cpu_count.as_str());
+    //  Graphics subsystem info
+    let gpu_name = format!("{}: {:?}, {}", t!("message.gpu_name", state.get_lang()), state.params.gpu_info.device_type, state.params.gpu_info.name);
+    msgs.push(gpu_name.as_str());
+    let graphics_system = format!("{}: {:?}", t!("message.graphics_system", state.get_lang()), state.params.gpu_info.backend);
+    msgs.push(graphics_system.as_str());
+    msgs.push(COPYRIGHT);                               // copyright notice
+    let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", state.get_lang()), &msgs, Some(t!("menu.ok", state.get_lang())));
+    let _stat = state.add_window(Box::new(about_window));
 }

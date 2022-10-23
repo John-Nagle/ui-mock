@@ -94,7 +94,6 @@ pub struct GuiState {
     pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
-    pub about_window: Option<TextWindow>,       // Help->About
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     //  Disposable dynamic windows
     ////temporary_windows: Vec<Box<dyn GuiWindow>>,
@@ -135,7 +134,6 @@ impl GuiState {
             grid_select_window,
             params: Rc::new(params),
             assets,
-            about_window: None,
             temporary_windows: Vec::new(),
             msg_ok,
             unique_id: 0,
@@ -182,10 +180,12 @@ impl GuiState {
     /// Draw all live windows
     pub fn draw(&mut self, ctx: &egui::Context) {
         //  Semi-permanent windows
-        if let Some(w) = &mut self.about_window { w.draw(ctx, &self.params) }
+        //  ***MAKE ABOUT WINDOW A TEMPORARY WINDOW***
+        ////if let Some(w) = &mut self.about_window { w.draw(ctx, self) }
         //  Temporary windows
+        //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
         let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(|m| Rc::clone(m)).collect();
-        for w in &todo_list { w.borrow_mut().draw(ctx, &self.params) }  // draw all temporaries
+        for w in &todo_list { w.borrow_mut().draw(ctx, self) }  // draw all temporaries
         self.temporary_windows.retain(|w| w.borrow().retain());  // keep only live ones
     }
     
@@ -270,7 +270,7 @@ impl GuiState {
 }
 
 pub trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>);    // called every frame
+    fn draw(&mut self, ctx: &egui::Context, state: &mut GuiState);    // called every frame
     fn retain(&self) -> bool { true }           // override and set to false when done
     fn get_id(&self) -> egui::Id;               // get ID of window
 }
@@ -305,7 +305,7 @@ impl TextWindow {
 
 impl GuiWindow for TextWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context, _params: &Rc<GuiParams>) {
+    fn draw(&mut self, ctx: &egui::Context, _state: &mut GuiState) {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -549,7 +549,7 @@ impl LoginDialogWindow {
 
 impl GuiWindow for LoginDialogWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context, params: &Rc<GuiParams>) {
+    fn draw(&mut self, ctx: &egui::Context, state: &mut GuiState) {
         const MIMIMUM_TEXT_BOX_WIDTH: f32 = 200.0;
         if self.is_open {
             let mut accepted = false;          // true if dismiss button pushed
@@ -563,26 +563,26 @@ impl GuiWindow for LoginDialogWindow {
                 .min_col_width(MIMIMUM_TEXT_BOX_WIDTH)
                 .show(ui, |ui| {
                     ui.horizontal(|ui| { 
-                        ui.label(t!("menu.username", &params.lang));
+                        ui.label(t!("menu.username", &state.params.lang));
                         let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name)); 
                     });
                     ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
-                        ui.checkbox(&mut self.remember_username, t!("menu.remember", &params.lang));                           
+                        ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
                     });                    
                     ui.end_row();
                     ui.horizontal(|ui| { 
-                        ui.label(t!("menu.password", &params.lang));
+                        ui.label(t!("menu.password", &state.params.lang));
                         let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
                     });
                     ui.with_layout(egui::Layout::right_to_left(), |ui| {    
-                        ui.checkbox(&mut self.remember_password, t!("menu.remember", &params.lang));
+                        ui.checkbox(&mut self.remember_password, t!("menu.remember", &state.params.lang));
                     });
                     ui.end_row();
    	            });
                 
                 ui.vertical_centered(|ui| {
                     let filled_in = self.login_auth_params.is_filled_in();  // if form filled in
-                    if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &params.lang))).clicked() {
+                    if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &state.params.lang))).clicked() {
                         let _password_md5 = md5::compute(&self.login_auth_params.password);  // get MD5 of password
                         self.login_auth_params.zeroize();       // erase text password in memory
                         accepted = true;                       // dismiss
