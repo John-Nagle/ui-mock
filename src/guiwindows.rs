@@ -25,11 +25,12 @@ use simplelog::{SharedLogger};
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
 
 /// User events sent to the main event loop
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum GuiEvent {
     OpenReplay(Option<PathBuf>),                    // open a replay file
     SaveReplay(PathBuf),                            // save into a replay file
     LoginTo(GridSelectParams),                      // ask for login params
+    LoginStart(LoginParams),                        // start the login process
     ////Login(ConnectInfo),                         // login dialog result
     ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
     LogMessage(String),                             // log to GUI
@@ -179,9 +180,6 @@ impl GuiState {
 
     /// Draw all live windows
     pub fn draw(&mut self, ctx: &egui::Context) {
-        //  Semi-permanent windows
-        //  ***MAKE ABOUT WINDOW A TEMPORARY WINDOW***
-        ////if let Some(w) = &mut self.about_window { w.draw(ctx, self) }
         //  Temporary windows
         //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
         let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(|m| Rc::clone(m)).collect();
@@ -491,27 +489,36 @@ impl GridSelectWindow {
     }
 }
 
-//  Parameters required for login.
+//  Dialog box parameters required for login.
 //  The password is zeroized as soon as it can be
 //  converted to MD5, and zeroized on drop if 
 //  auth is cancelled.
 #[derive(Default, ZeroizeOnDrop)]
-pub struct LoginAuthParams {
+pub struct LoginDialogInput {
     user_name: String,
     password: String,                   // zeroize this as soon as MD5 is computed
     _auth_token: Option<usize>           // future when 2FA implemented.
 }
 
-impl LoginAuthParams {
+impl LoginDialogInput {
 
-    /// True if both user name and password are filled in
+    /// True if minimum data for login is filled in.
     pub fn is_filled_in(&self) -> bool {
-        !self.user_name.trim().is_empty() && !self.password.trim().is_empty() 
+        !self.user_name.trim().is_empty()
     }
     
     pub fn zeroize(&mut self) {
         self.password.zeroize();
     }
+}
+
+/// Data needed to do a login
+#[derive(Debug)]
+pub struct LoginParams {
+    grid: GridSelectParams,     // which grid
+    user_name: String,          // user name
+    password_md5_opt: Option<md5::Digest>,  // MD5 of the password
+    auth_token: Option<usize>,  // future when 2FA implemented.
 }
 
 /// Login dialog window.
@@ -521,7 +528,7 @@ pub struct LoginDialogWindow {
     id: egui::Id,  // unique ID
     is_open: bool,  // true if open
     grid: GridSelectParams, // info about grid
-    login_auth_params: LoginAuthParams, // data needed for login
+    login_dialog_input: LoginDialogInput, // user-provided data needed for login
     remember_username: bool,
     remember_password: bool,
 }
@@ -535,7 +542,7 @@ impl LoginDialogWindow {
             id,
             grid: grid.clone(),
             is_open: true,
-            login_auth_params: Default::default(),
+            login_dialog_input: Default::default(),
             remember_username: false,
             remember_password: true,
         }
@@ -564,7 +571,7 @@ impl GuiWindow for LoginDialogWindow {
                 .show(ui, |ui| {
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.username", &state.params.lang));
-                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.user_name)); 
+                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.user_name)); 
                     });
                     ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
                         ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
@@ -572,7 +579,7 @@ impl GuiWindow for LoginDialogWindow {
                     ui.end_row();
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.password", &state.params.lang));
-                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_auth_params.password).password(true));
+                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.password).password(true));
                     });
                     ui.with_layout(egui::Layout::right_to_left(), |ui| {    
                         ui.checkbox(&mut self.remember_password, t!("menu.remember", &state.params.lang));
@@ -581,16 +588,25 @@ impl GuiWindow for LoginDialogWindow {
    	            });
                 
                 ui.vertical_centered(|ui| {
-                    let filled_in = self.login_auth_params.is_filled_in();  // if form filled in
+                    let filled_in = self.login_dialog_input.is_filled_in();  // if form filled in
                     if ui.add_enabled(filled_in, egui::Button::new(t!("menu.login", &state.params.lang))).clicked() {
-                        let _password_md5 = md5::compute(&self.login_auth_params.password);  // get MD5 of password
-                        self.login_auth_params.zeroize();       // erase text password in memory
-                        accepted = true;                       // dismiss
-                        //  ***NEED TO DO SOMETHING TO START LOGIN PROCESS***
-                    }
+                        let password_md5_opt = if self.login_dialog_input.password.is_empty() {
+                            None 
+                        } else {
+                            Some(md5::compute(&self.login_dialog_input.password.trim()))  // get MD5 of password
+                        };
+                        self.login_dialog_input.zeroize();              // erase text password in memory
+                        accepted = true;                                // dismiss dialog
+                        let login_event = GuiEvent::LoginStart(LoginParams {
+                            grid: self.grid.clone(),
+                            user_name: self.login_dialog_input.user_name.trim().to_string(),
+                            password_md5_opt,
+                            auth_token: None
+                        });
+                        let _ = state.send_gui_event(login_event);      // tell main to start the login process
+                     }
                 });
             });
-            //  ***NEED ACCESS TO STATE SO CAN SEND EVENTS***
             if accepted || !not_cancelled { self.is_open = false; } // do here to avoid borrow clash
         }
     }

@@ -109,6 +109,9 @@ impl Ui {
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
                 data.gui_state.unimplemented_msg(); // ***TEMP***
             }
+            GuiEvent::LoginStart(_login_params) => {
+                data.gui_state.unimplemented_msg(); // ***TEMP***
+            }            
             GuiEvent::ErrorMessage((title, messages)) => {   // display message
                 let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
                 data.gui_state.add_error_window(&title, &msgs);
