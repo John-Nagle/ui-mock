@@ -400,7 +400,8 @@ impl MessageWindow {
 /// Basic info about a grid for the splash page
 #[derive(Debug, Clone)]
 pub struct GridSelectParams {
-    pub name: String,
+    pub metaverse: String,                      // Second Life, OsGrid, etc.
+    pub grid: String,                           // agni, etc.
     pub picture_bar: egui::TextureId,
     pub web_url: String,
     pub login_url: Option<String>,              // if none, this is a replay  
@@ -444,7 +445,11 @@ impl GridSelectWindow {
                 ////println!("Rows: {:?} of {}, row height {}", row_range, self.grids.len(), row_height);  // ***TEMP***
                 for row in row_range {
                     let grid = &self.grids[row];
-                    ui.label(&grid.name);
+                    ui.horizontal(|ui| {
+                        ui.label(&grid.metaverse);
+                        ui.label(" -- ");
+                        ui.label(&grid.grid);
+                    });
                     ui.horizontal(|ui| {
                         //  Grid select
                         if ui.add(

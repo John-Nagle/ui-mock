@@ -12,7 +12,7 @@ use crate::{GuiEvent, GuiState,GridSelectParams};
 //  converted to MD5, and zeroized on drop if 
 //  auth is cancelled.
 #[derive(Default, ZeroizeOnDrop)]
-pub struct LoginDialogInput {
+struct LoginDialogInput {
     user_name: String,
     password: String,                   // zeroize this as soon as MD5 is computed
     _auth_token: Option<usize>           // future when 2FA implemented.
@@ -40,6 +40,43 @@ pub struct LoginParams {
     pub auth_token: Option<usize>,  // future when 2FA implemented.
 }
 
+impl LoginParams {
+    pub const CREDENTIAL_PREFIX: &str = "metaverse";            // credential keys are prefixed with this.
+    /// Translate special characters and make lower case
+    fn translate_special_characters(c: char) -> char {
+        match c {
+            '.' => '#',
+            '/' => '|',
+            _ => c
+        }
+    }
+    /// Prep string for use as credential storage key.
+    /// Remove all whitespace.
+    /// Translate "." and "/" to something else.
+    fn prep_string(s: &str) -> String {
+        let s: String = s.chars().filter(|c| !c.is_whitespace())
+            .map(Self::translate_special_characters).collect();
+        s.to_lowercase()            // and force to lower case
+    }
+    /// Returns the "service" string needed for credential storage.
+    /// Format is "PREFIX/SYSTEM/GRID". 
+    pub fn get_service(&self) -> String {
+        format!("{}/{}/{}", Self::CREDENTIAL_PREFIX, Self::prep_string(&self.grid.metaverse), Self::prep_string(&self.grid.grid))
+    }
+    /// Password as md5
+    pub fn get_password_md5(&self) -> Option<String> {
+        if let Some(pass) = self.password_md5_opt {
+            Some(format!("{:?}", pass))
+        } else {
+            None
+        }
+    }
+    /// Set password
+    pub fn set_password_md5(&mut self, digest: md5::Digest) {
+        todo!();
+    }
+}
+
 /// Login dialog window.
 //  The persistent part.
 pub struct LoginDialogWindow {
@@ -55,7 +92,7 @@ pub struct LoginDialogWindow {
 impl LoginDialogWindow {
     /// Create persistent text window, multiline
     pub fn new(id: egui::Id, grid: &GridSelectParams) -> Self {
-        let title = grid.name.clone();          // title is just grid name for now.
+        let title = format!("{} -- {}", grid.metaverse, grid.grid);          // title is just grid name for now.
         LoginDialogWindow {
             title,
             id,
@@ -121,13 +158,14 @@ impl GuiWindow for LoginDialogWindow {
                         };
                         self.login_dialog_input.zeroize();              // erase text password in memory
                         accepted = true;                                // dismiss dialog
-                        let login_event = GuiEvent::LoginStart(LoginParams {
+                        let login_params = LoginParams {
                             grid: self.grid.clone(),
                             user_name: self.login_dialog_input.user_name.trim().to_string(),
                             password_md5_opt,
                             auth_token: None
-                        });
-                        let _ = state.send_gui_event(login_event);      // tell main to start the login process
+                        };
+                        println!("Attempting login to {}", login_params.get_service());
+                        let _ = state.send_gui_event(GuiEvent::LoginStart(login_params));      // tell main to start the login process
                      }
                 });
             });

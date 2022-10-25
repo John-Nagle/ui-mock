@@ -98,12 +98,10 @@ impl Ui {
                     } else {
                         //  This is a login to a grid. Bring up login dialog window.
                         let id = data.gui_state.get_unique_id();
-                        println!("Bring up login dialog"); // ***TEMP**8
                         data.gui_state.add_window(Box::new(LoginDialogWindow::new(id, &grid))).unwrap();
-                        //  ***Initiate login dialog here***
                     }                  
                 } else {
-                    log::error!("Login request to {} while in state {:?}", grid.name, data.gui_state.get_mode());
+                    log::error!("Login request to {} while in state {:?}", grid.metaverse, data.gui_state.get_mode());
                 }
             }
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
@@ -474,19 +472,22 @@ fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
     //  Replay feature only if replay enabled
     #[cfg (feature="replay")]
     grids.push(GridSelectParams {
-        name: "Replay file".to_string(),
+        metaverse: "Replay file".to_string(),
+        grid: "Results from test run".to_string(),
         picture_bar: assets.replay_bar,
         web_url: "https://www.animats.com/viewer".to_string(),
         login_url: None,
     });
     grids.push(GridSelectParams {
-        name: "Second Life".to_string(),
+        metaverse: "Second Life".to_string(),
+        grid: "Agni".to_string(),
         picture_bar: assets.placeholder_a_bar,
         web_url: "https://www.secondlife.com".to_string(),
         login_url: Some("https://login.aditi.lindenlab.com/cgi-bin/login.cgi".to_string()),
     });
     grids.push(GridSelectParams {
-        name: "OsGrid".to_string(),
+        metaverse: "Open Simulator".to_string(),
+        grid: "OsGrid".to_string(),
         picture_bar: assets.placeholder_b_bar,
         web_url: "https://www.osgrid.org".to_string(),
         login_url: Some("http://login.osgrid.org".to_string()),
