@@ -36,12 +36,13 @@ impl LoginDialogInput {
 pub struct LoginParams {
     pub grid: GridSelectParams,     // which grid
     pub user_name: String,          // user name
-    pub password_md5_opt: Option<md5::Digest>,  // MD5 of the password
+    password_md5_opt: Option<String>, // MD5 of the password, including the PASSWORD_PREFIX, ready for login.
     pub auth_token: Option<usize>,  // future when 2FA implemented.
 }
 
 impl LoginParams {
     pub const CREDENTIAL_PREFIX: &str = "metaverse";            // credential keys are prefixed with this.
+    const PASSWORD_PREFIX: &'static str = "$1$";                // precedes password MD5 in hex. SL convention.
     /// Translate special characters and make lower case
     fn translate_special_characters(c: char) -> char {
         match c {
@@ -65,15 +66,15 @@ impl LoginParams {
     }
     /// Password as md5
     pub fn get_password_md5(&self) -> Option<String> {
-        if let Some(pass) = self.password_md5_opt {
-            Some(format!("{:?}", pass))
+        self.password_md5_opt.clone()
+    }
+    /// Set password from MD5
+    pub fn set_password_md5(&mut self, digest_opt: Option<md5::Digest>) {
+        self.password_md5_opt = if let Some(digest) = digest_opt {
+            Some(format!("{}{:032x}", Self::PASSWORD_PREFIX, digest)) // includes the   
         } else {
             None
         }
-    }
-    /// Set password
-    pub fn set_password_md5(&mut self, digest: md5::Digest) {
-        todo!();
     }
 }
 
@@ -158,12 +159,13 @@ impl GuiWindow for LoginDialogWindow {
                         };
                         self.login_dialog_input.zeroize();              // erase text password in memory
                         accepted = true;                                // dismiss dialog
-                        let login_params = LoginParams {
+                        let mut login_params = LoginParams {
                             grid: self.grid.clone(),
                             user_name: self.login_dialog_input.user_name.trim().to_string(),
-                            password_md5_opt,
+                            password_md5_opt: None,
                             auth_token: None
                         };
+                        login_params.set_password_md5(password_md5_opt);
                         println!("Attempting login to {}", login_params.get_service());
                         let _ = state.send_gui_event(GuiEvent::LoginStart(login_params));      // tell main to start the login process
                      }
