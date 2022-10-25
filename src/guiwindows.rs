@@ -182,7 +182,7 @@ impl GuiState {
     pub fn draw(&mut self, ctx: &egui::Context) {
         //  Temporary windows
         //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
-        let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(|m| Rc::clone(m)).collect();
+        let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(Rc::clone).collect();
         for w in &todo_list { w.borrow_mut().draw(ctx, self) }  // draw all temporaries
         self.temporary_windows.retain(|w| w.borrow().retain());  // keep only live ones
     }
@@ -563,9 +563,9 @@ pub struct MessageLogger {
 
 impl MessageLogger {
     //  Usual new
-    pub fn new(level_filter: LevelFilter, send_channel: crossbeam_channel::Sender::<GuiEvent>) -> Box<dyn SharedLogger> {
+    pub fn new_logger(level_filter: LevelFilter, send_channel: crossbeam_channel::Sender::<GuiEvent>) -> Box<dyn SharedLogger> {
         Box::new(MessageLogger {
-            send_channel: send_channel,
+            send_channel,
             level_filter,
             enabled: true               // always on, actually
         })

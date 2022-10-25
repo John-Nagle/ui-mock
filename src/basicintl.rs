@@ -73,7 +73,7 @@ impl Dictionary {
             return Ok(HashSet::new()); // empty list, no translations available
         }
         let file = &files[0]; // we have at least one
-        let translation_file = Self::read_translation_file(&file)
+        let translation_file = Self::read_translation_file(file)
             .with_context(|| format!("Translation file: {:?}", file))?;
         //  Get the unordered list of available translations from the first entry.
         //  They all have to be the same, and that's checked.

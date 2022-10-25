@@ -145,7 +145,7 @@ impl rend3_framework::App for Ui {
             vec![
                 ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
                 simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file")),
-                MessageLogger::new(LevelFilter::Warn, self.event_send_channel.clone()),
+                MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
             ]
         ); 
         log::warn!("Logging to {:?}", log_file_name);   // where the log is going         
