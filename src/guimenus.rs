@@ -115,15 +115,7 @@ pub fn draw_grid_login(state: &mut GuiState) {
     //  Central panel
     egui::CentralPanel::default().show(&ctx, |ui| {
         //  Login dialog
-        ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |ui| {
-            ui.with_layout(egui::Layout::top_down(egui::Align::Min), |ui| {
-                ////ui.label("Fill area");
-                ////if ui.button("test only").clicked() {}
-                ////if ui.button(t!("menu.cancel", state.get_lang())).clicked() {
-                    ////state.selected_grid = None;                 // clear grid selection
-                    ////state.change_mode(SystemMode::Start);       // back to start state
-                ////}
-            })
+        ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |_ui| {
         })
     });
     state.draw(&ctx); // all the standard windows
