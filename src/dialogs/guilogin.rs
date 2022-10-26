@@ -83,8 +83,9 @@ impl LoginParams {
     
     /// Save password in platform secure storage
     pub fn save_password(&self) -> Result<(), Error> {
-        match &self.password_md5_opt {
-            Some(pass) => 
+        println!("Saving password {:?}", &self.password_md5_opt);    // ***TEMP***
+        match &self.password_md5_opt {    
+            Some(pass) =>
                 Entry::new(&self.get_service(Self::CRED_TYPE_PASS), &Self::prep_string(&self.user_name))
                 .set_password(pass).map_err(anyhow::Error::msg),
             None => Err(anyhow!("Attempt to save empty password"))
@@ -160,7 +161,7 @@ impl GuiWindow for LoginDialogWindow {
                 .show(ui, |ui| {
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.username", &state.params.lang));
-                        let _ = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.user_name)); 
+                        let _response = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.user_name));
                     });
                     ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
                         ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
@@ -192,7 +193,15 @@ impl GuiWindow for LoginDialogWindow {
                             password_md5_opt: None,
                             auth_token: None
                         };
-                        login_params.set_password_md5(password_md5_opt);
+                        if password_md5_opt.is_some() {                 // if a new password was typed in
+                            login_params.set_password_md5(password_md5_opt);
+                        } else {                                        // try to get one from storage
+                            if login_params.fetch_password().is_err() {   // if no stored password
+                                println!("Still need password");        // ***TEMP*** need to make beep sound here.
+                                return;
+                            }
+                        }
+                        accepted = true;                                // dismiss dialog
                         println!("Attempting login to {}", login_params.get_service(LoginParams::CRED_TYPE_PASS));
                         //  ***TEMP*** save password here. Really need to save it after successful login
                         if let Some(_pass) = &login_params.password_md5_opt {
