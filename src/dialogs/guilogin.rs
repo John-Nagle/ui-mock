@@ -163,9 +163,9 @@ impl GuiWindow for LoginDialogWindow {
                         ui.label(t!("menu.username", &state.params.lang));
                         let _response = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.user_name));
                     });
-                    ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
-                        ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
-                    });                    
+                    ////ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
+                    ////    ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
+                    ////});                    
                     ui.end_row();
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.password", &state.params.lang));
@@ -186,7 +186,6 @@ impl GuiWindow for LoginDialogWindow {
                             Some(md5::compute(&self.login_dialog_input.password.trim()))  // get MD5 of password
                         };
                         self.login_dialog_input.zeroize();              // erase text password in memory
-                        accepted = true;                                // dismiss dialog
                         let mut login_params = LoginParams {
                             grid: self.grid.clone(),
                             user_name: self.login_dialog_input.user_name.trim().to_string(),
@@ -195,6 +194,10 @@ impl GuiWindow for LoginDialogWindow {
                         };
                         if password_md5_opt.is_some() {                 // if a new password was typed in
                             login_params.set_password_md5(password_md5_opt);
+                            //  Save newly typed password ***TEMP*** move this to after successful login.
+                            if self.remember_password {
+                                login_params.save_password().unwrap();  // ***NEED ERROR HANDLING***
+                            }
                         } else {                                        // try to get one from storage
                             if login_params.fetch_password().is_err() {   // if no stored password
                                 println!("Still need password");        // ***TEMP*** need to make beep sound here.
@@ -202,11 +205,7 @@ impl GuiWindow for LoginDialogWindow {
                             }
                         }
                         accepted = true;                                // dismiss dialog
-                        println!("Attempting login to {}", login_params.get_service(LoginParams::CRED_TYPE_PASS));
-                        //  ***TEMP*** save password here. Really need to save it after successful login
-                        if let Some(_pass) = &login_params.password_md5_opt {
-                            login_params.save_password().unwrap();  // ***NEED ERROR HANDLING***
-                        }
+                        println!("Attempting login to {}", login_params.get_service(LoginParams::CRED_TYPE_PASS));                        
                         let _ = state.send_gui_event(GuiEvent::LoginStart(login_params));      // tell main to start the login process
                      }
                 });
