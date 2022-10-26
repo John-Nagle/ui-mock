@@ -3,7 +3,9 @@
 //  Animats
 //  October 2022
 //
+use anyhow::{Error, anyhow};
 use zeroize::{Zeroize, ZeroizeOnDrop};
+use keyring::{Entry};
 use super::super::guiwindows::{GuiWindow};
 use crate::t;
 use crate::{GuiEvent, GuiState,GridSelectParams};
@@ -42,6 +44,8 @@ pub struct LoginParams {
 
 impl LoginParams {
     pub const CREDENTIAL_PREFIX: &str = "metaverse";            // credential keys are prefixed with this.
+    pub const CRED_TYPE_PASS: &str = "pass";
+    pub const CRED_TYPE_TOKEN: &str = "token";
     const PASSWORD_PREFIX: &'static str = "$1$";                // precedes password MD5 in hex. SL convention.
     /// Translate special characters and make lower case
     fn translate_special_characters(c: char) -> char {
@@ -61,8 +65,8 @@ impl LoginParams {
     }
     /// Returns the "service" string needed for credential storage.
     /// Format is "PREFIX/SYSTEM/GRID". 
-    pub fn get_service(&self) -> String {
-        format!("{}/{}/{}", Self::CREDENTIAL_PREFIX, Self::prep_string(&self.grid.metaverse), Self::prep_string(&self.grid.grid))
+    pub fn get_service(&self, cred_type: &str) -> String {
+        format!("{}/{}/{}/{}", Self::CREDENTIAL_PREFIX, Self::prep_string(&self.grid.metaverse), Self::prep_string(&self.grid.grid), cred_type)
     }
     /// Password as md5
     pub fn get_password_md5(&self) -> Option<String> {
@@ -76,6 +80,29 @@ impl LoginParams {
             None
         }
     }
+    
+    /// Save password in platform secure storage
+    pub fn save_password(&self) -> Result<(), Error> {
+        match &self.password_md5_opt {
+            Some(pass) => 
+                Entry::new(&self.get_service(Self::CRED_TYPE_PASS), &Self::prep_string(&self.user_name))
+                .set_password(pass).map_err(anyhow::Error::msg),
+            None => Err(anyhow!("Attempt to save empty password"))
+        }
+    }
+    /// Fetch password from platform secure storage.
+    pub fn fetch_password(&mut self) -> Result<(), Error> {
+        let pass = Entry::new(&self.get_service(Self::CRED_TYPE_PASS), &Self::prep_string(&self.user_name))
+            .get_password()?;
+        self.password_md5_opt = Some(pass);
+        Ok(())
+    }
+    /// Delete password 
+    pub fn delete_password(&mut self) -> Result<(), Error> {
+        Entry::new(&self.get_service(Self::CRED_TYPE_PASS), &Self::prep_string(&self.user_name))
+            .delete_password().map_err(anyhow::Error::msg)
+    }
+    //  ***NEED TO ADD TOKEN ACCESS FOR 2FA***
 }
 
 /// Login dialog window.
@@ -166,7 +193,11 @@ impl GuiWindow for LoginDialogWindow {
                             auth_token: None
                         };
                         login_params.set_password_md5(password_md5_opt);
-                        println!("Attempting login to {}", login_params.get_service());
+                        println!("Attempting login to {}", login_params.get_service(LoginParams::CRED_TYPE_PASS));
+                        //  ***TEMP*** save password here. Really need to save it after successful login
+                        if let Some(_pass) = &login_params.password_md5_opt {
+                            login_params.save_password().unwrap();  // ***NEED ERROR HANDLING***
+                        }
                         let _ = state.send_gui_event(GuiEvent::LoginStart(login_params));      // tell main to start the login process
                      }
                 });
