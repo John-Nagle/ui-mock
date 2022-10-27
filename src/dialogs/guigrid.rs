@@ -14,7 +14,7 @@ use std::sync::Arc;
 use serde::{Deserialize};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
-use crate::{GuiAssets, load_canned_icon};
+use crate::{GuiAssets, load_image};
 /// Basic info about a grid for the splash page
 /// GridSelectParams file contents.
 #[derive(Debug, Clone, Deserialize)]
@@ -60,8 +60,8 @@ impl GridSelectParams {
             image_file_name.push(&data.picture_bar);
             println!("Metaverse: {} Grid: {} Picture bar image file: {:?}", data.metaverse, data.grid, image_file_name);    // ***TEMP***
             let image = image::io::Reader::open(&image_file_name)?.decode().context("Unable to open image for grid menu")?;
-            let rgba = image.to_rgba8();
-            let picture_bar = load_canned_icon(&rgba, egui_routine, renderer);
+            ////let rgba = image.to_rgba8();
+            let picture_bar = load_image(image, egui_routine, renderer);
             params.push(GridSelectParams {
                 picture_bar,
                 data

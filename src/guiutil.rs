@@ -6,7 +6,7 @@
 
 use std::sync::Arc;
 use rend3::Renderer;
-use image::GenericImageView;
+use image::{DynamicImage, GenericImageView};
 use egui::{TextureId};
 use rend3_egui::EguiRenderRoutine;
 use egui::FontFamily::{Proportional};
@@ -25,7 +25,7 @@ pub fn load_canned_icon(
     egui_routine: &mut EguiRenderRoutine,
     renderer: &Arc<Renderer>,
 ) -> TextureId {
-    //Images
+    //  Images
     let image_image = image::load_from_memory(image_bytes).unwrap();
     let image_rgba = image_image.as_rgba8().unwrap().clone().into_raw();
     let dimensions = image_image.dimensions();
@@ -38,6 +38,27 @@ pub fn load_canned_icon(
         &image_rgba,
         dimensions,
         Some("Canned icon"),
+    )
+}
+
+/// Load an icon or image from standard image format.
+pub fn load_image(
+    image_image: DynamicImage,
+    egui_routine: &mut EguiRenderRoutine,
+    renderer: &Arc<Renderer>,
+) -> TextureId {
+    //Images
+    let image_rgba = image_image.as_rgba8().unwrap().clone().into_raw();
+    let dimensions = image_image.dimensions();
+    let format = wgpu::TextureFormat::Rgba8UnormSrgb;
+    //  Create and return texture
+    rend3_egui::EguiRenderRoutine::create_egui_texture(
+        &mut egui_routine.internal,
+        renderer,
+        format,
+        &image_rgba,
+        dimensions,
+        Some("Built-in image"),
     )
 }
 
