@@ -114,7 +114,6 @@ pub struct LoginDialogWindow {
     is_open: bool,  // true if open
     grid: GridSelectParams, // info about grid
     login_dialog_input: LoginDialogInput, // user-provided data needed for login
-    remember_username: bool,
     remember_password: bool,
 }
 
@@ -128,7 +127,6 @@ impl LoginDialogWindow {
             grid: grid.clone(),
             is_open: true,
             login_dialog_input: Default::default(),
-            remember_username: false,
             remember_password: true,
         }
     }

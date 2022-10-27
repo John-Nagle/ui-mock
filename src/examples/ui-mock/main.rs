@@ -245,18 +245,18 @@ impl rend3_framework::App for Ui {
             });
 
         //  Icon loading
-        let web_icon_bytes = include_bytes!("../../images/iconweb.png");
+        let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
         let assets = GuiAssets { 
             web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
             //  ***TEMP*** until this stuff gets loaded at run time.
-            replay_bar: libui::load_canned_icon(include_bytes!("../../images/replaybar.png"), &mut egui_routine, renderer),    
-            placeholder_a_bar: libui::load_canned_icon(include_bytes!("../../images/placeholdera.png"), &mut egui_routine, renderer), 
-            placeholder_b_bar: libui::load_canned_icon(include_bytes!("../../images/placeholderb.png"), &mut egui_routine, renderer), 
+            replay_bar: libui::load_canned_icon(include_bytes!("../../assets/images/replaybar.png"), &mut egui_routine, renderer),    
+            placeholder_a_bar: libui::load_canned_icon(include_bytes!("../../assets/images/placeholdera.png"), &mut egui_routine, renderer), 
+            placeholder_b_bar: libui::load_canned_icon(include_bytes!("../../assets/images/placeholderb.png"), &mut egui_routine, renderer), 
             };
 
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
-        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
+        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
         let lang = Dictionary::get_translation(&vec![std::path::PathBuf::from_str(locale_file).unwrap()])
             .expect("Trouble loading language translation files"); // select language
                                                                    

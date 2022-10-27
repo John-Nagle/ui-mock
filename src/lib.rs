@@ -17,7 +17,7 @@ mod dialogs;
 
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
-pub use guiwindows::{GuiParams, GuiAssets, GuiState, GuiEvent, SystemMode, GridSelectParams, MessageLogger};
+pub use guiwindows::{GuiParams, GuiAssets, GuiState, GuiEvent, SystemMode, MessageLogger};
 pub use guiwindows::{panic_dialog};
 /// Utility functions.
 pub use guiutil::{load_canned_icon, set_default_styles, get_log_file_name, get_executable_name, get_asset_dir, get_cache_dir};
@@ -25,3 +25,4 @@ pub use guiutil::{load_canned_icon, set_default_styles, get_log_file_name, get_e
 pub use basicintl::{Dictionary};
 /// Dialogs
 pub use dialogs::guilogin::{LoginParams, LoginDialogWindow};
+pub use dialogs::guigrid::{GridSelectParams};
