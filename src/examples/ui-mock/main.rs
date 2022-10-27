@@ -88,7 +88,7 @@ impl Ui {
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.
                 if data.gui_state.get_mode() == SystemMode::Login {
-                    let is_file_pick = grid.login_url.is_none();
+                    let is_file_pick = grid.data.login_url.is_none();
                     data.gui_state.selected_grid = Some(grid.clone());  // set the selected grid
                     if is_file_pick {
                         //  No grid URL, so this is a replay file selection, not a login.
@@ -101,7 +101,7 @@ impl Ui {
                         data.gui_state.add_window(Box::new(LoginDialogWindow::new(id, &grid))).unwrap();
                     }                  
                 } else {
-                    log::error!("Login request to {} while in state {:?}", grid.metaverse, data.gui_state.get_mode());
+                    log::error!("Login request to {} while in state {:?}", grid.data.metaverse, data.gui_state.get_mode());
                 }
             }
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
@@ -271,7 +271,10 @@ impl rend3_framework::App for Ui {
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
         ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
-        let grid_select_params = get_grid_select_params(&assets);                                                                
+        ////let grid_select_params = get_grid_select_params(&assets);
+        let mut grid_file = asset_dir.clone();
+        grid_file.push("grids.json");
+        let grid_select_params = GridSelectParams:: read_grid_select_params(&grid_file).unwrap();                                                           
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
@@ -468,7 +471,7 @@ fn main() {
 }
 
 
-
+/*
 /// Dummy of get grid select params.
 //  These will come from a file in future,
 //  with an entry for each supported metaverse.
@@ -503,5 +506,6 @@ fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
     */
     grids
 }
+*/
 
 

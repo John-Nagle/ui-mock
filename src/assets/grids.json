@@ -3,6 +3,9 @@
         "grid": "Results from test run",
         "picture_bar": "assets/images/replay_bar",
         "home_url": "https://www.animats.com/viewer",
+        "signup_url": null,
+        "login_url": null,
+        "comment": "This entry is a dummy for replaying captured files"
     },
     {
         "metaverse": "Second Life",
@@ -11,6 +14,7 @@
         "home_url": "https://www.secondlife.com",
         "signup_url": "https://join.secondlife.com",
         "login_url": "https://login.aditi.lindenlab.com/cgi-bin/login.cgi",
+        "comment": null
     },
     {
         "metaverse": "Open Simulator",
@@ -18,6 +22,7 @@
         "picture_bar": "assets/images/placeholder_b_bar",
         "home_url": "https://www.osgrid.org",
         "signup_url": "https://www.osgrid.org/accounts/?q=user/register",
-        "login_url": "http://login.osgrid.org"
+        "login_url": "http://login.osgrid.org",
+        "comment": null
     }]
 }

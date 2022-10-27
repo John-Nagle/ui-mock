@@ -138,7 +138,7 @@ pub fn draw_replay_file_pick(state: &mut GuiState) {
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 pub fn draw_login(state: &mut GuiState) {       
     if let Some(grid) = &state.selected_grid {
-        if let Some(_login_url) = &grid.login_url {
+        if let Some(_login_url) = &grid.data.login_url {
             //  Actual login, need username/password.
             draw_grid_login(state)
         } else {

@@ -66,7 +66,7 @@ impl LoginParams {
     /// Returns the "service" string needed for credential storage.
     /// Format is "PREFIX/SYSTEM/GRID". 
     pub fn get_service(&self, cred_type: &str) -> String {
-        format!("{}/{}/{}/{}", Self::CREDENTIAL_PREFIX, Self::prep_string(&self.grid.metaverse), Self::prep_string(&self.grid.grid), cred_type)
+        format!("{}/{}/{}/{}", Self::CREDENTIAL_PREFIX, Self::prep_string(&self.grid.data.metaverse), Self::prep_string(&self.grid.data.grid), cred_type)
     }
     /// Password as md5
     pub fn get_password_md5(&self) -> Option<String> {
@@ -120,7 +120,7 @@ pub struct LoginDialogWindow {
 impl LoginDialogWindow {
     /// Create persistent text window, multiline
     pub fn new(id: egui::Id, grid: &GridSelectParams) -> Self {
-        let title = format!("{} -- {}", grid.metaverse, grid.grid);          // title is just grid name for now.
+        let title = format!("{} -- {}", grid.data.metaverse, grid.data.grid);          // title is just grid name for now.
         LoginDialogWindow {
             title,
             id,

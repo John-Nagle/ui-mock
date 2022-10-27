@@ -5,17 +5,57 @@
 //  Animats
 //  October 2022
 //
-////use anyhow::{Error, anyhow};
+use anyhow::{Error, Context, anyhow};
 ////use crate::t;
+use std::fs::File;
+use std::path::PathBuf;
+use std::io::Read;
+use serde::{Deserialize};
 use crate::{GuiAssets};
 /// Basic info about a grid for the splash page
-#[derive(Debug, Clone)]
-pub struct GridSelectParams {
+/// GridSelectParams file contents.
+#[derive(Debug, Clone, Deserialize)]
+pub struct GridSelectParamsData {
     pub metaverse: String,                      // Second Life, OsGrid, etc.
     pub grid: String,                           // agni, etc.
-    pub picture_bar: egui::TextureId,
-    pub web_url: String,
-    pub login_url: Option<String>,              // if none, this is a replay  
+    pub picture_bar: String,                    // local file name in images directory
+    pub home_url: String,                       // home page for site   
+    pub join_url: Option<String>,               // How to join
+    pub login_url: Option<String>,              // if none, this is a replay
+    pub comment: Option<String>,                // to allow a comment in the source JSON file
+}
+
+/// This describes the format of the grids.json file for serde deserialization.
+#[derive(Debug, Clone, Deserialize)]
+struct GridSelectParamsDataJson {
+    pub grids: Vec<GridSelectParamsData>
+}
+
+#[derive(Debug, Clone)]
+pub struct GridSelectParams {
+    pub data: GridSelectParamsData,             // as read from JSON
+    pub picture_bar: egui::TextureId,           // texture has been loaded and is ready to go
+}
+
+impl GridSelectParams {
+    /// Read the JSON grid select params file tnto a GridSelectParams structure.
+    pub fn read_grid_select_params(filename: &PathBuf) -> Result<Vec<GridSelectParams>, Error> {
+        //  Read one translations file
+        let file = File::open(filename)
+            .with_context(|| anyhow!("Failed to open the grid select params config file: {:?}", filename))?;
+        let mut reader = std::io::BufReader::new(file);
+        let mut content = String::new();
+        reader
+            .read_to_string(&mut content)
+            .context("Failed to read the grid select params config.")?;
+        let grids_data: GridSelectParamsDataJson = serde_json::from_str(&content).context("Failed to parse grid select params config file.")?;
+        let mut params = Vec::new();
+        for grid_data in grids_data.grids {
+            println!("Metaverse: {} Grid: {}", grid_data.metaverse, grid_data.grid);    // ***TEMP***
+        } 
+        //  ***MORE***
+        Ok(params)
+    }
 }
 
 /// The grid selection window.
@@ -57,9 +97,9 @@ impl GridSelectWindow {
                 for row in row_range {
                     let grid = &self.grids[row];
                     ui.horizontal(|ui| {
-                        ui.label(&grid.metaverse);
+                        ui.label(&grid.data.metaverse);
                         ui.label(" -- ");
-                        ui.label(&grid.grid);
+                        ui.label(&grid.data.grid);
                     });
                     ui.horizontal(|ui| {
                         //  Grid select
@@ -83,11 +123,11 @@ impl GridSelectWindow {
                             .frame(true),
                         )
                         .clicked()
-                        {   //  Clicking on web icon opens web page for that grid
-                            match webbrowser::open(&grid.web_url) {
+                        {   //  Clicking on web icon opens home web page for that grid
+                            match webbrowser::open(&grid.data.home_url) {
                                 Ok(_) => {},
                                 Err(e) => {
-                                    log::error!("Trouble trying to open web page \"{}\": {:?}", grid.web_url, e);
+                                    log::error!("Trouble trying to open web page \"{}\": {:?}", grid.data.home_url, e);
                                     //  Popup if trouble
                                     /* ***MORE*** need access to state
                                     let errmsg = format!("{:?}",e);
