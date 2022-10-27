@@ -67,7 +67,6 @@ impl GridSelectParams {
                 data
             });
         } 
-        //  ***MORE***
         Ok(params)
     }
 }

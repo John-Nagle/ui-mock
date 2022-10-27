@@ -1,4 +1,3 @@
-//
 //  Main program of user interface
 //
 //  This is a mockup of the user interface for
@@ -14,10 +13,11 @@
 //
 use libui;
 use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger};
-use libui::{get_log_file_name, get_executable_name};
+use libui::{get_log_file_name, get_executable_name, panic_dialog};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
+use anyhow::{Error};
 mod examplesupport;
 
 /// Base level configuration
@@ -122,41 +122,15 @@ impl Ui {
             }                                       // shut down and exit
         }
     }
-}
-
-
-
-/// This is an instance of the Rend3 application framework.
-impl rend3_framework::App for Ui {
-    const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
-
-    fn sample_count(&self) -> rend3::types::SampleCount {
-        SAMPLE_COUNT
-    }
     
-    /// Register our loggers.
-    //  One logger goes to a file.
-    //  One logger goes to a window in the GUI
-    fn register_logger(&mut self) {
-        let log_file_name = get_log_file_name().expect("Unable to figure out where to put log files.");    // get appropriate name for platform
-        let _ = simplelog::CombinedLogger::init(
-            vec![
-                ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
-                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file")),
-                MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
-            ]
-        ); 
-        log::warn!("Logging to {:?}", log_file_name);   // where the log is going         
-    }
-
-    /// Setup of the graphics environment
-    fn setup(
+    /// Setup of the graphics environment. Returns error.
+    fn setup_with_error(
         &mut self,
         window: &winit::window::Window,
         renderer: &Arc<rend3::Renderer>,
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
-    ) {
+    ) -> Result<(), Error> {
         //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
         ////window.set_visible(true); // ***TEMP TEST***
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
@@ -248,15 +222,11 @@ impl rend3_framework::App for Ui {
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
         let assets = GuiAssets { 
             web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
-            //  ***TEMP*** until this stuff gets loaded at run time.
-            replay_bar: libui::load_canned_icon(include_bytes!("../../assets/images/replaybar.png"), &mut egui_routine, renderer),    
-            placeholder_a_bar: libui::load_canned_icon(include_bytes!("../../assets/images/placeholdera.png"), &mut egui_routine, renderer), 
-            placeholder_b_bar: libui::load_canned_icon(include_bytes!("../../assets/images/placeholderb.png"), &mut egui_routine, renderer), 
             };
 
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
-        let asset_dir = std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/")).unwrap(); // ***TEST ONLY*** installer dependent
+        let asset_dir = std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
         let mut locale_file = asset_dir.clone();
         locale_file.push("locales");
         locale_file.push("menus.json");
@@ -274,7 +244,7 @@ impl rend3_framework::App for Ui {
         const GRID_FILE: &str = "grids.json";
         // Read in the grid select params, which requires reading some images.
         let grid_select_params =
-            GridSelectParams:: read_grid_select_params(&std::path::PathBuf::from_str(GRID_FILE).unwrap(), &asset_dir, &mut egui_routine, renderer).unwrap();
+            GridSelectParams:: read_grid_select_params(&std::path::PathBuf::from_str(GRID_FILE)?, &asset_dir, &mut egui_routine, renderer)?;
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
@@ -299,7 +269,51 @@ impl rend3_framework::App for Ui {
             gui_state,
             quit: false,
         });
+        Ok(())
     }
+
+    
+}
+
+
+
+/// This is an instance of the Rend3 application framework.
+impl rend3_framework::App for Ui {
+    const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
+
+    fn sample_count(&self) -> rend3::types::SampleCount {
+        SAMPLE_COUNT
+    }
+    
+    /// Register our loggers.
+    //  One logger goes to a file.
+    //  One logger goes to a window in the GUI
+    fn register_logger(&mut self) {
+        let log_file_name = get_log_file_name().expect("Unable to figure out where to put log files.");    // get appropriate name for platform
+        let _ = simplelog::CombinedLogger::init(
+            vec![
+                ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
+                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file")),
+                MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
+            ]
+        ); 
+        log::warn!("Logging to {:?}", log_file_name);   // where the log is going         
+    }
+    
+    /// Setup of the graphics enviornment, popping up a panic dialog on error.
+    fn setup(
+        &mut self,
+        window: &winit::window::Window,
+        renderer: &Arc<rend3::Renderer>,
+        _routines: &Arc<rend3_framework::DefaultRoutines>,
+        surface_format: rend3::types::TextureFormat,
+    ) { 
+        if let Err(err) = self.setup_with_error(window, renderer, _routines, surface_format) {
+            panic_dialog("Start-up failure", &format!("{:?}", err)); // tell user
+            panic!("Start up failure: {:?}", err);   // then panic
+        }
+    }
+
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
     fn handle_event(
@@ -469,43 +483,3 @@ fn main() {
             .with_maximized(true)   // this is not effective on Linux/X11. Has to be re-done at startup.
     )
 }
-
-
-/*
-/// Dummy of get grid select params.
-//  These will come from a file in future,
-//  with an entry for each supported metaverse.
-fn get_grid_select_params(assets: &GuiAssets) -> Vec<GridSelectParams> {
-    let mut grids = Vec::new();
-    //  Replay feature only if replay enabled
-    #[cfg (feature="replay")]
-    grids.push(GridSelectParams {
-        metaverse: "Replay file".to_string(),
-        grid: "Results from test run".to_string(),
-        picture_bar: assets.replay_bar,
-        web_url: "https://www.animats.com/viewer".to_string(),
-        login_url: None,
-    });
-    grids.push(GridSelectParams {
-        metaverse: "Second Life".to_string(),
-        grid: "Agni".to_string(),
-        picture_bar: assets.placeholder_a_bar,
-        web_url: "https://www.secondlife.com".to_string(),
-        login_url: Some("https://login.aditi.lindenlab.com/cgi-bin/login.cgi".to_string()),
-    });
-    grids.push(GridSelectParams {
-        metaverse: "Open Simulator".to_string(),
-        grid: "OsGrid".to_string(),
-        picture_bar: assets.placeholder_b_bar,
-        web_url: "https://www.osgrid.org".to_string(),
-        login_url: Some("http://login.osgrid.org".to_string()),
-    });
-    /*  ***TEST ONLY*** to test scrolling. Not working right in egui 0.17
-    let work = &grids[0].clone();   // ***TEMP***
-    for _ in 0..10 { grids.push(work.clone());}  // ***TEMP*** forcing scrolling
-    */
-    grids
-}
-*/
-
-

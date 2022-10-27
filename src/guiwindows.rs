@@ -54,10 +54,6 @@ pub struct GuiParams {
 #[derive(Default)]
 pub struct GuiAssets {
     pub web_icon: egui::TextureId,
-    pub replay_bar: egui::TextureId,
-    //  ***TEMP*** will be loaded from file at startup
-    pub placeholder_a_bar: egui::TextureId,
-    pub placeholder_b_bar: egui::TextureId,
 }
 
 /// GUI states.
