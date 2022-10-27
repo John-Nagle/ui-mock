@@ -59,7 +59,10 @@ impl GridSelectParams {
             let mut image_file_name = asset_dir.clone();                // build file name of image
             image_file_name.push(&data.picture_bar);
             println!("Metaverse: {} Grid: {} Picture bar image file: {:?}", data.metaverse, data.grid, image_file_name);    // ***TEMP***
-            let image = image::io::Reader::open(&image_file_name)?.decode().context("Unable to open image for grid menu")?;
+            let image = image::io::Reader::open(&image_file_name)
+                .with_context(|| format!("Unable to open image file {:?} for grid menu", image_file_name))?
+                .decode()
+                .with_context(|| format!("Unable to decode image file {:?} for grid menu", image_file_name))?;
             ////let rgba = image.to_rgba8();
             let picture_bar = load_image(image, egui_routine, renderer);
             params.push(GridSelectParams {
