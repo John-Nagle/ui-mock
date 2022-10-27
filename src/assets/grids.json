@@ -1,7 +1,7 @@
 { "grids": [
     {   "metaverse": "Replay file",
         "grid": "Results from test run",
-        "picture_bar": "assets/images/replay_bar",
+        "picture_bar": "images/replaybar.png",
         "home_url": "https://www.animats.com/viewer",
         "signup_url": null,
         "login_url": null,
@@ -10,7 +10,7 @@
     {
         "metaverse": "Second Life",
         "grid": "Agni",
-        "picture_bar": "assets/images/placeholder_a_bar",
+        "picture_bar": "images/placeholdera.png",
         "home_url": "https://www.secondlife.com",
         "signup_url": "https://join.secondlife.com",
         "login_url": "https://login.aditi.lindenlab.com/cgi-bin/login.cgi",
@@ -19,7 +19,7 @@
     {
         "metaverse": "Open Simulator",
         "grid": "OsGrid",
-        "picture_bar": "assets/images/placeholder_b_bar",
+        "picture_bar": "images/placeholderb.png",
         "home_url": "https://www.osgrid.org",
         "signup_url": "https://www.osgrid.org/accounts/?q=user/register",
         "login_url": "http://login.osgrid.org",

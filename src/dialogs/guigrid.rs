@@ -10,8 +10,11 @@ use anyhow::{Error, Context, anyhow};
 use std::fs::File;
 use std::path::PathBuf;
 use std::io::Read;
+use std::sync::Arc;
 use serde::{Deserialize};
-use crate::{GuiAssets};
+use rend3::Renderer;
+use rend3_egui::EguiRenderRoutine;
+use crate::{GuiAssets, load_canned_icon};
 /// Basic info about a grid for the splash page
 /// GridSelectParams file contents.
 #[derive(Debug, Clone, Deserialize)]
@@ -39,9 +42,11 @@ pub struct GridSelectParams {
 
 impl GridSelectParams {
     /// Read the JSON grid select params file tnto a GridSelectParams structure.
-    pub fn read_grid_select_params(filename: &PathBuf) -> Result<Vec<GridSelectParams>, Error> {
-        //  Read one translations file
-        let file = File::open(filename)
+    pub fn read_grid_select_params(filename: &PathBuf, asset_dir: &PathBuf, egui_routine: &mut EguiRenderRoutine, renderer: &Arc<Renderer>) -> Result<Vec<GridSelectParams>, Error> {
+        //  Read grid_select file
+        let mut grid_file = asset_dir.clone();
+        grid_file.push(filename);
+        let file = File::open(grid_file)
             .with_context(|| anyhow!("Failed to open the grid select params config file: {:?}", filename))?;
         let mut reader = std::io::BufReader::new(file);
         let mut content = String::new();
@@ -50,8 +55,17 @@ impl GridSelectParams {
             .context("Failed to read the grid select params config.")?;
         let grids_data: GridSelectParamsDataJson = serde_json::from_str(&content).context("Failed to parse grid select params config file.")?;
         let mut params = Vec::new();
-        for grid_data in grids_data.grids {
-            println!("Metaverse: {} Grid: {}", grid_data.metaverse, grid_data.grid);    // ***TEMP***
+        for data in grids_data.grids {
+            let mut image_file_name = asset_dir.clone();                // build file name of image
+            image_file_name.push(&data.picture_bar);
+            println!("Metaverse: {} Grid: {} Picture bar image file: {:?}", data.metaverse, data.grid, image_file_name);    // ***TEMP***
+            let image = image::io::Reader::open(&image_file_name)?.decode().context("Unable to open image for grid menu")?;
+            let rgba = image.to_rgba8();
+            let picture_bar = load_canned_icon(&rgba, egui_routine, renderer);
+            params.push(GridSelectParams {
+                picture_bar,
+                data
+            });
         } 
         //  ***MORE***
         Ok(params)

@@ -271,10 +271,10 @@ impl rend3_framework::App for Ui {
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
         ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
-        ////let grid_select_params = get_grid_select_params(&assets);
-        let mut grid_file = asset_dir.clone();
-        grid_file.push("grids.json");
-        let grid_select_params = GridSelectParams:: read_grid_select_params(&grid_file).unwrap();                                                           
+        const GRID_FILE: &str = "grids.json";
+        // Read in the grid select params, which requires reading some images.
+        let grid_select_params =
+            GridSelectParams:: read_grid_select_params(&std::path::PathBuf::from_str(GRID_FILE).unwrap(), &asset_dir, &mut egui_routine, renderer).unwrap();
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
