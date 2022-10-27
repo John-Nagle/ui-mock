@@ -41,6 +41,7 @@ pub enum GuiEvent {
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
     pub version: String,                            // main program version
+    pub asset_dir: PathBuf,                         // the asset directory
     pub lang: Dictionary,                           // translation dictionary for chosen language
     pub dark_mode: bool,                            // true if in dark mode
     pub log_level: LevelFilter,                     // logging level

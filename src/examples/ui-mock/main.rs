@@ -256,8 +256,12 @@ impl rend3_framework::App for Ui {
 
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
-        let locale_file = concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/locales/menus.json"); // ***TEST ONLY*** Installer-dependent
-        let lang = Dictionary::get_translation(&vec![std::path::PathBuf::from_str(locale_file).unwrap()])
+        let asset_dir = std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/")).unwrap(); // ***TEST ONLY*** installer dependent
+        let mut locale_file = asset_dir.clone();
+        locale_file.push("locales");
+        locale_file.push("menus.json");
+        ////let locale_file = asset_dir.to_string() + "locales/menus.json"; // locale file is under in assets
+        let lang = Dictionary::get_translation(&[locale_file])
             .expect("Trouble loading language translation files"); // select language
                                                                    
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
@@ -273,6 +277,7 @@ impl rend3_framework::App for Ui {
         let params = GuiParams {
             lang,
             version,                        // because we need version of main program, not libs
+            asset_dir,
             dark_mode,
             log_level,
             menu_display_secs: MENU_DISPLAY_SECS,
