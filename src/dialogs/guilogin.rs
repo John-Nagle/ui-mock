@@ -9,6 +9,8 @@ use keyring::{Entry};
 use super::super::guiwindows::{GuiWindow};
 use crate::t;
 use crate::{GuiEvent, GuiState,GridSelectParams};
+
+
 //  Dialog box parameters required for login.
 //  The password is zeroized as soon as it can be
 //  converted to MD5, and zeroized on drop if 
@@ -17,7 +19,8 @@ use crate::{GuiEvent, GuiState,GridSelectParams};
 struct LoginDialogInput {
     user_name: String,
     password: String,                   // zeroize this as soon as MD5 is computed
-    _auth_token: Option<usize>           // future when 2FA implemented.
+    _auth_token: Option<usize>,         // future when 2FA implemented.
+    destination: LoginDestination,
 }
 
 impl LoginDialogInput {
@@ -32,11 +35,21 @@ impl LoginDialogInput {
     }
 }
 
+/// Where do you want to go today?
+#[derive(Default, ZeroizeOnDrop, PartialEq, Clone, Debug)]
+pub enum LoginDestination {
+#[default]
+    Last,                   // location at last login
+    Home,                   // home
+    Region(String)          // specified region
+}
+
 /// Data needed to do a login.
 //  This is passed to the client, and contains the data the server needs for a login.
 #[derive(Debug)]
 pub struct LoginParams {
     pub grid: GridSelectParams,     // which grid
+    pub destination: LoginDestination,  // where on grid
     pub user_name: String,          // user name
     password_md5_opt: Option<String>, // MD5 of the password, including the PASSWORD_PREFIX, ready for login.
     pub auth_token: Option<usize>,  // future when 2FA implemented.
@@ -113,6 +126,7 @@ pub struct LoginDialogWindow {
     id: egui::Id,  // unique ID
     is_open: bool,  // true if open
     grid: GridSelectParams, // info about grid
+    
     login_dialog_input: LoginDialogInput, // user-provided data needed for login
     remember_password: bool,
 }
@@ -157,14 +171,13 @@ impl GuiWindow for LoginDialogWindow {
                 egui::Grid::new("login box")
                 .min_col_width(MIMIMUM_TEXT_BOX_WIDTH)
                 .show(ui, |ui| {
+                    //  User name
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.username", &state.params.lang));
                         let _response = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.user_name));
                     });
-                    ////ui.with_layout(egui::Layout::right_to_left(), |ui| {    // ***MUST CHANGE FOR egui 0.19"***                       
-                    ////    ui.checkbox(&mut self.remember_username, t!("menu.remember", &state.params.lang));                           
-                    ////});                    
                     ui.end_row();
+                    //  Password
                     ui.horizontal(|ui| { 
                         ui.label(t!("menu.password", &state.params.lang));
                         let _ = ui.add(egui::TextEdit::singleline(&mut self.login_dialog_input.password).password(true));
@@ -173,6 +186,18 @@ impl GuiWindow for LoginDialogWindow {
                         ui.checkbox(&mut self.remember_password, t!("menu.remember", &state.params.lang));
                     });
                     ui.end_row();
+                    //  Destination region
+                    //  For now, just "last" or home" - can't type in a region because
+                    //  ComboBox doesn't seem to support that yet. Or does it?
+                    ui.label(t!("menu.destination_region", &state.params.lang));
+                    ////egui::ComboBox::from_label(t!("menu.destination_region", &state.params.lang))
+                    egui::ComboBox::from_label("")
+                        .selected_text(format!("{:?}", self.login_dialog_input.destination)) // No translation - fix this
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Last, t!("menu.last_location", &state.params.lang));
+                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Home, t!("menu.home", &state.params.lang));
+                        }
+                    );	
    	            });
                 
                 ui.vertical_centered(|ui| {
@@ -186,6 +211,7 @@ impl GuiWindow for LoginDialogWindow {
                         self.login_dialog_input.zeroize();              // erase text password in memory
                         let mut login_params = LoginParams {
                             grid: self.grid.clone(),
+                            destination: self.login_dialog_input.destination.clone(), // which region
                             user_name: self.login_dialog_input.user_name.trim().to_string(),
                             password_md5_opt: None,
                             auth_token: None

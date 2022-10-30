@@ -88,6 +88,18 @@
         "en": "Remember",
         "fr": "Rappeler"
     },
+    "menu.destination_region": {
+        "en": "Destination region",
+        "fr": "Région de destination"
+    },
+    "menu.last_location": {
+        "en": "Last",
+        "fr": "Dernier"
+    },
+    "menu.home": {
+        "en": "Home",
+        "fr": "Domicile"
+    },
     "window.messages": {
         "en": "Messages",
         "fr": "Messages"
