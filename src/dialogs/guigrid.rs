@@ -8,7 +8,7 @@
 use anyhow::{Error, Context, anyhow};
 ////use crate::t;
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::io::Read;
 use std::sync::Arc;
 use serde::{Deserialize};
@@ -42,9 +42,9 @@ pub struct GridSelectParams {
 
 impl GridSelectParams {
     /// Read the JSON grid select params file tnto a GridSelectParams structure.
-    pub fn read_grid_select_params(filename: &PathBuf, asset_dir: &PathBuf, egui_routine: &mut EguiRenderRoutine, renderer: &Arc<Renderer>) -> Result<Vec<GridSelectParams>, Error> {
+    pub fn read_grid_select_params(filename: &PathBuf, asset_dir: &Path, egui_routine: &mut EguiRenderRoutine, renderer: &Arc<Renderer>) -> Result<Vec<GridSelectParams>, Error> {
         //  Read grid_select file
-        let mut grid_file = asset_dir.clone();
+        let mut grid_file = asset_dir.to_path_buf();
         grid_file.push(filename);
         let file = File::open(grid_file)
             .with_context(|| anyhow!("Failed to open the grid select params config file: {:?}", filename))?;
@@ -56,7 +56,7 @@ impl GridSelectParams {
         let grids_data: GridSelectParamsDataJson = serde_json::from_str(&content).context("Failed to parse grid select params config file.")?;
         let mut params = Vec::new();
         for data in grids_data.grids {
-            let mut image_file_name = asset_dir.clone();                // build file name of image
+            let mut image_file_name = asset_dir.to_path_buf();                // build file name of image
             image_file_name.push(&data.picture_bar);
             println!("Metaverse: {} Grid: {} Picture bar image file: {:?}", data.metaverse, data.grid, image_file_name);    // ***TEMP***
             let image = image::io::Reader::open(&image_file_name)

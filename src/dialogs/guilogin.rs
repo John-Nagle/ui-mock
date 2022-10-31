@@ -36,7 +36,7 @@ impl LoginDialogInput {
 }
 
 /// Where do you want to go today?
-#[derive(Default, ZeroizeOnDrop, PartialEq, Clone, Debug)]
+#[derive(Default, ZeroizeOnDrop, PartialEq, Eq, Clone, Debug)]
 pub enum LoginDestination {
 #[default]
     Last,                   // location at last login
@@ -86,9 +86,10 @@ impl LoginParams {
         self.password_md5_opt.clone()
     }
     /// Set password from MD5
-    pub fn set_password_md5(&mut self, digest_opt: Option<md5::Digest>) {
+    #[allow(clippy::manual_map)]    // avoid excessive use of functional notation when it makes things more confusing
+    pub fn set_password_md5(&mut self, digest_opt: Option<md5::Digest>) {        
         self.password_md5_opt = if let Some(digest) = digest_opt {
-            Some(format!("{}{:032x}", Self::PASSWORD_PREFIX, digest)) // includes the   
+            Some(format!("{}{:032x}", Self::PASSWORD_PREFIX, digest)) // includes the prefix
         } else {
             None
         }
@@ -211,14 +212,10 @@ impl GuiWindow for LoginDialogWindow {
                                     LoginDestination::Region("".to_string()), t!("menu.region", &state.params.lang));
                         })
                     });
-                    ////);
                     //  If combo box is "region", allow input of region name
-                    match &mut self.login_dialog_input.destination {
-                        LoginDestination::Region(ref mut region_name) => {
-                            let _ = ui.add(egui::TextEdit::singleline(region_name));
-                        }
-                        _ => {}
-                    }
+                    if let LoginDestination::Region(ref mut region_name) = &mut self.login_dialog_input.destination {
+                         let _ = ui.add(egui::TextEdit::singleline(region_name));
+                    };
    	            });
                 
                 ui.vertical_centered(|ui| {
@@ -269,6 +266,3 @@ impl GuiWindow for LoginDialogWindow {
         self.id
     }   
 }
-
-// ---------------
-
