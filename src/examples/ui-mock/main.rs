@@ -236,7 +236,7 @@ impl Ui {
                                                                    
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
-        let dark_mode = true; // ***TEMP*** force dark mode as default
+        let dark_mode = false; // ***TEMP*** force dark mode as default
         let log_level = LevelFilter::Warn;                      // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
