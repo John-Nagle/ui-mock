@@ -8,7 +8,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 use keyring::{Entry};
 use super::super::guiwindows::{GuiWindow};
 use crate::t;
-use crate::{GuiEvent, GuiState,GridSelectParams};
+use crate::{GuiEvent, GuiState,GridSelectParams, Dictionary};
 
 
 //  Dialog box parameters required for login.
@@ -158,6 +158,16 @@ impl GuiWindow for LoginDialogWindow {
     //  If username is present, but password is blank, look up password MD5 in password storage.
     //  New password is not stored here, 
     fn draw(&mut self, ctx: &egui::Context, state: &mut GuiState) {
+        //  Translated name of destination
+        fn destination_name(dest: &LoginDestination, lang: &Dictionary) -> &'static str {
+            match dest {
+                LoginDestination::Last => t!("menu.last_location", lang),
+                LoginDestination::Home => t!("menu.home", lang),
+                LoginDestination::Region(_) => t!("menu.region", lang)
+            }
+        }
+                
+                
         const MIMIMUM_TEXT_BOX_WIDTH: f32 = 200.0;
         if self.is_open {
             let mut accepted = false;          // true if dismiss button pushed
@@ -186,18 +196,22 @@ impl GuiWindow for LoginDialogWindow {
                     });
                     ui.end_row();
                     //  Destination region
-                    //  For now, just "last" or home" - can't type in a region because
-                    //  ComboBox doesn't seem to support that yet. Or does it?
-                    ui.label(t!("menu.destination_region", &state.params.lang));
-                    ////egui::ComboBox::from_label(t!("menu.destination_region", &state.params.lang))
-                    egui::ComboBox::from_label("")
-                        .selected_text(format!("{:?}", self.login_dialog_input.destination)) // No translation - fix this
-                        .show_ui(ui, |ui| {
-                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Last, t!("menu.last_location", &state.params.lang));
-                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Home, t!("menu.home", &state.params.lang));
-                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Region("".to_string()), t!("menu.region", &state.params.lang));
-                        }
-                    );
+                    //  Dropdown menu. egui calls this a "combo box", but it doesn't have a text input area.
+                    ui.horizontal(|ui| { 
+                        ui.label(t!("menu.destination_region", &state.params.lang));
+                        egui::ComboBox::from_label("")
+                            .selected_text(destination_name(&self.login_dialog_input.destination, &state.params.lang))
+                            ////format!("{:?}", self.login_dialog_input.destination)) // No translation - fix this
+                            .show_ui(ui, |ui| {
+                                ui.selectable_value(&mut self.login_dialog_input.destination, 
+                                    LoginDestination::Last, t!("menu.last_location", &state.params.lang));
+                                ui.selectable_value(&mut self.login_dialog_input.destination, 
+                                    LoginDestination::Home, t!("menu.home", &state.params.lang));
+                                ui.selectable_value(&mut self.login_dialog_input.destination, 
+                                    LoginDestination::Region("".to_string()), t!("menu.region", &state.params.lang));
+                        })
+                    });
+                    ////);
                     //  If combo box is "region", allow input of region name
                     match &mut self.login_dialog_input.destination {
                         LoginDestination::Region(ref mut region_name) => {
