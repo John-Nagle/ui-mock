@@ -20,7 +20,7 @@ struct LoginDialogInput {
     user_name: String,
     password: String,                   // zeroize this as soon as MD5 is computed
     _auth_token: Option<usize>,         // future when 2FA implemented.
-    destination: LoginDestination,
+    destination: LoginDestination,      // where do we want to go today?
 }
 
 impl LoginDialogInput {
@@ -125,8 +125,7 @@ pub struct LoginDialogWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
     is_open: bool,  // true if open
-    grid: GridSelectParams, // info about grid
-    
+    grid: GridSelectParams, // info about grid   
     login_dialog_input: LoginDialogInput, // user-provided data needed for login
     remember_password: bool,
 }
@@ -196,8 +195,16 @@ impl GuiWindow for LoginDialogWindow {
                         .show_ui(ui, |ui| {
                             ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Last, t!("menu.last_location", &state.params.lang));
                             ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Home, t!("menu.home", &state.params.lang));
+                            ui.selectable_value(&mut self.login_dialog_input.destination, LoginDestination::Region("".to_string()), t!("menu.region", &state.params.lang));
                         }
-                    );	
+                    );
+                    //  If combo box is "region", allow input of region name
+                    match &mut self.login_dialog_input.destination {
+                        LoginDestination::Region(ref mut region_name) => {
+                            let _ = ui.add(egui::TextEdit::singleline(region_name));
+                        }
+                        _ => {}
+                    }
    	            });
                 
                 ui.vertical_centered(|ui| {
