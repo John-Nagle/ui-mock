@@ -62,7 +62,7 @@ impl LoginParams {
     const PASSWORD_PREFIX: &'static str = "$1$";                // precedes password MD5 in hex. SL convention.
 
     /// New, without password    
-    fn new(grid: GridSelectParams, destination: LoginDestination, user_name: String) -> Self {
+    pub fn new(grid: GridSelectParams, destination: LoginDestination, user_name: String) -> Self {
         LoginParams {
             grid,
             destination,
