@@ -24,5 +24,5 @@ pub use guiutil::{load_canned_icon, load_image, set_default_styles, get_log_file
 /// Internationalization
 pub use basicintl::{Dictionary};
 /// Dialogs
-pub use dialogs::guilogin::{LoginParams, LoginDialogWindow};
+pub use dialogs::guilogin::{LoginParams, LoginDialogWindow, LoginDestination};
 pub use dialogs::guigrid::{GridSelectParams};
