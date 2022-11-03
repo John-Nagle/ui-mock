@@ -60,6 +60,18 @@ impl LoginParams {
     pub const CRED_TYPE_PASS: &str = "pass";
     pub const CRED_TYPE_TOKEN: &str = "token";
     const PASSWORD_PREFIX: &'static str = "$1$";                // precedes password MD5 in hex. SL convention.
+
+    /// New, without password    
+    fn new(grid: GridSelectParams, destination: LoginDestination, user_name: String) -> Self {
+        LoginParams {
+            grid,
+            destination,
+            user_name,
+            password_md5_opt: None,
+            auth_token: None
+        }
+    }
+    
     /// Translate special characters and make lower case
     fn translate_special_characters(c: char) -> char {
         match c {
@@ -227,13 +239,19 @@ impl GuiWindow for LoginDialogWindow {
                             Some(md5::compute(&self.login_dialog_input.password.trim()))  // get MD5 of password
                         };
                         self.login_dialog_input.zeroize();              // erase text password in memory
+                        /*
                         let mut login_params = LoginParams {
                             grid: self.grid.clone(),
                             destination: self.login_dialog_input.destination.clone(), // which region
                             user_name: self.login_dialog_input.user_name.trim().to_string(),
-                            password_md5_opt: None,
-                            auth_token: None
+                            ..Default::default()
                         };
+                        */
+                        let mut login_params = LoginParams::new(
+                            self.grid.clone(),
+                            self.login_dialog_input.destination.clone(), // which region
+                            self.login_dialog_input.user_name.trim().to_string());
+                            
                         if password_md5_opt.is_some() {                 // if a new password was typed in
                             login_params.set_password_md5(password_md5_opt);
                             //  Save newly typed password ***TEMP*** move this to after successful login.
