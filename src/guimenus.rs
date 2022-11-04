@@ -8,7 +8,8 @@
 //  Animats
 //  June 2022
 //
-use super::guiwindows::{GuiState, GuiEvent, SystemMode};
+use crate::{GuiState};
+use crate::{GuiEvent, SystemMode}; //    ***TEMP*** these are moving out of libui
 use super::guiactions;
 use egui::{menu, Frame};
 use crate::t;

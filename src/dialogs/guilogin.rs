@@ -6,9 +6,9 @@
 use anyhow::{Error, anyhow};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use keyring::{Entry};
-use super::super::guiwindows::{GuiWindow};
+use crate::{GuiWindow, Dictionary};
 use crate::t;
-use crate::{GuiEvent, GuiState,GridSelectParams, Dictionary};
+use crate::{GuiEvent, GuiState, GridSelectParams};  // ***TEMP*** moving out of libui
 
 
 //  Dialog box parameters required for login.

@@ -8,7 +8,7 @@
 //
 use crate::t;
 use egui::Ui;
-use super::guiwindows::{GuiState, GuiEvent, TextWindow};
+use crate::{GuiState, GuiEvent, TextWindow};
 
 /// Configuration
 const HELP_PAGE: &str =

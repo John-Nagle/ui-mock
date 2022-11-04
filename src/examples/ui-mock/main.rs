@@ -13,7 +13,7 @@
 //
 use libui;
 use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger, SendAnyBoxed};
-use libui::{get_log_file_name, get_executable_name, panic_dialog};
+use libui::{get_log_file_name, get_executable_name, panic_dialog, pick_replay_file_async};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
@@ -100,7 +100,7 @@ impl Ui {
                         //  No grid URL, so this is a replay file selection, not a login.
                         //  File pick is done with the platform's native file picker, asynchronously.
                         //  File pickers are special - they authorize the program to access the file at the system level.
-                        GuiState::pick_replay_file_async(&mut data.gui_state, window); // use the file picker
+                        pick_replay_file_async(&mut data.gui_state, window); // use the file picker
                     } else {
                         //  This is a login to a grid. Bring up login dialog window.
                         let id = data.gui_state.get_unique_id();
