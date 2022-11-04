@@ -31,3 +31,9 @@ pub use dialogs::guigrid::{GridSelectParams};
 //  ***TEMPORARY*** moving outside of libui
 pub use guiwindows::{SystemMode, GuiEvent};
 pub use guiwindows::{pick_replay_file_async};
+
+//  Traits
+/// A group of menus. Libui user sets what menus are to be shown.
+pub trait MenuGroup {
+    fn draw(&mut self, state: &mut GuiState) -> bool;    // returns true if menu is in use
+}

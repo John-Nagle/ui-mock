@@ -22,6 +22,7 @@ use super::guiutil;
 use super::guimenus;
 use crate::t;
 use crate::{GridSelectParams};
+use crate::{MenuGroup};
 use super::dialogs::guigrid::GridSelectWindow;
 use rend3::{ExtendedAdapterInfo};
 use simplelog::{SharedLogger};
@@ -69,8 +70,8 @@ pub struct GuiState {
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
+    pub menu_group_opt: Option<Box<dyn MenuGroup>>, // currently active menu group
     //  Disposable dynamic windows
-    ////temporary_windows: Vec<Box<dyn GuiWindow>>,
     temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
     msg_ok: String,                             // translated OK message
@@ -109,6 +110,7 @@ impl GuiState {
             params: Rc::new(params),
             assets,
             temporary_windows: Vec::new(),
+            menu_group_opt: None,
             msg_ok,
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
@@ -121,6 +123,18 @@ impl GuiState {
         }
     }
     
+    /// Set the currently active menu group. Consumes menu group
+    //  So, on a state change, we have to build a new menu group.
+    pub fn set_menu_group(&mut self, menu_group: Box<dyn MenuGroup>) {
+        self.menu_group_opt = Some(menu_group);
+    }
+    
+    /// Take the currently active menu group out.
+    //  Not that useful, 
+    pub fn take_menu_group(&mut self) -> Option<Box<dyn MenuGroup>> {
+        self.menu_group_opt.take() 
+    }
+    
     /// Draw all of GUI. Called at beginning of redraw event
     pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
@@ -128,7 +142,20 @@ impl GuiState {
 
         // Insert egui commands here
         let show_menus = self.if_gui_awake();
-        let mut inuse = guimenus::draw(self, show_menus); // draws the GUI
+        let mut inuse = guimenus::draw(self, show_menus); // draws the GUI (BECOMING OBSOLETE)
+        //  Draw the active menus.
+        /*
+        if let Some(menu_group) = &mut self.menu_group_opt {
+            inuse |= menu_group.draw(self)
+        }
+        */
+        //  Hokey way to do this
+        let taken_menu_group = self.menu_group_opt.take();  // take ownership temporarily to avoid double mutable borrow
+        if let Some(mut menu_group) = taken_menu_group {
+            inuse |= menu_group.draw(self);
+            self.menu_group_opt = Some(menu_group); // put it back
+        }
+        
         inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
         if inuse {
             self.wake_up_gui();
