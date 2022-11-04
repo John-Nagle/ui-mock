@@ -12,7 +12,7 @@
 //  June 2022
 //
 use libui;
-use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger};
+use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger, SendAnyBoxed};
 use libui::{get_log_file_name, get_executable_name, panic_dialog};
 use std::sync::Arc;
 use log::{LevelFilter};
@@ -48,8 +48,8 @@ pub struct Ui {
     data: Option<UiData>,
     //  UI event channel.
     //  We have to do this at the outer level so the logger can access it early.
-    event_send_channel: crossbeam_channel::Sender<GuiEvent>, 
-    event_recv_channel: Option<crossbeam_channel::Receiver<GuiEvent>>,
+    event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
+    event_recv_channel: Option<crossbeam_channel::Receiver<SendAnyBoxed>>,
 }
 
 impl Ui {
@@ -68,7 +68,13 @@ impl Ui {
     /// Handle user-created event.
     //  This is how the GUI and other parts of the
     //  system communicate with the main event loop.
-    pub fn handle_user_event(&mut self, window: &winit::window::Window, event: GuiEvent) {
+    pub fn handle_user_event(&mut self, window: &winit::window::Window, raw_event: SendAnyBoxed) {
+        //  Events should always be GuiEvents. The dynamic typing is to get the definition of GuiEvent out of
+        //  libui.
+        let event = match raw_event.downcast_ref::<GuiEvent>() {
+            Some(event) => event,
+            None => { log::error!("Invalid non GuiEvent in handle_user_event: {:?}", raw_event); return; }
+        };
         let data = self.data.as_mut().unwrap();
         match event {
             GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
@@ -115,7 +121,7 @@ impl Ui {
                 data.gui_state.add_error_window(&title, &msgs);
             }
             GuiEvent::LogMessage(s) => {
-                data.gui_state.add_msg(s)
+                data.gui_state.add_msg(s.to_string())
             }
             GuiEvent::Quit => {
                 data.quit = true;                   // force quit              
@@ -336,7 +342,7 @@ impl rend3_framework::App for Ui {
         {   let data = self.data.as_mut().unwrap();
             if !data.gui_state.event_recv_channel.is_empty() {    // if events queued
                 //  Get all events, avoiding double borrow.
-                let events: Vec<GuiEvent> = data.gui_state.event_recv_channel.try_iter().collect(); 
+                let events: Vec<SendAnyBoxed> = data.gui_state.event_recv_channel.try_iter().collect(); 
                 for ev in events {
                     println!("User event: {:?}", ev);       // ***TEMP***
                     self.handle_user_event(window, ev);

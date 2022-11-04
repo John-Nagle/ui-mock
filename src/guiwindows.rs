@@ -11,6 +11,7 @@
 use std::collections::VecDeque;
 use std::rc::{Rc};
 use core::cell::RefCell;
+use std::any::{Any};
 use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
@@ -24,6 +25,9 @@ use rend3::{ExtendedAdapterInfo};
 use simplelog::{SharedLogger};
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message window
+
+pub type SendAny = dyn Any + Send;                  // Can send anything across a channel. Must be boxed, though.
+pub type SendAnyBoxed = Box<SendAny>;               // the boxed version
 
 /// User events sent to the main event loop
 #[derive(Debug)]
@@ -101,8 +105,8 @@ pub struct GuiState {
     msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
-    pub event_send_channel: crossbeam_channel::Sender<GuiEvent>,
-    pub event_recv_channel: crossbeam_channel::Receiver<GuiEvent>,
+    pub event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
+    pub event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
     pub light_mode_visuals: egui::Visuals,          // light mode colors, etc.
     pub dark_mode_visuals: egui::Visuals,           // dark mode colors, etc.
 }
@@ -111,8 +115,8 @@ impl GuiState {
 
     /// Usual new
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
-        event_send_channel: crossbeam_channel::Sender<GuiEvent>, 
-        event_recv_channel: crossbeam_channel::Receiver<GuiEvent>) -> GuiState {
+        event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
+        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>) -> GuiState {
         //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
@@ -244,15 +248,22 @@ impl GuiState {
     //  This ought to use winit events, but we can't do that yet
     //  because of bug https://github.com/BVE-Reborn/rend3/issues/406
     pub fn send_gui_event(&self, event: GuiEvent) -> Result<(), Error> {
-        Ok(self.event_send_channel.send(event)?)    // send
+        Self::send_gui_event_on_channel(&self.event_send_channel, event)
+        ////Ok(self.event_send_channel.send(Box::new(event))?)    // send
+        ////let boxed_event: Box<SendAny> = Box::new(event);    // send
+        ////Ok(self.event_send_channel.send(boxed_event)?)    // send
     }
     /// Access to channel, mostly for inter-thread sending.
-    pub fn get_send_channel(&self) -> &crossbeam_channel::Sender<GuiEvent> {
+    pub fn get_send_channel(&self) -> &crossbeam_channel::Sender<SendAnyBoxed> {
         &self.event_send_channel        
     }
     /// Send, given channel
-    pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<GuiEvent>, event: GuiEvent) -> Result<(), Error> {
-        Ok(channel.send(event)?)    // send
+    pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<SendAnyBoxed>, event: GuiEvent) -> Result<(), Error> {
+        if let Err(_) = channel.send(Box::new(event)) { 
+            Err(anyhow!("Error sending GUI event on channel"))  // have to do this because error from send is not sync
+        } else {
+            Ok(())
+        }
     }
     /// Display message in message window
     pub fn add_msg(&mut self, s: String) {
@@ -462,14 +473,14 @@ pub fn is_at_fullscreen_window_top_bottom(window: &winit::window::Window, ctx: &
 //  almost everything else. Even the GUI to which
 //  it is logging.
 pub struct MessageLogger {
-    send_channel: crossbeam_channel::Sender::<GuiEvent>,  // channel for sending messages
+    send_channel: crossbeam_channel::Sender::<SendAnyBoxed>,  // channel for sending messages
     level_filter: LevelFilter,      // errors at this level and above appear for user
     enabled: bool,                  // true if still enabled
 }
 
 impl MessageLogger {
     //  Usual new
-    pub fn new_logger(level_filter: LevelFilter, send_channel: crossbeam_channel::Sender::<GuiEvent>) -> Box<dyn SharedLogger> {
+    pub fn new_logger(level_filter: LevelFilter, send_channel: crossbeam_channel::Sender::<SendAnyBoxed>) -> Box<dyn SharedLogger> {
         Box::new(MessageLogger {
             send_channel,
             level_filter,
