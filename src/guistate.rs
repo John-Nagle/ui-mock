@@ -32,6 +32,7 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message win
 pub type SendAny = dyn Any + Send;                  // Can send anything across a channel. Must be boxed, though.
 pub type SendAnyBoxed = Box<SendAny>;               // the boxed version
 pub type GuiWindowLink = Rc<RefCell<Box<dyn GuiWindow>>>;    // a bit much
+pub type MenuGroupLink = Rc<RefCell<Box<dyn MenuGroup>>>;
 
 /// ***TEMPORARY IMPORTS*** will leave when more code moves outside of libui
 use crate::guiwindows::{SystemMode, GuiEvent};
@@ -70,7 +71,7 @@ pub struct GuiState {
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
-    pub menu_group_opt: Option<Box<dyn MenuGroup>>, // currently active menu group
+    pub menu_group_opt: Option<MenuGroupLink>,  // currently active menu group
     //  Disposable dynamic windows
     temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
@@ -125,15 +126,16 @@ impl GuiState {
     
     /// Set the currently active menu group. Consumes menu group
     //  So, on a state change, we have to build a new menu group.
-    pub fn set_menu_group(&mut self, menu_group: Box<dyn MenuGroup>) {
+    pub fn set_menu_group(&mut self, menu_group: MenuGroupLink) {
         self.menu_group_opt = Some(menu_group);
     }
-    
+/*    
     /// Take the currently active menu group out.
     //  Not that useful, 
     pub fn take_menu_group(&mut self) -> Option<Box<dyn MenuGroup>> {
         self.menu_group_opt.take() 
     }
+*/
     
     /// Draw all of GUI. Called at beginning of redraw event
     pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
@@ -149,12 +151,24 @@ impl GuiState {
             inuse |= menu_group.draw(self)
         }
         */
+        /*
         //  Hokey way to do this
         let taken_menu_group = self.menu_group_opt.take();  // take ownership temporarily to avoid double mutable borrow
         if let Some(mut menu_group) = taken_menu_group {
             inuse |= menu_group.draw(self);
             self.menu_group_opt = Some(menu_group); // put it back
         }
+        */
+        /*
+        if let Some(menu_group) = &mut self.menu_group_opt {
+            inuse |= menu_group.borrow_mut().draw(self)
+        }
+        */
+        if self.menu_group_opt.is_some() {
+            let menu_group = Rc::clone(self.menu_group_opt.as_ref().unwrap());
+            inuse |= menu_group.borrow_mut().draw(self);
+        }
+            
         
         inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
         if inuse {
