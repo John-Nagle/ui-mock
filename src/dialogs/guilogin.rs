@@ -3,10 +3,12 @@
 //  Animats
 //  October 2022
 //
+use std::rc::Rc;
+use core::cell::RefCell;
 use anyhow::{Error, anyhow};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use keyring::{Entry};
-use crate::{GuiWindow, Dictionary};
+use crate::{GuiWindow, GuiWindowLink, Dictionary};
 use crate::t;
 use crate::{GuiEvent, GuiState, GridSelectParams};  // ***TEMP*** moving out of libui
 
@@ -155,6 +157,11 @@ impl LoginDialogWindow {
             login_dialog_input: Default::default(),
             remember_password: true,
         }
+    }
+    
+    /// As link
+    pub fn new_link(id: egui::Id, grid: &GridSelectParams) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, grid)))
     }
     
     /// Reopen previously closed window, with old contents.

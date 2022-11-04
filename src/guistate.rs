@@ -31,8 +31,8 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message win
 /// Useful types
 pub type SendAny = dyn Any + Send;                  // Can send anything across a channel. Must be boxed, though.
 pub type SendAnyBoxed = Box<SendAny>;               // the boxed version
-pub type GuiWindowLink = Rc<RefCell<Box<dyn GuiWindow>>>;    // a bit much
-pub type MenuGroupLink = Rc<RefCell<Box<dyn MenuGroup>>>;
+pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;    // a bit much
+pub type MenuGroupLink = Rc<RefCell<dyn MenuGroup>>;
 
 /// ***TEMPORARY IMPORTS*** will leave when more code moves outside of libui
 use crate::guiwindows::{SystemMode, GuiEvent};
@@ -160,7 +160,7 @@ impl GuiState {
         }
         */
         /*
-        if let Some(menu_group) = &mut self.menu_group_opt {
+        if let Some(menu_group) = self.menu_group_opt.as_ref() {
             inuse |= menu_group.borrow_mut().draw(self)
         }
         */
@@ -168,7 +168,12 @@ impl GuiState {
             let menu_group = Rc::clone(self.menu_group_opt.as_ref().unwrap());
             inuse |= menu_group.borrow_mut().draw(self);
         }
-            
+        /*
+        // ***TEMP TEST***
+        if let Some(menu_group) = &self.menu_group_opt {
+            menu_group.borrow_mut().draw(self);
+        }
+        */
         
         inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
         if inuse {
@@ -202,14 +207,14 @@ impl GuiState {
     }
     
     /// General window add
-    pub fn add_window(&mut self, window: Box<dyn GuiWindow>) -> Result<(), Error> {
+    pub fn add_window(&mut self, window: GuiWindowLink) -> Result<(), Error> {
         //  Check for duplicate window
         for w in &self.temporary_windows {
-            if w.borrow().get_id() == window.get_id() {
+            if w.borrow().get_id() == window.borrow().get_id() {
                 return Err(anyhow!("Duplicate id for window"));
             }
         }
-        self.temporary_windows.push(Rc::new(RefCell::new(window)));
+        self.temporary_windows.push(window);
         Ok(())
     }
     	
@@ -228,8 +233,8 @@ impl GuiState {
     //  Handle common errors       
     pub fn add_error_window(&mut self, title: &str, message: &[&str]) {
         //  Create a window with text and an "OK" button.
-        let w = TextWindow::new(self.get_unique_id(), title, message, Some(self.msg_ok.as_str()));
-        self.add_window(Box::new(w)).expect("Duplicate error msg ID");  // had better not be a duplicate
+        let w = TextWindow::new_link(self.get_unique_id(), title, message, Some(self.msg_ok.as_str()));
+        self.add_window(w).expect("Duplicate error msg ID");  // had better not be a duplicate
     }
     
     /// Pop up "unimplemented" message.
@@ -315,6 +320,11 @@ impl TextWindow {
             is_open: true,  // start open
             dismiss_button: dismiss_button.map(|s| s.to_string())   // to string if present, else none
         }
+    }
+    
+    /// As link
+    pub fn new_link(id: egui::Id, title: &str, message: &[&str], dismiss_button: Option::<&str>) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, title, message, dismiss_button)))
     }
     
     /// Reopen previously closed window, with old contents.

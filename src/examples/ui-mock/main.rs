@@ -104,7 +104,7 @@ impl Ui {
                     } else {
                         //  This is a login to a grid. Bring up login dialog window.
                         let id = data.gui_state.get_unique_id();
-                        data.gui_state.add_window(Box::new(LoginDialogWindow::new(id, &grid))).unwrap();
+                        data.gui_state.add_window(LoginDialogWindow::new_link(id, &grid)).unwrap();
                     }                  
                 } else {
                     log::error!("Login request to {} while in state {:?}", grid.data.metaverse, data.gui_state.get_mode());

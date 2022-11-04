@@ -65,6 +65,6 @@ pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
     let graphics_system = format!("{}: {:?}", t!("message.graphics_system", state.get_lang()), state.params.gpu_info.backend);
     msgs.push(graphics_system.as_str());
     msgs.push(COPYRIGHT);                               // copyright notice
-    let about_window = TextWindow::new(egui::Id::new("about window"), t!("menu.help.about", state.get_lang()), &msgs, Some(t!("menu.ok", state.get_lang())));
-    let _stat = state.add_window(Box::new(about_window));
+    let about_window = TextWindow::new_link(egui::Id::new("about window"), t!("menu.help.about", state.get_lang()), &msgs, Some(t!("menu.ok", state.get_lang())));
+    let _stat = state.add_window(about_window);
 }
