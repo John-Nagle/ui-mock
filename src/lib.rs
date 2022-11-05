@@ -8,7 +8,7 @@
 //  That is checked with Tracy, as being under span "GUI".
 //
 mod basicintl;
-mod guiactions;
+pub mod guiactions; // ***pub is TEMP*** moving elsewhere
 mod guimenus;
 mod guiwindows;
 mod guiutil;
