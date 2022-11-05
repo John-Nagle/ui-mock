@@ -20,6 +20,7 @@ use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
 use super::guimenus;
+use super::menunone::{MenuNone};
 use crate::t;
 use crate::{GridSelectParams};
 use crate::{MenuGroup};
@@ -71,7 +72,7 @@ pub struct GuiState {
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
-    pub menu_group_opt: Option<MenuGroupLink>,  // currently active menu group
+    pub menu_group: MenuGroupLink,              // currently active menu group
     //  Disposable dynamic windows
     temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
@@ -111,7 +112,7 @@ impl GuiState {
             params: Rc::new(params),
             assets,
             temporary_windows: Vec::new(),
-            menu_group_opt: None,
+            menu_group: MenuNone::new_link(),
             msg_ok,
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
@@ -127,15 +128,8 @@ impl GuiState {
     /// Set the currently active menu group. Consumes menu group
     //  So, on a state change, we have to build a new menu group.
     pub fn set_menu_group(&mut self, menu_group: MenuGroupLink) {
-        self.menu_group_opt = Some(menu_group);
+        self.menu_group = menu_group;
     }
-/*    
-    /// Take the currently active menu group out.
-    //  Not that useful, 
-    pub fn take_menu_group(&mut self) -> Option<Box<dyn MenuGroup>> {
-        self.menu_group_opt.take() 
-    }
-*/
     
     /// Draw all of GUI. Called at beginning of redraw event
     pub fn draw_all(&mut self, window: &winit::window::Window) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
@@ -164,16 +158,20 @@ impl GuiState {
             inuse |= menu_group.borrow_mut().draw(self)
         }
         */
+        /*
         if self.menu_group_opt.is_some() {
             let menu_group = Rc::clone(self.menu_group_opt.as_ref().unwrap());
             inuse |= menu_group.borrow_mut().draw(self);
         }
+        */
         /*
         // ***TEMP TEST***
         if let Some(menu_group) = &self.menu_group_opt {
             menu_group.borrow_mut().draw(self);
         }
         */
+        let menu_group = Rc::clone(&self.menu_group);
+        inuse |= menu_group.borrow_mut().draw(self);
         
         inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
         if inuse {

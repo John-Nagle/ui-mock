@@ -14,6 +14,7 @@ mod guiwindows;
 mod guiutil;
 mod guistate;
 //  The various dialogs
+mod menunone;   // the empty menu
 mod dialogs;
 
 /// The main draw function. Called on every frame.
