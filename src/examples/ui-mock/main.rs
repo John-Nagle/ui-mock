@@ -19,6 +19,7 @@ use log::{LevelFilter};
 use std::str::FromStr;
 use anyhow::{Error};
 mod examplesupport;
+mod dialogs;
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time

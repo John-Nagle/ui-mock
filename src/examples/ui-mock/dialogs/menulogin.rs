@@ -1,0 +1,49 @@
+//
+//  menulogin.rs -- Start menu
+//
+//  Fills the whole screen and puts up a dialog.
+//
+//  Animats
+//  November 2022
+//
+use libui::{GuiState, MenuGroup};
+use libui::{SystemMode}; //    ***TEMP*** these are moving out of libui
+use libui::t;
+#[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
+
+/// Update the GUI. Called on each frame.
+//  Returns true if the GUI is active and should not disappear.
+//
+//  The start screen. A scrolling list of big image buttons, one
+//  for each metaverse.
+pub struct MenuLogin {
+}
+
+impl MenuGroup for MenuLogin {
+
+    /// Draws the menu set for Login state.
+    //  Called on every frame. Do not delay here.
+    fn draw(&mut self, state: &mut GuiState) -> bool {                          
+        // Login to a grid
+        let ctx = state.platform.context();
+
+        //  Top menu bar
+        egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
+            if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
+                state.selected_grid = None;                 // clear grid selection
+                state.change_mode(SystemMode::Start);       // back to start state
+            }
+        });
+
+        //  Central panel
+        egui::CentralPanel::default().show(&ctx, |ui| {
+            //  Login dialog
+            ui.with_layout(egui::Layout::centered_and_justified(egui::Direction::TopDown), |_ui| {
+            })
+        });
+        state.draw(&ctx); // all the standard windows
+        true
+    }
+}
+
+
