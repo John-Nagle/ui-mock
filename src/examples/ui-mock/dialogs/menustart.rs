@@ -7,8 +7,10 @@
 //  Animats
 //  November 2022
 //
-use libui::{GuiState, MenuGroup};
+use libui::{GuiState, MenuGroup, MenuGroupLink};
 use libui::{GuiEvent, SystemMode}; //    ***TEMP*** these are moving out of libui
+use core::cell::RefCell;
+use std::rc::Rc;
 
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
@@ -18,6 +20,14 @@ use libui::{GuiEvent, SystemMode}; //    ***TEMP*** these are moving out of libu
 //  The start screen. A scrolling list of big image buttons, one
 //  for each metaverse.
 pub struct MenuStart {
+    //  No status at this time.
+}
+
+impl MenuStart {
+    /// Create new, as trait object
+    pub fn new_link() -> MenuGroupLink {
+        Rc::new(RefCell::new(MenuStart{}))                          // create a trait object to dispatch
+    }
 }
 
 impl MenuGroup for MenuStart {

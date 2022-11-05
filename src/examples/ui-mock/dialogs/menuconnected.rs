@@ -6,11 +6,13 @@
 //  Animats
 //  November 2022
 //
-use libui::{GuiState, MenuGroup};
+use libui::{GuiState, MenuGroup, MenuGroupLink};
 use libui::t;
 use egui::{menu, Frame};
 use log::{LevelFilter};
 use libui::guiactions;  // ***TEMP*** needs to move
+use core::cell::RefCell;
+use std::rc::Rc;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
 /// Grey background for button area.
@@ -32,6 +34,13 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 //  The overlay on the main screen. Menus disappear when not used.
 //  Cursor to top or bottom of window restores them.
 pub struct MenuConnected {
+}
+
+impl MenuConnected {
+    /// Create new, as trait object
+    pub fn new_link() -> MenuGroupLink {
+        Rc::new(RefCell::new(MenuConnected{}))                          // create a trait object to dispatch
+    }
 }
 
 impl MenuGroup for MenuConnected {
