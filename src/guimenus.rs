@@ -65,7 +65,8 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
         SystemMode::Shutdown => {
             //  Do shutdown stuff
             //  Switch to exit mode
-            state.change_mode(SystemMode::Exit);
+            ////state.change_mode(SystemMode::Exit);
+            println!("Why are we in shutdown mode and still running?");
             true
         }
         SystemMode::Exit => {
@@ -90,12 +91,13 @@ pub fn draw_start(state: &mut GuiState) {
             if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
                 //  A grid has been selected
                 let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
-                state.change_mode(SystemMode::Login);
+                ////state.change_mode(SystemMode::Login);
             }
         } else {
             //  Something is wrong if we're in start state with a selected grid
             log::error!("In START state with a grid selected.");    // probably previous bad shutdown
-            state.change_mode(SystemMode::Shutdown);                // force a shutdown
+            let _ = state.send_gui_event(GuiEvent::Quit);           // force a shutdown
+            ////state.change_mode(SystemMode::Shutdown);                // force a shutdown
         }  
         state.draw(&ctx); // all the standard windows
     });
@@ -109,7 +111,8 @@ pub fn draw_grid_login(state: &mut GuiState) {
     egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
         if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
             state.selected_grid = None;                 // clear grid selection
-            state.change_mode(SystemMode::Start);       // back to start state
+            let _ = state.send_gui_event(GuiEvent::Startup); // tell main which grid has been selected.
+            ////state.change_mode(SystemMode::Start);       // back to start state
         }
     });
 

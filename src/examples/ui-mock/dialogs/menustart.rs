@@ -8,7 +8,7 @@
 //  November 2022
 //
 use libui::{GuiState, MenuGroup, MenuGroupLink};
-use libui::{GuiEvent, SystemMode}; //    ***TEMP*** these are moving out of libui
+use libui::{GuiEvent}; //    ***TEMP*** these are moving out of libui
 use core::cell::RefCell;
 use std::rc::Rc;
 
@@ -44,12 +44,13 @@ impl MenuGroup for MenuStart {
                 if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
                     //  A grid has been selected
                     let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
-                    state.change_mode(SystemMode::Login);
+                    ////state.change_mode(SystemMode::Login);
                 }
             } else {
                 //  Something is wrong if we're in start state with a selected grid
-                log::error!("In START state with a grid selected.");    // probably previous bad shutdown
-                state.change_mode(SystemMode::Shutdown);                // force a shutdown
+                log::error!("App state out of sync - in start state with a grid selected.");    // probably previous bad shutdown
+                ////state.change_mode(SystemMode::Shutdown);                // force a shutdown
+                let _ = state.send_gui_event(GuiEvent::Quit);       // force a shutdown.
             }  
             state.draw(&ctx); // all the standard windows
         });

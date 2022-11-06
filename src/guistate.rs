@@ -140,36 +140,6 @@ impl GuiState {
         let show_menus = self.if_gui_awake();
         let mut inuse = guimenus::draw(self, show_menus); // draws the GUI (BECOMING OBSOLETE)
         //  Draw the active menus.
-        /*
-        if let Some(menu_group) = &mut self.menu_group_opt {
-            inuse |= menu_group.draw(self)
-        }
-        */
-        /*
-        //  Hokey way to do this
-        let taken_menu_group = self.menu_group_opt.take();  // take ownership temporarily to avoid double mutable borrow
-        if let Some(mut menu_group) = taken_menu_group {
-            inuse |= menu_group.draw(self);
-            self.menu_group_opt = Some(menu_group); // put it back
-        }
-        */
-        /*
-        if let Some(menu_group) = self.menu_group_opt.as_ref() {
-            inuse |= menu_group.borrow_mut().draw(self)
-        }
-        */
-        /*
-        if self.menu_group_opt.is_some() {
-            let menu_group = Rc::clone(self.menu_group_opt.as_ref().unwrap());
-            inuse |= menu_group.borrow_mut().draw(self);
-        }
-        */
-        /*
-        // ***TEMP TEST***
-        if let Some(menu_group) = &self.menu_group_opt {
-            menu_group.borrow_mut().draw(self);
-        }
-        */
         let menu_group = Rc::clone(&self.menu_group);
         inuse |= menu_group.borrow_mut().draw(self);
         

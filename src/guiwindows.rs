@@ -14,6 +14,7 @@ use crate::{LoginParams, GridSelectParams, GuiState};
 /// User events sent to the main event loop
 #[derive(Debug)]
 pub enum GuiEvent {
+    Startup,                                        // back to startup state
     OpenReplay(Option<PathBuf>),                    // open a replay file
     SaveReplay(PathBuf),                            // save into a replay file
     LoginTo(GridSelectParams),                      // ask for login params

@@ -6,8 +6,7 @@
 //  Animats
 //  November 2022
 //
-use libui::{GuiState, MenuGroup, MenuGroupLink};
-use libui::{SystemMode}; //    ***TEMP*** these are moving out of libui
+use libui::{GuiState, GuiEvent, MenuGroup, MenuGroupLink};
 use libui::t;
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -39,8 +38,9 @@ impl MenuGroup for MenuLogin {
         //  Top menu bar
         egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
             if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
-                state.selected_grid = None;                 // clear grid selection
-                state.change_mode(SystemMode::Start);       // back to start state
+                state.selected_grid = None;                 // clear grid selection ***MOVE TO APP LEVEL***
+                let _ = state.send_gui_event(GuiEvent::Startup);       // Back to startup state
+                ////state.change_mode(SystemMode::Start);       // back to start state
             }
         });
 
