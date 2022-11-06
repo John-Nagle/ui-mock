@@ -22,7 +22,7 @@ pub enum GuiEvent {
     ////Login(ConnectInfo),                         // login dialog result
     ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
     LogMessage(String),                             // log to GUI
-    Quit                                            // shut down and exit
+    Shutdown                                        // shut down and exit
 }
 
 /// GUI states.
@@ -30,7 +30,7 @@ pub enum GuiEvent {
 //  This is a state machine
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum SystemMode {
-    Start,  // idle, waiting for grid selection
+    Startup,  // idle, waiting for grid selection
             // -> Login, Replay. Exit
     Login,  // login dialog is up.
             // -> Connected, Start
@@ -42,7 +42,6 @@ pub enum SystemMode {
             // -> Shutdown
     Shutdown, // shutting down and cleaning up
             // -> Exit, Start
-    Exit, // Program exits
 }
 
 

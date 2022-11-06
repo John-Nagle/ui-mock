@@ -116,7 +116,7 @@ impl GuiState {
             msg_ok,
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
-            system_mode: SystemMode::Start,
+            system_mode: SystemMode::Startup,
             selected_grid: None,
             event_send_channel,
             event_recv_channel,

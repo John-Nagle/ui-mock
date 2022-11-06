@@ -41,7 +41,7 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
     }
     //  Select appropriate GUI for current mode.
     match state.get_mode() {
-        SystemMode::Start => {
+        SystemMode::Startup => {
             //  Start state. Show available metaverses.
             draw_start(state);
             true
@@ -68,12 +68,7 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
             ////state.change_mode(SystemMode::Exit);
             println!("Why are we in shutdown mode and still running?");
             true
-        }
-        SystemMode::Exit => {
-            println!("Why are we in exit mode and still running?");
-            true
-        }
-        
+        }       
     }
 }
 /// Update the GUI. Called on each frame.
@@ -96,7 +91,7 @@ pub fn draw_start(state: &mut GuiState) {
         } else {
             //  Something is wrong if we're in start state with a selected grid
             log::error!("In START state with a grid selected.");    // probably previous bad shutdown
-            let _ = state.send_gui_event(GuiEvent::Quit);           // force a shutdown
+            let _ = state.send_gui_event(GuiEvent::Shutdown);           // force a shutdown
             ////state.change_mode(SystemMode::Shutdown);                // force a shutdown
         }  
         state.draw(&ctx); // all the standard windows

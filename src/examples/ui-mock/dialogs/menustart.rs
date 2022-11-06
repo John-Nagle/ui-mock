@@ -50,7 +50,7 @@ impl MenuGroup for MenuStart {
                 //  Something is wrong if we're in start state with a selected grid
                 log::error!("App state out of sync - in start state with a grid selected.");    // probably previous bad shutdown
                 ////state.change_mode(SystemMode::Shutdown);                // force a shutdown
-                let _ = state.send_gui_event(GuiEvent::Quit);       // force a shutdown.
+                let _ = state.send_gui_event(GuiEvent::Shutdown);       // force a shutdown.
             }  
             state.draw(&ctx); // all the standard windows
         });

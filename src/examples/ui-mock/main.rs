@@ -81,7 +81,7 @@ impl Ui {
             //  Login aborted, back to start state.
             GuiEvent::Startup => {
                 data.gui_state.selected_grid = None;                    // cancel grid selection
-                data.gui_state.change_mode(SystemMode::Start);          // back to starting state
+                data.gui_state.change_mode(SystemMode::Startup);          // back to starting state
             }
             GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
                 match path_buf_opt {
@@ -93,14 +93,14 @@ impl Ui {
                     None => {
                         //  User cancelled replay. Back to ground state.
                         data.gui_state.selected_grid = None;            // cancel grid selection
-                        data.gui_state.change_mode(SystemMode::Start);  // back to starting state
+                        data.gui_state.change_mode(SystemMode::Startup);  // back to starting state
                     }
                 }
             }
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.
                 match data.gui_state.get_mode() {
-                    SystemMode::Start => {
+                    SystemMode::Startup => {
                         data.gui_state.change_mode(SystemMode::Login);  // advance to login state
                         let is_file_pick = grid.data.login_url.is_none();
                         data.gui_state.selected_grid = Some(grid.clone());  // set the selected grid
@@ -133,8 +133,8 @@ impl Ui {
             GuiEvent::LogMessage(s) => {
                 data.gui_state.add_msg(s.to_string())
             }
-            GuiEvent::Quit => {
-                data.gui_state.change_mode(SystemMode::Exit);  // shutdown starts
+            GuiEvent::Shutdown => {
+                data.gui_state.change_mode(SystemMode::Shutdown);  // shutdown starts
                 data.quit = true;                   // force quit              
             }                                       // shut down and exit
         }
@@ -286,7 +286,7 @@ impl Ui {
             gui_state,
             quit: false,
         });
-        self.data.as_mut().unwrap().gui_state.change_mode(SystemMode::Start);          // go to starting state
+        self.data.as_mut().unwrap().gui_state.change_mode(SystemMode::Startup);          // go to starting state
         Ok(())
     }
 
