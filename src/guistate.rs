@@ -58,11 +58,11 @@ pub struct GuiAssets {
 }
 
 //  User interface info specific to the app
-pub trait GenericUiInfo {
+pub trait AppState {
     ////fn draw_item(&mut self);
 }
 
-pub struct FixedStateInfo {
+pub struct CommonState {
     //  Data needed in GUI
     pub params: Rc<GuiParams>,                  // starting params
     //  Assets - images, etc.
@@ -84,7 +84,7 @@ pub struct FixedStateInfo {
     pub dark_mode_visuals: egui::Visuals,           // dark mode colors, etc.
 }
 
-impl FixedStateInfo {
+impl CommonState {
     /// Usual new
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
@@ -103,7 +103,7 @@ impl FixedStateInfo {
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
         ////let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
-        FixedStateInfo {
+        Self {
             platform,
             message_window,
             grid_select_window,
@@ -114,8 +114,6 @@ impl FixedStateInfo {
             msg_ok,
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
-            ////system_mode: SystemMode::Startup,
-            ////selected_grid: None,
             event_send_channel,
             event_recv_channel,
             light_mode_visuals,
@@ -261,27 +259,27 @@ impl FixedStateInfo {
 */
 
 /// All GUI windows persistent state.  Includes the generic part.
-pub struct GuiState<T: GenericUiInfo> {
-    pub fixed_info: FixedStateInfo,         // same regardless of generic
-    pub app_info: T,                            // application-specific info
+pub struct GuiState<T: AppState> {
+    pub common_state: CommonState,               // same regardless of generic
+    pub app_state: T,                            // application-specific state
 }
 
-impl <T: GenericUiInfo> GuiState<T> {
+impl <T: AppState> GuiState<T> {
 
     /// Usual new
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
-        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>, app_info: T) -> GuiState<T> {
-        let fixed_info = FixedStateInfo::new(params, assets, platform, event_send_channel, event_recv_channel);
+        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>, app_state: T) -> GuiState<T> {
+        let common_state = CommonState::new(params, assets, platform, event_send_channel, event_recv_channel);
         GuiState::<T> {
-            fixed_info,
-            app_info
+            common_state,
+            app_state
         }
     } 
 }
 
 pub trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context, state: &mut FixedStateInfo);    // called every frame
+    fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState);    // called every frame
     fn retain(&self) -> bool { true }           // override and set to false when done
     fn get_id(&self) -> egui::Id;               // get ID of window
 }
@@ -321,7 +319,7 @@ impl TextWindow {
 
 impl GuiWindow for TextWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context, _state: &mut FixedStateInfo) {
+    fn draw(&mut self, ctx: &egui::Context, _state: &mut CommonState) {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -482,7 +480,7 @@ impl log::Log for MessageLogger {
                 record.target(),
                 record.args());
         let event = GuiEvent::LogMessage(s);
-        if let Err(e) = FixedStateInfo::send_gui_event_on_channel(&self.send_channel, event) {
+        if let Err(e) = CommonState::send_gui_event_on_channel(&self.send_channel, event) {
             println!("Error {}:{} -- {} could not be sent to GUI: {:?}", record.level(), record.target(), record.args(), e);
         }
     }

@@ -19,7 +19,7 @@ mod dialogs;
 
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
-pub use guistate::{GuiParams, GuiAssets, GuiState, FixedStateInfo, GenericUiInfo, MessageLogger, GuiWindow, 
+pub use guistate::{GuiParams, GuiAssets, GuiState, CommonState, GenericUiInfo, MessageLogger, GuiWindow, 
     GuiWindowLink, SendAny, SendAnyBoxed, TextWindow, MenuGroupLink};
 pub use guistate::{panic_dialog};
 /// Utility functions.
