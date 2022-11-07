@@ -1,4 +1,4 @@
-//  Main program of user interface
+// # Main program of user interface
 //
 //  This is a mockup of the user interface for
 //  a metaverse viewer. It has windows and menus,
@@ -20,6 +20,8 @@ use std::str::FromStr;
 use anyhow::{Error};
 mod examplesupport;
 mod dialogs;
+mod uiinfo;
+use uiinfo::{UiInfo};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
@@ -35,20 +37,11 @@ pub struct UiData {
     quit: bool,                                 // global quit flag
 
     //  The 2D GUI
-    gui_state: GuiState,                        // state of the GUI
+    gui_state: GuiState<UiInfo>,                // state of the GUI
 }
 
 impl UiData {
 
-}
-
-/// Generic parameter to GuiState, containing app-specific info needed by draw functions.
-#[derive(Default, Debug}]
-pub struct UiInfo {
-    //  Primary system mode
-    system_mode: SystemMode,                // primary operating mode
-    //  Selected grid
-    pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
 }
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
@@ -89,61 +82,61 @@ impl Ui {
         match event {
             //  Login aborted, back to start state.
             GuiEvent::Startup => {
-                data.gui_state.selected_grid = None;                    // cancel grid selection
-                data.gui_state.change_mode(SystemMode::Startup);          // back to starting state
+                data.gui_state.app_info.selected_grid = None;                    // cancel grid selection
+                data.gui_state.app_info.change_mode(SystemMode::Startup);          // back to starting state
             }
             GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
                 match path_buf_opt {
                     Some(path_buf) => {
                         println!("Open replay: {:?}", path_buf); // ***TEMP***
                         //  ***NEED TO PASS path_buf and grid to startup and actually go***
-                        data.gui_state.change_mode(SystemMode::Connected);
+                        data.gui_state.app_info.change_mode(SystemMode::Connected);
                     }
                     None => {
                         //  User cancelled replay. Back to ground state.
-                        data.gui_state.selected_grid = None;            // cancel grid selection
-                        data.gui_state.change_mode(SystemMode::Startup);  // back to starting state
+                        data.gui_state.app_info.selected_grid = None;            // cancel grid selection
+                        data.gui_state.app_info.change_mode(SystemMode::Startup);  // back to starting state
                     }
                 }
             }
             GuiEvent::LoginTo(grid) => {
                 //  Grid has been selected, now try to log in.
-                match data.gui_state.get_mode() {
+                match data.gui_state.app_info.get_mode() {
                     SystemMode::Startup => {
-                        data.gui_state.change_mode(SystemMode::Login);  // advance to login state
+                        data.gui_state.app_info.change_mode(SystemMode::Login);  // advance to login state
                         let is_file_pick = grid.data.login_url.is_none();
-                        data.gui_state.selected_grid = Some(grid.clone());  // set the selected grid
+                        data.gui_state.app_info.selected_grid = Some(grid.clone());  // set the selected grid
                         if is_file_pick {
                             //  No grid URL, so this is a replay file selection, not a login.
                             //  File pick is done with the platform's native file picker, asynchronously.
                             //  File pickers are special - they authorize the program to access the file at the system level.
-                            pick_replay_file_async(&mut data.gui_state, window); // use the file picker
+                            pick_replay_file_async(&mut data.gui_state.fixed_info, window); // use the file picker
                         } else {
                             //  This is a login to a grid. Bring up login dialog window.
-                            let id = data.gui_state.get_unique_id();
-                            data.gui_state.add_window(LoginDialogWindow::new_link(id, &grid)).unwrap();
+                            let id = data.gui_state.fixed_info.get_unique_id();
+                            data.gui_state.fixed_info.add_window(LoginDialogWindow::new_link(id, &grid)).unwrap();
                         }  
                     }
                     _ => {            
-                        log::error!("Login request to {} while in state {:?}", grid.data.metaverse, data.gui_state.get_mode());
+                        log::error!("Login request to {} while in state {:?}", grid.data.metaverse, data.gui_state.app_info.get_mode());
                     }
                 }
             }
             GuiEvent::SaveReplay(_path_buf) => {     // save a replay file
-                data.gui_state.unimplemented_msg(); // ***TEMP***
+                data.gui_state.fixed_info.unimplemented_msg(); // ***TEMP***
             }
             GuiEvent::LoginStart(_login_params) => {
-                data.gui_state.unimplemented_msg(); // ***TEMP***
+                data.gui_state.fixed_info.unimplemented_msg(); // ***TEMP***
             }            
             GuiEvent::ErrorMessage((title, messages)) => {   // display message
                 let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
-                data.gui_state.add_error_window(&title, &msgs);
+                data.gui_state.fixed_info.add_error_window(&title, &msgs);
             }
             GuiEvent::LogMessage(s) => {
-                data.gui_state.add_msg(s.to_string())
+                data.gui_state.fixed_info.add_msg(s.to_string())
             }
             GuiEvent::Shutdown => {
-                data.gui_state.change_mode(SystemMode::Shutdown);  // shutdown starts
+                data.gui_state.app_info.change_mode(SystemMode::Shutdown);  // shutdown starts
                 data.quit = true;                   // force quit              
             }                                       // shut down and exit
         }
@@ -285,7 +278,10 @@ impl Ui {
         };
         let event_send_channel = self.event_send_channel.clone();
         let event_recv_channel = self.event_recv_channel.take().unwrap();
-        let gui_state = GuiState::new::<UiInfo>(params, assets, platform, event_send_channel, event_recv_channel);     // all the fixed and popup windows
+        //  Set initial state of app-level UI info
+        let app_info = UiInfo::new();
+        //  Main state of the GUI
+        let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel, app_info);  
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -295,7 +291,7 @@ impl Ui {
             gui_state,
             quit: false,
         });
-        self.data.as_mut().unwrap().gui_state.change_mode(SystemMode::Startup);          // go to starting state
+        ////self.data.as_mut().unwrap().gui_state.change_mode(SystemMode::Startup);          // go to starting state
         Ok(())
     }
 
@@ -361,9 +357,9 @@ impl rend3_framework::App for Ui {
         //  Temporarily uses separate queue due to
         //  bug https://github.com/BVE-Reborn/rend3/issues/406
         {   let data = self.data.as_mut().unwrap();
-            if !data.gui_state.event_recv_channel.is_empty() {    // if events queued
+            if !data.gui_state.fixed_info.event_recv_channel.is_empty() {    // if events queued
                 //  Get all events, avoiding double borrow.
-                let events: Vec<SendAnyBoxed> = data.gui_state.event_recv_channel.try_iter().collect(); 
+                let events: Vec<SendAnyBoxed> = data.gui_state.fixed_info.event_recv_channel.try_iter().collect(); 
                 for ev in events {
                     println!("User event: {:?}", ev);       // ***TEMP***
                     self.handle_user_event(window, ev);
@@ -373,8 +369,8 @@ impl rend3_framework::App for Ui {
               
         let data = self.data.as_mut().unwrap();
         //  This is where EGUI handles 2D UI events.
-        data.gui_state.platform.handle_event(&event);
-        if data.gui_state.platform.captures_event(&event) {
+        data.gui_state.fixed_info.platform.handle_event(&event);
+        if data.gui_state.fixed_info.platform.captures_event(&event) {
             ////println!("GUI captured event: {:?}", event);    // ***TEMP TEST***
             return; // 2D UI consumed this event.
         }
@@ -382,7 +378,7 @@ impl rend3_framework::App for Ui {
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
-                data.gui_state.platform
+                data.gui_state.fixed_info.platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
                 /*
                 data.gui_state.platform.begin_frame();
@@ -411,11 +407,11 @@ impl rend3_framework::App for Ui {
 
                 let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
                 */
-                let (paint_jobs, textures_delta) = data.gui_state.draw_all(&window);  // build the 2D GUI
+                let (paint_jobs, textures_delta) = data.gui_state.fixed_info.draw_all(&window);  // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
-                    context: data.gui_state.platform.context(),
+                    context: data.gui_state.fixed_info.platform.context(),
                 };
 
                 profiling::scope!("3D");
@@ -474,14 +470,14 @@ impl rend3_framework::App for Ui {
                 }
                 winit::event::WindowEvent::Focused(gained) => {
                     if gained {
-                        data.gui_state.wake_up_gui();
+                        data.gui_state.fixed_info.wake_up_gui();
                     } // make menus reappear on focus
                 }
                 winit::event::WindowEvent::CursorEntered { .. } => {
-                    data.gui_state.wake_up_gui(); // either entering or leaving makes menus reappear
+                    data.gui_state.fixed_info.wake_up_gui(); // either entering or leaving makes menus reappear
                 }
                 winit::event::WindowEvent::CursorLeft { .. } => {
-                    data.gui_state.wake_up_gui();
+                    data.gui_state.fixed_info.wake_up_gui();
                 }
                 winit::event::WindowEvent::KeyboardInput { input, .. } => {
                     let _ = input;   // not yet used

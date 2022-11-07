@@ -59,7 +59,7 @@ pub struct GuiAssets {
 
 //  User interface info specific to the app
 pub trait GenericUiInfo {
-    fn draw_item(&mut self);
+    ////fn draw_item(&mut self);
 }
 
 pub struct FixedStateInfo {
@@ -69,11 +69,6 @@ pub struct FixedStateInfo {
     pub assets: GuiAssets,
     //  Platform data for context
     pub platform: egui_winit_platform::Platform,
-    //  Primary system mode
-    ////system_mode: SystemMode,                // primary operating mode
-    //  Selected grid
-    ////pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
-    //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     pub menu_group: MenuGroupLink,              // currently active menu group
