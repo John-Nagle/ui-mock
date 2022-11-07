@@ -5,74 +5,11 @@
 //  Animats
 //  October 2022
 //
-use anyhow::{Error, Context, anyhow};
-////use crate::t;
-use std::fs::File;
-use std::path::{Path, PathBuf};
-use std::io::Read;
-use std::sync::Arc;
-use serde::{Deserialize};
-use rend3::Renderer;
-use rend3_egui::EguiRenderRoutine;
-use crate::{GuiAssets, load_image};
+////use rend3_egui::EguiRenderRoutine;
+use crate::{GuiAssets};
+use super::super::uiinfo::{GridSelectParams};
 /// Basic info about a grid for the splash page
-/// GridSelectParams file contents.
-#[derive(Debug, Clone, Deserialize)]
-pub struct GridSelectParamsData {
-    pub metaverse: String,                      // Second Life, OsGrid, etc.
-    pub grid: String,                           // agni, etc.
-    pub picture_bar: String,                    // local file name in images directory
-    pub home_url: String,                       // home page for site   
-    pub join_url: Option<String>,               // How to join
-    pub login_url: Option<String>,              // if none, this is a replay
-    pub comment: Option<String>,                // to allow a comment in the source JSON file
-}
 
-/// This describes the format of the grids.json file for serde deserialization.
-#[derive(Debug, Clone, Deserialize)]
-struct GridSelectParamsDataJson {
-    pub grids: Vec<GridSelectParamsData>
-}
-
-#[derive(Debug, Clone)]
-pub struct GridSelectParams {
-    pub data: GridSelectParamsData,             // as read from JSON
-    pub picture_bar: egui::TextureId,           // texture has been loaded and is ready to go
-}
-
-impl GridSelectParams {
-    /// Read the JSON grid select params file tnto a GridSelectParams structure.
-    pub fn read_grid_select_params(filename: &PathBuf, asset_dir: &Path, egui_routine: &mut EguiRenderRoutine, renderer: &Arc<Renderer>) -> Result<Vec<GridSelectParams>, Error> {
-        //  Read grid_select file
-        let mut grid_file = asset_dir.to_path_buf();
-        grid_file.push(filename);
-        let file = File::open(grid_file)
-            .with_context(|| anyhow!("Failed to open the grid select params config file: {:?}", filename))?;
-        let mut reader = std::io::BufReader::new(file);
-        let mut content = String::new();
-        reader
-            .read_to_string(&mut content)
-            .context("Failed to read the grid select params config.")?;
-        let grids_data: GridSelectParamsDataJson = serde_json::from_str(&content).context("Failed to parse grid select params config file.")?;
-        let mut params = Vec::new();
-        for data in grids_data.grids {
-            let mut image_file_name = asset_dir.to_path_buf();                // build file name of image
-            image_file_name.push(&data.picture_bar);
-            println!("Metaverse: {} Grid: {} Picture bar image file: {:?}", data.metaverse, data.grid, image_file_name);    // ***TEMP***
-            let image = image::io::Reader::open(&image_file_name)
-                .with_context(|| format!("Unable to open image file {:?} for grid menu", image_file_name))?
-                .decode()
-                .with_context(|| format!("Unable to decode image file {:?} for grid menu", image_file_name))?;
-            ////let rgba = image.to_rgba8();
-            let picture_bar = load_image(image, egui_routine, renderer);
-            params.push(GridSelectParams {
-                picture_bar,
-                data
-            });
-        } 
-        Ok(params)
-    }
-}
 
 /// The grid selection window.
 //  Appears at startup.

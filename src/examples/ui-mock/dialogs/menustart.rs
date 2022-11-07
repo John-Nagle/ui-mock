@@ -8,7 +8,7 @@
 //  November 2022
 //
 use libui::{CommonState, MenuGroup, MenuGroupLink};
-use libui::{GuiEvent}; //    ***TEMP*** these are moving out of libui
+use super::super::uiinfo::GuiEvent;
 ////use super::super::uiinfo::{UiInfo};
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -43,7 +43,7 @@ impl MenuGroup for MenuStart {
         egui::CentralPanel::default().show(&ctx, |_ui| {
             if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
                 //  A grid has been selected
-                let _ = state.send_gui_event(GuiEvent::LoginTo(grid)); // tell main which grid has been selected.
+                let _ = state.send_boxed_gui_event(Box::new(GuiEvent::LoginTo(grid))); // tell main which grid has been selected.
 
             }
             state.draw(&ctx); // all the standard windows

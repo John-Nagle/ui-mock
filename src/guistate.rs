@@ -22,9 +22,9 @@ use super::guiutil;
 ////use super::guimenus;
 use super::menunone::{MenuNone};
 use crate::t;
-use crate::{GridSelectParams};
+////use crate::{GridSelectParams};
 use crate::{MenuGroup};
-use super::dialogs::guigrid::GridSelectWindow;
+////use super::dialogs::guigrid::GridSelectWindow;
 use rend3::{ExtendedAdapterInfo};
 use simplelog::{SharedLogger};
 /// Configuration
@@ -35,10 +35,6 @@ pub type SendAnyBoxed = Box<SendAny>;               // the boxed version
 pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;    // a bit much
 pub type MenuGroupLink = Rc<RefCell<dyn MenuGroup>>;
 
-/// ***TEMPORARY IMPORTS*** will leave when more code moves outside of libui
-use crate::guiwindows::{GuiEvent};
-
-
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
     pub version: String,                            // main program version
@@ -48,7 +44,15 @@ pub struct GuiParams {
     pub log_level: LevelFilter,                     // logging level
     pub menu_display_secs: u64,                     // (secs) display menus for this long
     pub gpu_info: ExtendedAdapterInfo,              // GPU info
-    pub grid_select_params: Vec<GridSelectParams>,  // grid info
+    ////pub grid_select_params: Vec<GridSelectParams>,  // grid info
+}
+
+/// Common events any app can use.
+//  The app can define more app-specific events.
+pub enum GuiCommonEvent {
+    ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
+    LogMessage(String),                             // log to GUI
+    Shutdown,                                       // eventually, everything shuts down
 }
 
 /// Assets used in displaying the GUI.
@@ -69,7 +73,7 @@ pub struct CommonState {
     pub assets: GuiAssets,
     //  Platform data for context
     pub platform: egui_winit_platform::Platform,
-    pub grid_select_window: GridSelectWindow,   // used at start
+    ////pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     pub menu_group: MenuGroupLink,              // currently active menu group
     //  Disposable dynamic windows
@@ -91,7 +95,7 @@ impl CommonState {
         event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>) -> Self {
         //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
-        let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
+        ////let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
         //  Set up defaults
         guiutil::set_default_styles(&platform.context());  // set up color and text defaults.
         let light_mode_visuals = egui::Visuals::light();
@@ -106,7 +110,6 @@ impl CommonState {
         Self {
             platform,
             message_window,
-            grid_select_window,
             params: Rc::new(params),
             assets,
             temporary_windows: Vec::new(),
@@ -226,21 +229,21 @@ impl CommonState {
     }
 */    
     /// Sends a user event to the event loop.
-    //  This ought to use winit events, but we can't do that yet
-    //  because of bug https://github.com/BVE-Reborn/rend3/issues/406
-    pub fn send_gui_event(&self, event: GuiEvent) -> Result<(), Error> {
-        Self::send_gui_event_on_channel(&self.event_send_channel, event)
-        ////Ok(self.event_send_channel.send(Box::new(event))?)    // send
-        ////let boxed_event: Box<SendAny> = Box::new(event);    // send
-        ////Ok(self.event_send_channel.send(boxed_event)?)    // send
+    //  Common events only
+    pub fn send_gui_event(&self, event: GuiCommonEvent) -> Result<(), Error> {
+        self.send_boxed_gui_event( Box::new(event))
+    }
+    /// Any kind of event, but boxed
+    pub fn send_boxed_gui_event(&self, boxed_event: SendAnyBoxed) -> Result<(), Error> {
+        Self::send_gui_event_on_channel(&self.event_send_channel, boxed_event)
     }
     /// Access to channel, mostly for inter-thread sending.
     pub fn get_send_channel(&self) -> &crossbeam_channel::Sender<SendAnyBoxed> {
         &self.event_send_channel        
     }
     /// Send, given channel
-    pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<SendAnyBoxed>, event: GuiEvent) -> Result<(), Error> {
-        if let Err(_) = channel.send(Box::new(event)) { 
+    pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<SendAnyBoxed>, boxed_event: SendAnyBoxed) -> Result<(), Error> {
+        if let Err(_) = channel.send(boxed_event) { 
             Err(anyhow!("Error sending GUI event on channel"))  // have to do this because error from send is not sync
         } else {
             Ok(())
@@ -479,8 +482,8 @@ impl log::Log for MessageLogger {
                 record.level(),
                 record.target(),
                 record.args());
-        let event = GuiEvent::LogMessage(s);
-        if let Err(e) = CommonState::send_gui_event_on_channel(&self.send_channel, event) {
+        let event = GuiCommonEvent::LogMessage(s);
+        if let Err(e) = CommonState::send_gui_event_on_channel(&self.send_channel, Box::new(event)) {
             println!("Error {}:{} -- {} could not be sent to GUI: {:?}", record.level(), record.target(), record.args(), e);
         }
     }

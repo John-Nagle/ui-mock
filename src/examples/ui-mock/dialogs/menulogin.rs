@@ -6,8 +6,9 @@
 //  Animats
 //  November 2022
 //
-use libui::{CommonState, GuiEvent, MenuGroup, MenuGroupLink};
+use libui::{CommonState, MenuGroup, MenuGroupLink};
 use libui::t;
+use super::super::uiinfo::GuiEvent;
 use core::cell::RefCell;
 use std::rc::Rc;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
@@ -39,7 +40,7 @@ impl MenuGroup for MenuLogin {
         egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
             if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
                 ////state.selected_grid = None;                 // clear grid selection ***MOVE TO APP LEVEL***
-                let _ = state.send_gui_event(GuiEvent::Startup);       // Back to startup state
+                let _ = state.send_boxed_gui_event(Box::new(GuiEvent::Startup)); // tell main which grid has been selected.
                 ////state.change_mode(SystemMode::Start);       // back to start state
             }
         });

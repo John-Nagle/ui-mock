@@ -8,9 +8,9 @@ use core::cell::RefCell;
 use anyhow::{Error, anyhow};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use keyring::{Entry};
-use crate::{GuiWindow, GuiWindowLink, Dictionary, CommonState};
-use crate::t;
-use crate::{GuiEvent, GridSelectParams};  // ***TEMP*** moving out of libui
+use libui::{GuiWindow, GuiWindowLink, Dictionary, CommonState};
+use libui::t;
+use super::super::uiinfo::{GuiEvent, GridSelectParams};
 
 
 //  Dialog box parameters required for login.
@@ -273,7 +273,7 @@ impl GuiWindow for LoginDialogWindow {
                         }
                         accepted = true;                                // dismiss dialog
                         println!("Attempting login to {}", login_params.get_service(LoginParams::CRED_TYPE_PASS));                        
-                        let _ = state.send_gui_event(GuiEvent::LoginStart(login_params));      // tell main to start the login process
+                        let _ = state.send_boxed_gui_event(Box::new(GuiEvent::LoginStart(login_params))); // tell main which grid has been selected.
                      }
                 });
             });

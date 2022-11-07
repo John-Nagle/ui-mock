@@ -12,8 +12,8 @@
 //  June 2022
 //
 use libui;
-use libui::{GuiState, GuiParams, GuiEvent, GuiAssets, SystemMode, GridSelectParams, LoginDialogWindow, Dictionary, MessageLogger, SendAnyBoxed};
-use libui::{get_log_file_name, get_executable_name, panic_dialog, pick_replay_file_async};
+use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, SendAnyBoxed};
+use libui::{get_log_file_name, get_executable_name, panic_dialog};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
@@ -21,7 +21,8 @@ use anyhow::{Error};
 mod examplesupport;
 mod dialogs;
 mod uiinfo;
-use uiinfo::{UiInfo};
+use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
+use dialogs::guilogin::{LoginDialogWindow};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
@@ -72,8 +73,10 @@ impl Ui {
     //  This is how the GUI and other parts of the
     //  system communicate with the main event loop.
     pub fn handle_user_event(&mut self, window: &winit::window::Window, raw_event: SendAnyBoxed) {
+        //  Events can be a GuiEvent or a GuiCommonEvent. 
         //  Events should always be GuiEvents. The dynamic typing is to get the definition of GuiEvent out of
         //  libui.
+        //  ***NEED OUTER MATCH on GuiEvent or GuiCommonEvent**
         let event = match raw_event.downcast_ref::<GuiEvent>() {
             Some(event) => event,
             None => { log::error!("Invalid non GuiEvent in handle_user_event: {:?}", raw_event); return; }
@@ -274,7 +277,7 @@ impl Ui {
             log_level,
             menu_display_secs: MENU_DISPLAY_SECS,
             gpu_info: adapter_info,             // GPU info
-            grid_select_params,
+            ////grid_select_params,
         };
         let event_send_channel = self.event_send_channel.clone();
         let event_recv_channel = self.event_recv_channel.take().unwrap();

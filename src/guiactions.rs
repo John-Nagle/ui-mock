@@ -8,7 +8,7 @@
 //
 use crate::t;
 use egui::Ui;
-use crate::{GuiEvent, TextWindow, CommonState};
+use crate::{TextWindow, CommonState, GuiCommonEvent};
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -24,7 +24,7 @@ pub fn manu_preferences(_ui: &mut Ui, state: &mut CommonState) {
 
 /// Avatar->Quit
 pub fn menu_quit(_ui: &mut Ui, state: &mut CommonState) {
-    let _ = state.send_gui_event(GuiEvent::Shutdown); // tell main loop to quit
+    let _ = state.send_gui_event(GuiCommonEvent::Shutdown); // tell main loop to quit
 }
 
 /// Help->Help
