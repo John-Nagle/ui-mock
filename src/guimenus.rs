@@ -8,7 +8,8 @@
 //  Animats
 //  June 2022
 //
-use crate::{GuiState};
+/*
+use crate::{FixedStateInfo};
 use crate::{GuiEvent, SystemMode}; //    ***TEMP*** these are moving out of libui
 use super::guiactions;
 use egui::{menu, Frame};
@@ -29,7 +30,7 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 );
 
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
+pub fn draw(state: &mut FixedStateInfo, show_menus: bool) -> bool {
     profiling::scope!("Gui");
     //  Do dark mode for all states.
     {   let ctx = state.platform.context();
@@ -76,7 +77,7 @@ pub fn draw(state: &mut GuiState, show_menus: bool) -> bool {
 //
 //  The start screen. A scrolling list of big image buttons, one
 //  for each metaverse.
-pub fn draw_start(state: &mut GuiState) {                          
+pub fn draw_start(state: &mut FixedStateInfo) {                          
     // Insert egui commands here
     let ctx = state.platform.context();
     //  Draw the splash screen with a big set of alternative metaverses.
@@ -99,7 +100,7 @@ pub fn draw_start(state: &mut GuiState) {
 }
 
 /// Login to a grid
-pub fn draw_grid_login(state: &mut GuiState) {
+pub fn draw_grid_login(state: &mut FixedStateInfo) {
     let ctx = state.platform.context();
 
     //  Top menu bar
@@ -121,7 +122,7 @@ pub fn draw_grid_login(state: &mut GuiState) {
 }
 
 /// File picker for replay file
-pub fn draw_replay_file_pick(state: &mut GuiState) {
+pub fn draw_replay_file_pick(state: &mut FixedStateInfo) {
     let ctx = state.platform.context();
     //  Central panel
     egui::CentralPanel::default().show(&ctx, |ui| {
@@ -135,7 +136,7 @@ pub fn draw_replay_file_pick(state: &mut GuiState) {
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw_login(state: &mut GuiState) {       
+pub fn draw_login(state: &mut FixedStateInfo) {       
     if let Some(grid) = &state.selected_grid {
         if let Some(_login_url) = &grid.data.login_url {
             //  Actual login, need username/password.
@@ -151,7 +152,7 @@ pub fn draw_login(state: &mut GuiState) {
 
 /// Draw menus for "connected" state - 3D system is live.
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
-pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {                          
+pub fn draw_connected(state: &mut FixedStateInfo, show_menus: bool) -> bool {                          
     // Insert egui commands here
     let ctx = state.platform.context();
     //  Top menu bar
@@ -246,4 +247,5 @@ pub fn draw_connected(state: &mut GuiState, show_menus: bool) -> bool {
     //  Finish
     ctx.is_pointer_over_area() // True if GUI is in use
 }
+*/
 

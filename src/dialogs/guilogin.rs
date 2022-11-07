@@ -10,7 +10,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 use keyring::{Entry};
 use crate::{GuiWindow, GuiWindowLink, Dictionary};
 use crate::t;
-use crate::{GuiEvent, GuiState, GridSelectParams};  // ***TEMP*** moving out of libui
+use crate::{GuiEvent, FixedStateInfo, GridSelectParams};  // ***TEMP*** moving out of libui
 
 
 //  Dialog box parameters required for login.
@@ -177,7 +177,7 @@ impl GuiWindow for LoginDialogWindow {
     //  In that case, show actual username in username field and •••• in the password field.
     //  If username is present, but password is blank, look up password MD5 in password storage.
     //  New password is not stored here, 
-    fn draw(&mut self, ctx: &egui::Context, state: &mut GuiState) {
+    fn draw(&mut self, ctx: &egui::Context, state: &mut FixedStateInfo) {
         //  Translated name of destination
         fn destination_name(dest: &LoginDestination, lang: &Dictionary) -> &'static str {
             match dest {

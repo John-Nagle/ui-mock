@@ -8,7 +8,7 @@
 //
 use crate::t;
 use egui::Ui;
-use crate::{GuiState, GuiEvent, TextWindow};
+use crate::{GuiEvent, TextWindow, FixedStateInfo};
 
 /// Configuration
 const HELP_PAGE: &str =
@@ -17,18 +17,18 @@ const COPYRIGHT: &str = "© 2022 Animats";
 
 //
 /// Avatar->Preferences
-pub fn manu_preferences(_ui: &mut Ui, state: &mut GuiState) {
+pub fn manu_preferences(_ui: &mut Ui, state: &mut FixedStateInfo) {
     //  Unimplemented
     state.add_error_window(t!("menu.unimplemented", state.get_lang()), &[t!("menu.unimplemented", state.get_lang())]);
 }
 
 /// Avatar->Quit
-pub fn menu_quit(_ui: &mut Ui, state: &mut GuiState) {
+pub fn menu_quit(_ui: &mut Ui, state: &mut FixedStateInfo) {
     let _ = state.send_gui_event(GuiEvent::Shutdown); // tell main loop to quit
 }
 
 /// Help->Help
-pub fn menu_help_manual(_ui: &mut Ui, state: &mut GuiState) {
+pub fn menu_help_manual(_ui: &mut Ui, state: &mut FixedStateInfo) {
     //  Open help page in browser
     match webbrowser::open(HELP_PAGE) {
         Ok(_) => {},
@@ -40,7 +40,7 @@ pub fn menu_help_manual(_ui: &mut Ui, state: &mut GuiState) {
         }
     }
 }
-pub fn menu_help_about(_ui: &mut Ui, state: &mut GuiState) {
+pub fn menu_help_about(_ui: &mut Ui, state: &mut FixedStateInfo) {
     //  Create window if necessary
     //  Generate system information dump
     let if_unknown = |x| if let Some(v) = x { v } else {"unknown".to_string()}; // for Option

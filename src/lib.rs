@@ -19,7 +19,8 @@ mod dialogs;
 
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
-pub use guistate::{GuiParams, GuiAssets, GuiState, MessageLogger, GuiWindow, GuiWindowLink, SendAny, SendAnyBoxed, TextWindow, MenuGroupLink};
+pub use guistate::{GuiParams, GuiAssets, GuiState, FixedStateInfo, GenericUiInfo, MessageLogger, GuiWindow, 
+    GuiWindowLink, SendAny, SendAnyBoxed, TextWindow, MenuGroupLink};
 pub use guistate::{panic_dialog};
 /// Utility functions.
 pub use guiutil::{load_canned_icon, load_image, set_default_styles, get_log_file_name, get_executable_name, get_asset_dir, get_cache_dir};
@@ -36,5 +37,5 @@ pub use guiwindows::{pick_replay_file_async};
 //  Traits
 /// A group of menus. Libui user sets what menus are to be shown.
 pub trait MenuGroup {
-    fn draw(&mut self, state: &mut GuiState) -> bool;    // returns true if menu is in use
+    fn draw(&mut self, state: &mut FixedStateInfo) -> bool;    // returns true if menu is in use
 }

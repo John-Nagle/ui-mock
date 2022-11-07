@@ -42,6 +42,15 @@ impl UiData {
 
 }
 
+/// Generic parameter to GuiState, containing app-specific info needed by draw functions.
+#[derive(Default, Debug}]
+pub struct UiInfo {
+    //  Primary system mode
+    system_mode: SystemMode,                // primary operating mode
+    //  Selected grid
+    pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
+}
+
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// The application.
@@ -276,7 +285,7 @@ impl Ui {
         };
         let event_send_channel = self.event_send_channel.clone();
         let event_recv_channel = self.event_recv_channel.take().unwrap();
-        let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel);     // all the fixed and popup windows
+        let gui_state = GuiState::new::<UiInfo>(params, assets, platform, event_send_channel, event_recv_channel);     // all the fixed and popup windows
         self.data = Some(UiData {
             _object_handle,
             _material_handle,

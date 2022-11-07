@@ -19,7 +19,7 @@ use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
-use super::guimenus;
+////use super::guimenus;
 use super::menunone::{MenuNone};
 use crate::t;
 use crate::{GridSelectParams};
@@ -36,7 +36,7 @@ pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;    // a bit much
 pub type MenuGroupLink = Rc<RefCell<dyn MenuGroup>>;
 
 /// ***TEMPORARY IMPORTS*** will leave when more code moves outside of libui
-use crate::guiwindows::{SystemMode, GuiEvent};
+use crate::guiwindows::{GuiEvent};
 
 
 /// Initial values needed to initialize the GUI.
@@ -57,8 +57,12 @@ pub struct GuiAssets {
     pub web_icon: egui::TextureId,
 }
 
-/// All GUI windows persistent state.
-pub struct GuiState {
+//  User interface info specific to the app
+pub trait GenericUiInfo {
+    fn draw_item(&mut self);
+}
+
+pub struct FixedStateInfo {
     //  Data needed in GUI
     pub params: Rc<GuiParams>,                  // starting params
     //  Assets - images, etc.
@@ -66,17 +70,17 @@ pub struct GuiState {
     //  Platform data for context
     pub platform: egui_winit_platform::Platform,
     //  Primary system mode
-    system_mode: SystemMode,                // primary operating mode
+    ////system_mode: SystemMode,                // primary operating mode
     //  Selected grid
-    pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
+    ////pub selected_grid: Option<GridSelectParams>,// params of selected grid, if any
     //  Fixed, reopenable windows.
     pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow,          // miscellaneous messages ***TEMP***
     pub menu_group: MenuGroupLink,              // currently active menu group
     //  Disposable dynamic windows
-    temporary_windows: Vec<GuiWindowLink>,
+    pub temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
-    msg_ok: String,                             // translated OK message
+    pub msg_ok: String,                             // translated OK message
     unique_id: usize,                           // unique ID, serial
     last_interaction_time: instant::Instant,    // time of last user 2D interaction
     pub event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
@@ -85,12 +89,11 @@ pub struct GuiState {
     pub dark_mode_visuals: egui::Visuals,           // dark mode colors, etc.
 }
 
-impl GuiState {
-
+impl FixedStateInfo {
     /// Usual new
     pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
-        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>) -> GuiState {
+        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>) -> Self {
         //  Set up base windows.
         let message_window = MessageWindow::new("Messages", t!("window.messages", &params.lang), MESSAGE_SCROLLBACK_LIMIT);
         let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
@@ -105,7 +108,7 @@ impl GuiState {
         //  Some common words need translations handy
         let msg_ok =  t!("menu.ok", &params.lang).to_string();
         ////let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
-        GuiState {
+        FixedStateInfo {
             platform,
             message_window,
             grid_select_window,
@@ -116,8 +119,8 @@ impl GuiState {
             msg_ok,
             unique_id: 0,
             last_interaction_time: instant::Instant::now(),
-            system_mode: SystemMode::Startup,
-            selected_grid: None,
+            ////system_mode: SystemMode::Startup,
+            ////selected_grid: None,
             event_send_channel,
             event_recv_channel,
             light_mode_visuals,
@@ -136,12 +139,12 @@ impl GuiState {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
         self.platform.begin_frame();
 
-        // Insert egui commands here
-        let show_menus = self.if_gui_awake();
-        let mut inuse = guimenus::draw(self, show_menus); // draws the GUI (BECOMING OBSOLETE)
+        // egui commands run here
+        ////let show_menus = self.if_gui_awake();
+        ////let mut inuse = guimenus::draw(self, show_menus); // draws the GUI (BECOMING OBSOLETE)
         //  Draw the active menus.
         let menu_group = Rc::clone(&self.menu_group);
-        inuse |= menu_group.borrow_mut().draw(self);
+        let mut inuse = menu_group.borrow_mut().draw(self);
         
         inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
         if inuse {
@@ -219,7 +222,7 @@ impl GuiState {
     pub fn if_gui_awake(&self) -> bool {
         self.last_interaction_time.elapsed().as_secs() < self.params.menu_display_secs
     }
-    
+/*    
     pub fn change_mode(&mut self, new_mode: SystemMode) {
         log::info!("System state change: {:?} -> {:?}", self.system_mode, new_mode);
         self.system_mode = new_mode;                    // do state change
@@ -228,7 +231,7 @@ impl GuiState {
     pub fn get_mode(&self) -> SystemMode {
         self.system_mode
     }
-    
+*/    
     /// Sends a user event to the event loop.
     //  This ought to use winit events, but we can't do that yet
     //  because of bug https://github.com/BVE-Reborn/rend3/issues/406
@@ -254,16 +257,36 @@ impl GuiState {
     pub fn add_msg(&mut self, s: String) {
         self.message_window.add_line(s)
     }
+}
 /*    
     //  Open replay file dialog, async version.
     pub fn pick_replay_file_async(&mut self, window: &winit::window::Window) {
         pick_replay_file_async(self, window)
     }
 */
+
+/// All GUI windows persistent state.  Includes the generic part.
+pub struct GuiState<T: GenericUiInfo> {
+    pub fixed_info: FixedStateInfo,         // same regardless of generic
+    pub app_info: T,                            // application-specific info
+}
+
+impl <T: GenericUiInfo> GuiState<T> {
+
+    /// Usual new
+    pub fn new(params: GuiParams, assets: GuiAssets, platform: egui_winit_platform::Platform, 
+        event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
+        event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>, app_info: T) -> GuiState<T> {
+        let fixed_info = FixedStateInfo::new(params, assets, platform, event_send_channel, event_recv_channel);
+        GuiState::<T> {
+            fixed_info,
+            app_info
+        }
+    } 
 }
 
 pub trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context, state: &mut GuiState);    // called every frame
+    fn draw(&mut self, ctx: &egui::Context, state: &mut FixedStateInfo);    // called every frame
     fn retain(&self) -> bool { true }           // override and set to false when done
     fn get_id(&self) -> egui::Id;               // get ID of window
 }
@@ -303,7 +326,7 @@ impl TextWindow {
 
 impl GuiWindow for TextWindow { 
     /// Draw window of text
-    fn draw(&mut self, ctx: &egui::Context, _state: &mut GuiState) {
+    fn draw(&mut self, ctx: &egui::Context, _state: &mut FixedStateInfo) {
         if self.is_open {
             let mut dismissed = false;          // true if dismiss button pushed
             let window = egui::containers::Window::new(self.title.as_str()).id(self.id)
@@ -464,7 +487,7 @@ impl log::Log for MessageLogger {
                 record.target(),
                 record.args());
         let event = GuiEvent::LogMessage(s);
-        if let Err(e) = GuiState::send_gui_event_on_channel(&self.send_channel, event) {
+        if let Err(e) = FixedStateInfo::send_gui_event_on_channel(&self.send_channel, event) {
             println!("Error {}:{} -- {} could not be sent to GUI: {:?}", record.level(), record.target(), record.args(), e);
         }
     }
