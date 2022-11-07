@@ -7,9 +7,9 @@
 //  Animats
 //  November 2022
 //
-use libui::{FixedStateInfo, MenuGroup, MenuGroupLink};
+use libui::{CommonState, MenuGroup, MenuGroupLink};
 use libui::{GuiEvent}; //    ***TEMP*** these are moving out of libui
-use super::super::uiinfo::{UiInfo};
+////use super::super::uiinfo::{UiInfo};
 use core::cell::RefCell;
 use std::rc::Rc;
 
@@ -35,7 +35,7 @@ impl MenuGroup for MenuStart {
 
     /// Draws the menu set for Start state.
     //  Called on every frame. Do not delay here.
-    fn draw(&mut self, state: &mut FixedStateInfo) -> bool {                          
+    fn draw(&mut self, state: &mut CommonState) -> bool {                          
         // Insert egui commands here to draw the menus for thie state.
         let ctx = state.platform.context();
         //  Draw the splash screen with a big set of alternative metaverses.

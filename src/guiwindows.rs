@@ -9,7 +9,7 @@
 //
 use std::path::PathBuf;
 use crate::t;
-use crate::{LoginParams, GridSelectParams, FixedStateInfo};
+use crate::{LoginParams, GridSelectParams, CommonState};
 
 /// User events sent to the main event loop
 #[derive(Debug)]
@@ -47,7 +47,7 @@ pub enum SystemMode {
 
 /// Pick replay file, async form
 #[cfg (feature="replay")]
-pub fn pick_replay_file_async(state: &mut FixedStateInfo, window: &winit::window::Window) {
+pub fn pick_replay_file_async(state: &mut CommonState, window: &winit::window::Window) {
     fn execute<F: std::future::Future<Output = ()> + Send + 'static>(f: F) {
         // this is stupid... use any executor of your choice instead
         std::thread::spawn(move || futures::executor::block_on(f));
@@ -75,7 +75,7 @@ pub fn pick_replay_file_async(state: &mut FixedStateInfo, window: &winit::window
             None
         };
         //  Send dialog result to the main event loop for action.
-        let _ = FixedStateInfo::send_gui_event_on_channel(&channel, GuiEvent::OpenReplay(replay_path_opt)); // if we can't send, we must be shutting down
+        let _ = CommonState::send_gui_event_on_channel(&channel, GuiEvent::OpenReplay(replay_path_opt)); // if we can't send, we must be shutting down
     });
 }
 

@@ -6,7 +6,7 @@
 //  Animats
 //  November 2022
 //
-use libui::{FixedStateInfo, MenuGroup, MenuGroupLink};
+use libui::{CommonState, MenuGroup, MenuGroupLink};
 use libui::t;
 use egui::{menu, Frame};
 use log::{LevelFilter};
@@ -47,7 +47,7 @@ impl MenuGroup for MenuConnected {
 
     /// Draws the menu set for Login state.
     //  Called on every frame. Do not delay here.
-    fn draw(&mut self, state: &mut FixedStateInfo) -> bool {                          
+    fn draw(&mut self, state: &mut CommonState) -> bool {                          
         // Insert egui commands here
         let ctx = state.platform.context();
         //  Top menu bar

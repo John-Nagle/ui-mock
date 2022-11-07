@@ -23,7 +23,7 @@ pub fn manu_preferences(_ui: &mut Ui, state: &mut CommonState) {
 }
 
 /// Avatar->Quit
-pub fn menu_quit(_ui: &mut Ui, state: &mut FixedStateInfo) {
+pub fn menu_quit(_ui: &mut Ui, state: &mut CommonState) {
     let _ = state.send_gui_event(GuiEvent::Shutdown); // tell main loop to quit
 }
 

@@ -6,7 +6,7 @@
 //  Animats
 //  November 2022
 //
-use libui::{FixedStateInfo, GuiEvent, MenuGroup, MenuGroupLink};
+use libui::{CommonState, GuiEvent, MenuGroup, MenuGroupLink};
 use libui::t;
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -31,7 +31,7 @@ impl MenuGroup for MenuLogin {
 
     /// Draws the menu set for Login state.
     //  Called on every frame. Do not delay here.
-    fn draw(&mut self, state: &mut FixedStateInfo) -> bool {                          
+    fn draw(&mut self, state: &mut CommonState) -> bool {                          
         // Login to a grid
         let ctx = state.platform.context();
 

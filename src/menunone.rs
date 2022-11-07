@@ -8,7 +8,7 @@
 //  Animats
 //  November 2022
 //
-use crate::{MenuGroup, MenuGroupLink, FixedStateInfo};
+use crate::{MenuGroup, MenuGroupLink, CommonState};
 use core::cell::RefCell;
 use std::rc::Rc;
 
@@ -31,7 +31,7 @@ impl MenuGroup for MenuNone {
 
     /// Draws the menu set for Login state.
     //  Called on every frame. Do not delay here.
-    fn draw(&mut self, _state: &mut FixedStateInfo) -> bool {                          
+    fn draw(&mut self, _state: &mut CommonState) -> bool {                          
         // Insert egui commands here
         //  Nothing to do, this is MenuNone.
         true
