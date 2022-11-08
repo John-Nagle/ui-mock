@@ -49,6 +49,7 @@ pub struct GuiParams {
 
 /// Common events any app can use.
 //  The app can define more app-specific events.
+#[derive(Debug)]
 pub enum GuiCommonEvent {
     ErrorMessage((String, Vec<String>)),            // pops up an warning dialog (title, [text])
     LogMessage(String),                             // log to GUI
