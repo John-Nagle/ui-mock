@@ -232,8 +232,8 @@ impl CommonState {
     }
     /// Send, given channel
     pub fn send_gui_event_on_channel(channel: &crossbeam_channel::Sender<SendAnyBoxed>, boxed_event: SendAnyBoxed) -> Result<(), Error> {
-        if let Err(_) = channel.send(boxed_event) { 
-            Err(anyhow!("Error sending GUI event on channel"))  // have to do this because error from send is not sync
+        if let Err(e) = channel.send(boxed_event) { 
+            Err(anyhow!("Error sending GUI event on channel: {:?}", e))  // have to do this because error from send is not sync
         } else {
             Ok(())
         }

@@ -11,16 +11,16 @@
 //  Animats
 //  June 2022
 //
-use libui;
+mod examplesupport;
+mod dialogs;
+mod uiinfo;
+
 use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, GuiCommonEvent, SendAnyBoxed};
 use libui::{t, get_log_file_name, get_executable_name, panic_dialog};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
 use anyhow::{Error};
-mod examplesupport;
-mod dialogs;
-mod uiinfo;
 use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
 use dialogs::guilogin::{LoginDialogWindow};
 use dialogs::guigrid::GridSelectWindow;
@@ -61,6 +61,7 @@ pub struct Ui {
 impl Ui {
     /// Create the top-level user interface struct.
     //  This owns everything.
+    #[allow(clippy::new_without_default)]   // don't need a default. Only used once.
     pub fn new() -> Ui {
         //  The message channel which allows other things to send to the UI.
         let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
@@ -127,7 +128,7 @@ impl Ui {
                             } else {
                                 //  This is a login to a grid. Bring up login dialog window.
                                 let id = data.gui_state.common_state.get_unique_id();
-                                data.gui_state.common_state.add_window(LoginDialogWindow::new_link(id, &grid)).unwrap();
+                                data.gui_state.common_state.add_window(LoginDialogWindow::new_link(id, grid)).unwrap();
                             }  
                         }
                         _ => {            
@@ -146,7 +147,7 @@ impl Ui {
             match event {
                 GuiCommonEvent::ErrorMessage((title, messages)) => {   // display message
                     let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
-                    data.gui_state.common_state.add_error_window(&title, &msgs);
+                    data.gui_state.common_state.add_error_window(title, &msgs);
                 }
                 GuiCommonEvent::LogMessage(s) => {
                     data.gui_state.common_state.add_msg(s.to_string())
@@ -157,7 +158,7 @@ impl Ui {
                 }                                       // shut down and exit
             }
         } else {
-            log::error!("Invalid non GuiEvent/GuiCommonEvent in handle_user_event: {:?}", raw_event); return;
+            log::error!("Invalid non GuiEvent/GuiCommonEvent in handle_user_event: {:?}", raw_event);
         }
     }
     
@@ -424,7 +425,7 @@ impl rend3_framework::App for Ui {
 
                 let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
                 */
-                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(&window);  // build the 2D GUI
+                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window);  // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,

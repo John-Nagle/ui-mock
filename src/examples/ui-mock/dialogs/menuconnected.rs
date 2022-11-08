@@ -147,7 +147,7 @@ impl MenuGroup for MenuConnected {
     
     /// Ident for debug purposes
     fn get_name(&self) -> &'static str {
-        &"Connected"
+        "Connected"
     }
 }
 

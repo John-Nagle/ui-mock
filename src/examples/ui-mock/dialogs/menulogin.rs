@@ -55,7 +55,7 @@ impl MenuGroup for MenuLogin {
     
     /// Ident for debug purposes
     fn get_name(&self) -> &'static str {
-        &"Login"
+        "Login"
     }
 }
 

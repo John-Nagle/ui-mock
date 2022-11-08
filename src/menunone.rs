@@ -1,5 +1,4 @@
-//
-//  menunone.rs -- the null MenuGroup
+///#  menunone.rs -- the null MenuGroup
 //
 //  Just used to get started.
 //  Also useful when you need a template for making a MenuGroup.
@@ -25,8 +24,6 @@ impl MenuNone  {
     pub fn new_link() -> MenuGroupLink {
         Rc::new(RefCell::new(MenuNone{}))                          // create a trait object to dispatch
     }
-    
-
 }
 
 impl MenuGroup for MenuNone {
@@ -40,6 +37,6 @@ impl MenuGroup for MenuNone {
     }
     /// Ident for debug purposes
     fn get_name(&self) -> &'static str {
-        &"---"
+        "---"
     }
 }

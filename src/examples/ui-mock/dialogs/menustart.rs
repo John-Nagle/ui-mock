@@ -53,7 +53,7 @@ impl MenuGroup for MenuStart {
     
     /// Ident for debug purposes
     fn get_name(&self) -> &'static str {
-        &"Start"
+        "Start"
     }
 }
 
