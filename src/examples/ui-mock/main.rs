@@ -89,7 +89,6 @@ impl Ui {
                         t!("window.grid_select", &data.gui_state.common_state.params.lang), 
                         &data.gui_state.common_state.assets, data.gui_state.app_state.grid_select_params.clone());
                     let start_menu = dialogs::menustart::MenuStart::new_link(grid_select_window);
-                    println!("Setting menu group"); // ***TEMP***
                     data.gui_state.common_state.set_menu_group(start_menu);
 
                 }
@@ -109,9 +108,13 @@ impl Ui {
                 }
                 GuiEvent::LoginTo(grid) => {
                     //  Grid has been selected, now try to log in.
+                    //  Bring up a background with a top menu bar plus a login dialog.
+                    
                     match data.gui_state.app_state.get_mode() {
                         SystemMode::Startup => {
                             data.gui_state.app_state.change_mode(SystemMode::Login);  // advance to login state
+                            let login_menu = dialogs::menulogin::MenuLogin::new_link();
+                            data.gui_state.common_state.set_menu_group(login_menu);
                             let is_file_pick = grid.data.login_url.is_none();
                             data.gui_state.app_state.selected_grid = Some(grid.clone());  // set the selected grid
                             if is_file_pick {
@@ -294,7 +297,7 @@ impl Ui {
         let event_recv_channel = self.event_recv_channel.take().unwrap();
         //  Set initial state of app-level UI info
         let app_state = UiInfo::new(grid_select_params);
-        //  Main state of the GUI
+        //  Set up main state of the GUI
         let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel, app_state);  
         self.data = Some(UiData {
             _object_handle,

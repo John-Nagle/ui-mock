@@ -39,9 +39,7 @@ impl MenuGroup for MenuLogin {
         //  Top menu bar
         egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {
             if ui.button(t!("menu.unimplemented", state.get_lang())).clicked() {
-                ////state.selected_grid = None;                 // clear grid selection ***MOVE TO APP LEVEL***
                 let _ = state.send_boxed_gui_event(Box::new(GuiEvent::Startup)); // tell main which grid has been selected.
-                ////state.change_mode(SystemMode::Start);       // back to start state
             }
         });
 
