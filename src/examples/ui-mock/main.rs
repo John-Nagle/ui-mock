@@ -24,6 +24,7 @@ mod uiinfo;
 use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
 use dialogs::guilogin::{LoginDialogWindow};
 use dialogs::guigrid::GridSelectWindow;
+use dialogs::menuconnected::{MenuConnected};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
@@ -96,13 +97,14 @@ impl Ui {
                     match path_buf_opt {
                         Some(path_buf) => {
                             println!("Open replay: {:?}", path_buf); // ***TEMP***
-                            //  ***NEED TO PASS path_buf and grid to startup and actually go***
+                            //  ***NEED TO PASS path_buf and grid to startup and actually go*** This is the dummy version
                             data.gui_state.app_state.change_mode(SystemMode::Connected);
+                            let connected_menu = MenuConnected::new_link();
+                            data.gui_state.common_state.set_menu_group(connected_menu);
                         }
                         None => {
                             //  User cancelled replay. Back to ground state.
-                            data.gui_state.app_state.selected_grid = None;            // cancel grid selection
-                            data.gui_state.app_state.change_mode(SystemMode::Startup);  // back to starting state
+                            data.gui_state.common_state.send_boxed_gui_event(Box::new(GuiEvent::Startup)).unwrap(); // Start up the GUI.
                         }
                     }
                 }

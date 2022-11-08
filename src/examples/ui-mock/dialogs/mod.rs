@@ -10,3 +10,4 @@ pub mod guigrid;
 pub mod menustart;
 pub mod menulogin;
 pub mod menuconnected;
+pub mod menuhelp;

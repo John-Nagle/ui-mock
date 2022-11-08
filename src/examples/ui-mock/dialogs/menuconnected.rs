@@ -13,6 +13,7 @@ use log::{LevelFilter};
 use libui::guiactions;  // ***TEMP*** needs to move
 use core::cell::RefCell;
 use std::rc::Rc;
+use super::menuhelp::{menu_help_about, menu_help_manual};   // submenus
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
 /// Grey background for button area.
@@ -87,11 +88,11 @@ impl MenuGroup for MenuConnected {
                     ui.menu_button(t!("menu.help", state.get_lang()), |ui| {
                         // Help menu
                         if ui.button(t!("menu.help", state.get_lang())).clicked() {
-                            guiactions::menu_help_manual(ui, state);
+                            menu_help_manual(ui, state);
                         }
                         if ui.button(t!("menu.help.about", state.get_lang())).clicked() {
                             // About menu entry
-                            guiactions::menu_help_about(ui, state);
+                            menu_help_about(ui, state);
                         }
                     });
                     ui.menu_button(t!("menu.developer", state.get_lang()), |ui| {   

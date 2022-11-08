@@ -10,12 +10,9 @@
 mod basicintl;
 pub mod guiactions; // ***pub is TEMP*** moving elsewhere
 mod guimenus;
-mod guiwindows;
 mod guiutil;
 mod guistate;
-//  The various dialogs
 mod menunone;   // the empty menu
-mod dialogs;
 
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
