@@ -45,11 +45,15 @@ impl MenuGroup for MenuStart {
             if let Some(grid) = self.grid_select_window.draw(&ctx) {  // select desired grid
                 //  A grid has been selected
                 let _ = state.send_boxed_gui_event(Box::new(GuiEvent::LoginTo(grid))); // tell main which grid has been selected.
-
             }
             state.draw(&ctx); // all the standard windows
         });
         true                // menus must stay visible, not time out
+    }
+    
+    /// Ident for debug purposes
+    fn get_name(&self) -> &'static str {
+        &"Start"
     }
 }
 

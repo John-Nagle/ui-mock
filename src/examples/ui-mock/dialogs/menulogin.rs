@@ -54,6 +54,11 @@ impl MenuGroup for MenuLogin {
         state.draw(&ctx); // all the standard windows
         true
     }
+    
+    /// Ident for debug purposes
+    fn get_name(&self) -> &'static str {
+        &"Login"
+    }
 }
 
 

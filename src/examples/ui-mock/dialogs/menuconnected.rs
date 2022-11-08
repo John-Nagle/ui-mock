@@ -143,6 +143,11 @@ impl MenuGroup for MenuConnected {
     //  Finish
         ctx.is_pointer_over_area() // True if GUI is in use
     }
+    
+    /// Ident for debug purposes
+    fn get_name(&self) -> &'static str {
+        &"Connected"
+    }
 }
 
 

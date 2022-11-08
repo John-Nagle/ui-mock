@@ -19,12 +19,9 @@ use anyhow::{anyhow, Error};
 use simplelog::LevelFilter;
 use super::basicintl::Dictionary;
 use super::guiutil;
-////use super::guimenus;
 use super::menunone::{MenuNone};
 use crate::t;
-////use crate::{GridSelectParams};
 use crate::{MenuGroup};
-////use super::dialogs::guigrid::GridSelectWindow;
 use rend3::{ExtendedAdapterInfo};
 use simplelog::{SharedLogger};
 /// Configuration
@@ -128,6 +125,7 @@ impl CommonState {
     /// Set the currently active menu group. Consumes menu group
     //  So, on a state change, we have to build a new menu group.
     pub fn set_menu_group(&mut self, menu_group: MenuGroupLink) {
+        println!("Displaying menu group {}", menu_group.borrow().get_name()); // ***TEMP***
         self.menu_group = menu_group;
     }
     
@@ -219,16 +217,6 @@ impl CommonState {
     pub fn if_gui_awake(&self) -> bool {
         self.last_interaction_time.elapsed().as_secs() < self.params.menu_display_secs
     }
-/*    
-    pub fn change_mode(&mut self, new_mode: SystemMode) {
-        log::info!("System state change: {:?} -> {:?}", self.system_mode, new_mode);
-        self.system_mode = new_mode;                    // do state change
-    }
-    
-    pub fn get_mode(&self) -> SystemMode {
-        self.system_mode
-    }
-*/    
     /// Sends a user event to the event loop.
     //  Common events only
     pub fn send_gui_event(&self, event: GuiCommonEvent) -> Result<(), Error> {

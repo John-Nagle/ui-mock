@@ -89,6 +89,7 @@ impl Ui {
                         t!("window.grid_select", &data.gui_state.common_state.params.lang), 
                         &data.gui_state.common_state.assets, data.gui_state.app_state.grid_select_params.clone());
                     let start_menu = dialogs::menustart::MenuStart::new_link(grid_select_window);
+                    println!("Setting menu group"); // ***TEMP***
                     data.gui_state.common_state.set_menu_group(start_menu);
 
                 }
@@ -304,7 +305,7 @@ impl Ui {
             gui_state,
             quit: false,
         });
-        self.data.as_mut().unwrap().gui_state.app_state.change_mode(SystemMode::Startup);          // go to starting state
+        self.data.as_mut().unwrap().gui_state.common_state.send_boxed_gui_event(Box::new(GuiEvent::Startup)).unwrap(); // Start up the GUI.
         Ok(())
     }
 

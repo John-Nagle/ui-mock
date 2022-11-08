@@ -34,4 +34,5 @@ pub use basicintl::{Dictionary};
 /// A group of menus. Libui user sets what menus are to be shown.
 pub trait MenuGroup {
     fn draw(&mut self, state: &mut CommonState) -> bool;    // returns true if menu is in use
+    fn get_name(&self) -> &'static str;     // name for debug and logging purposes only
 }

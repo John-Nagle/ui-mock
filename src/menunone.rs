@@ -25,6 +25,8 @@ impl MenuNone  {
     pub fn new_link() -> MenuGroupLink {
         Rc::new(RefCell::new(MenuNone{}))                          // create a trait object to dispatch
     }
+    
+
 }
 
 impl MenuGroup for MenuNone {
@@ -35,5 +37,9 @@ impl MenuGroup for MenuNone {
         // Insert egui commands here
         //  Nothing to do, this is MenuNone.
         true
+    }
+    /// Ident for debug purposes
+    fn get_name(&self) -> &'static str {
+        &"---"
     }
 }
