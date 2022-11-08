@@ -80,8 +80,10 @@ impl Ui {
         //  The dynamic typing is to get the definition of GuiEvent out of
         //  libui.
         let data = self.data.as_mut().unwrap();
-        if let Some(event) = raw_event.downcast_ref::<GuiEvent>() {
+        if let Some(event) = raw_event.downcast_ref::<GuiEvent>() {          
             log::warn!("GuiEvent: {:?}", event);
+            eventswitch::handle_gui_event(data, window, event); // main GUI event handler switch
+            /*
             match event {
                 //  Go to start state.
                 GuiEvent::Startup => {
@@ -142,7 +144,8 @@ impl Ui {
                 GuiEvent::LoginStart(_login_params) => {
                     data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
                 }
-            }                      
+            }      
+            */                
         } else if let Some(event) = raw_event.downcast_ref::<GuiCommonEvent>() {
             match event {
                 GuiCommonEvent::ErrorMessage((title, messages)) => {   // display message

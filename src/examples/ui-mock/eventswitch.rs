@@ -1,4 +1,3 @@
-
 /// #eventswitch.rs -- fan out and handle events.
 //
 //  The main switch for GUI events.
@@ -23,7 +22,7 @@ use super::uiinfo;
 use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
 
 ///  Handle GuiEvent
-pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event: GuiEvent) {
+pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event: &GuiEvent) {
     //  Events can be a GuiEvent or a GuiCommonEvent.
     //  The dynamic typing is to get the definition of GuiEvent out of
     //  libui.
