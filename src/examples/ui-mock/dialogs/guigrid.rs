@@ -5,7 +5,7 @@
 //  Animats
 //  October 2022
 //
-////use rend3_egui::EguiRenderRoutine;
+use std::rc::Rc;
 use crate::{GuiAssets};
 use super::super::uiinfo::{GridSelectParams};
 /// Basic info about a grid for the splash page
@@ -18,12 +18,12 @@ pub struct GridSelectWindow {
     title: String, // title of window
     id: egui::Id,  // unique ID
     web_icon: egui::TextureId,  // icon for web button
-    grids: Vec<GridSelectParams>, // available grids
+    grids: Rc<Vec<GridSelectParams>>, // available grids
 }
 
 impl GridSelectWindow {
     /// Create scrollable message window
-    pub fn new(id: &str, title: &str, assets: &GuiAssets, grids: Vec<GridSelectParams>) -> Self {
+    pub fn new(id: &str, title: &str, assets: &GuiAssets, grids: Rc<Vec<GridSelectParams>>) -> Self {
         GridSelectWindow {
             id: egui::Id::new(id),
             title: title.to_string(),

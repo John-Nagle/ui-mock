@@ -9,6 +9,7 @@
 //
 use libui::{CommonState, MenuGroup, MenuGroupLink};
 use super::super::uiinfo::GuiEvent;
+use super::super:: dialogs::guigrid::{GridSelectWindow};
 ////use super::super::uiinfo::{UiInfo};
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -21,13 +22,13 @@ use std::rc::Rc;
 //  The start screen. A scrolling list of big image buttons, one
 //  for each metaverse.
 pub struct MenuStart {
-    //  No status at this time.
+    grid_select_window: GridSelectWindow,                           // the window with the big buttons..
 }
 
 impl MenuStart {
     /// Create new, as trait object
-    pub fn new_link() -> MenuGroupLink {
-        Rc::new(RefCell::new(MenuStart{}))                          // create a trait object to dispatch
+    pub fn new_link(grid_select_window: GridSelectWindow) -> MenuGroupLink {
+        Rc::new(RefCell::new(MenuStart{grid_select_window}))                          // create a trait object to dispatch
     }
 }
 
@@ -41,7 +42,7 @@ impl MenuGroup for MenuStart {
         //  Draw the splash screen with a big set of alternative metaverses.
         //
         egui::CentralPanel::default().show(&ctx, |_ui| {
-            if let Some(grid) = state.grid_select_window.draw(&ctx) {  // select desired grid
+            if let Some(grid) = self.grid_select_window.draw(&ctx) {  // select desired grid
                 //  A grid has been selected
                 let _ = state.send_boxed_gui_event(Box::new(GuiEvent::LoginTo(grid))); // tell main which grid has been selected.
 

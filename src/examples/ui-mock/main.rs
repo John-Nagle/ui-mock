@@ -13,7 +13,7 @@
 //
 use libui;
 use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, SendAnyBoxed};
-use libui::{get_log_file_name, get_executable_name, panic_dialog};
+use libui::{t, get_log_file_name, get_executable_name, panic_dialog};
 use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
@@ -23,6 +23,7 @@ mod dialogs;
 mod uiinfo;
 use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
 use dialogs::guilogin::{LoginDialogWindow};
+use dialogs::guigrid::GridSelectWindow;
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
@@ -83,10 +84,16 @@ impl Ui {
         };
         let data = self.data.as_mut().unwrap();
         match event {
-            //  Login aborted, back to start state.
+            //  Go to start state.
             GuiEvent::Startup => {
                 data.gui_state.app_state.selected_grid = None;                    // cancel grid selection
                 data.gui_state.app_state.change_mode(SystemMode::Startup);          // back to starting state
+                let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", 
+                    &data.gui_state.common_state.params.lang), 
+                    &data.gui_state.common_state.assets, data.gui_state.app_state.grid_select_params.clone());
+                let start_menu = dialogs::menustart::MenuStart::new_link(grid_select_window);
+                data.gui_state.common_state.set_menu_group(start_menu);
+
             }
             GuiEvent::OpenReplay(path_buf_opt) => {     // open a replay file
                 match path_buf_opt {
@@ -282,7 +289,7 @@ impl Ui {
         let event_send_channel = self.event_send_channel.clone();
         let event_recv_channel = self.event_recv_channel.take().unwrap();
         //  Set initial state of app-level UI info
-        let app_state = UiInfo::new();
+        let app_state = UiInfo::new(grid_select_params);
         //  Main state of the GUI
         let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel, app_state);  
         self.data = Some(UiData {
