@@ -10,10 +10,10 @@ use libui::{CommonState, MenuGroup, MenuGroupLink};
 use libui::t;
 use egui::{menu, Frame};
 use log::{LevelFilter};
-use libui::guiactions;  // ***TEMP*** needs to move
 use core::cell::RefCell;
 use std::rc::Rc;
 use super::menuhelp::{menu_help_about, menu_help_manual};   // submenus
+use super::menuavatar;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
 /// Grey background for button area.
@@ -60,11 +60,11 @@ impl MenuGroup for MenuConnected {
                         // Avatar menu
                         if ui.button(t!("menu.avatar.preferences", state.get_lang())).clicked() {
                             // Preferences menu entry
-                            guiactions::manu_preferences(ui, state);
+                            menuavatar::manu_preferences(ui, state);
                         }
 
                         if ui.button(t!("menu.avatar.quit", state.get_lang())).clicked() {
-                            guiactions::menu_quit(ui, state);
+                            menuavatar::menu_quit(ui, state);
                         }
                     });
                     ui.menu_button(t!("menu.comm", state.get_lang()), |ui| {

@@ -1,5 +1,5 @@
 //
-//  guiactions.rs -- GUI menu and button actions
+//  menuavatar.rs -- Avatar submenu
 //
 //  Animats
 //  June, 2022
@@ -8,7 +8,8 @@
 //
 use crate::t;
 use egui::Ui;
-use crate::{CommonState, GuiCommonEvent};
+use libui::{CommonState};
+use crate::{GuiCommonEvent};
 
 //
 /// Avatar->Preferences
