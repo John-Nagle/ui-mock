@@ -14,6 +14,7 @@
 mod examplesupport;
 mod dialogs;
 mod uiinfo;
+mod eventswitch;
 
 use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, GuiCommonEvent, SendAnyBoxed};
 use libui::{t, get_log_file_name, get_executable_name, panic_dialog};
@@ -46,7 +47,6 @@ pub struct UiData {
 impl UiData {
 
 }
-
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// The application.
