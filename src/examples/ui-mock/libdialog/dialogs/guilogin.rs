@@ -278,6 +278,9 @@ impl GuiWindow for LoginDialogWindow {
                 });
             });
             if accepted || !not_cancelled { self.is_open = false; } // do here to avoid borrow clash
+            if !not_cancelled {                                     // user clicked close box                                   
+                let _ = state.send_boxed_gui_event(Box::new(GuiEvent::Startup)); // back to ground state
+            }
         }
     }
     
