@@ -12,9 +12,7 @@
 //  June 2022
 //
 mod examplesupport;
-mod dialogs;
-mod uiinfo;
-mod eventswitch;
+mod libdialog;
 
 use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, GuiCommonEvent, SendAnyBoxed};
 use libui::{t, get_log_file_name, get_executable_name, panic_dialog};
@@ -22,7 +20,8 @@ use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
 use anyhow::{Error};
-use uiinfo::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams};
+use libdialog::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams};
+use libdialog::{handle_gui_event};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
@@ -64,7 +63,7 @@ impl AppUi {
         let data = self.data.as_mut().unwrap();
         if let Some(event) = raw_event.downcast_ref::<GuiEvent>() {          
             log::warn!("GuiEvent: {:?}", event);
-            eventswitch::handle_gui_event(data, window, event); // main GUI event handler switch
+            handle_gui_event(data, window, event); // main GUI event handler switch
         } else if let Some(event) = raw_event.downcast_ref::<GuiCommonEvent>() {
             //  Handle standard utility-type events.
             match event {
