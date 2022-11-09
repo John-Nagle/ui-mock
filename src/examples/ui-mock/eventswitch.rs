@@ -7,19 +7,14 @@
 //  Animats
 //  November, 2022
 //
-use libui::{
-    Dictionary, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger, SendAnyBoxed,
-};
 use super::dialogs;
 use dialogs::guilogin::{LoginDialogWindow};
 use dialogs::menuconnected::{MenuConnected};
 use dialogs::guigrid::{GridSelectWindow};
 
-// Workaround for naming problem. Need to rename Ui because of conflict with egui::Ui
-use crate::UiData ;
 use libui::{t};
 use super::uiinfo;
-use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
+use uiinfo::{UiData, SystemMode, GuiEvent, pick_replay_file_async};
 
 ///  Handle GuiEvent
 pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event: &GuiEvent) {

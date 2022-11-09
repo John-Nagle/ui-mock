@@ -13,7 +13,7 @@ use std::sync::Arc;
 use std::rc::{Rc};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
-use libui::{t, AppState, CommonState};
+use libui::{t,GuiState, AppState, CommonState};
 use libui::{load_image};
 use super::dialogs::guilogin::LoginParams;
 
@@ -48,9 +48,29 @@ pub enum SystemMode {
             // -> Exit, Start
 }
 
+/// Part of AppUi
+pub struct UiData {
+    //  These keep reference-counted Rend3 objects alive.
+    pub _object_handle: rend3::types::ObjectHandle,
+    pub _material_handle: rend3::types::MaterialHandle,
+    pub _directional_handle: rend3::types::DirectionalLightHandle,
+
+    pub egui_routine: rend3_egui::EguiRenderRoutine,
+    pub start_time: instant::Instant,
+    pub quit: bool,                                 // global quit flag
+
+    //  The 2D GUI
+    pub gui_state: GuiState<UiInfo>,                // state of the GUI
+}
+
+impl UiData {
+
+}
+
 
 
 /// Generic parameter to GuiState, containing app-specific info.
+//  Data passed through GuiState, but not interpreted by it.
 #[derive(Debug)]
 pub struct UiInfo {
     //  Primary system mode

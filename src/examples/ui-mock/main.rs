@@ -22,35 +22,16 @@ use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
 use anyhow::{Error};
-use uiinfo::{UiInfo, SystemMode, GuiEvent, GridSelectParams, pick_replay_file_async};
-use dialogs::guilogin::{LoginDialogWindow};
-use dialogs::guigrid::GridSelectWindow;
-use dialogs::menuconnected::{MenuConnected};
+use uiinfo::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
 
-pub struct UiData {
-    //  These keep reference-counted Rend3 objects alive.
-    _object_handle: rend3::types::ObjectHandle,
-    _material_handle: rend3::types::MaterialHandle,
-    _directional_handle: rend3::types::DirectionalLightHandle,
 
-    egui_routine: rend3_egui::EguiRenderRoutine,
-    start_time: instant::Instant,
-    quit: bool,                                 // global quit flag
-
-    //  The 2D GUI
-    gui_state: GuiState<UiInfo>,                // state of the GUI
-}
-
-impl UiData {
-
-}
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// The application.
-pub struct Ui {
+pub struct AppUi {
     data: Option<UiData>,
     //  UI event channel.
     //  We have to do this at the outer level so the logger can access it early.
@@ -58,14 +39,15 @@ pub struct Ui {
     event_recv_channel: Option<crossbeam_channel::Receiver<SendAnyBoxed>>,
 }
 
-impl Ui {
+impl AppUi {
     /// Create the top-level user interface struct.
     //  This owns everything.
     #[allow(clippy::new_without_default)]   // don't need a default. Only used once.
-    pub fn new() -> Ui {
+    pub fn new() -> Self {
         //  The message channel which allows other things to send to the UI.
         let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
-        Ui {
+        
+        AppUi {
             data: None,
             event_recv_channel: Some(event_recv_channel),   // because it will be taken
             event_send_channel: event_send_channel.clone(),          
@@ -259,7 +241,7 @@ impl Ui {
 }
 
 /// This is an instance of the Rend3 application framework.
-impl rend3_framework::App for Ui {
+impl rend3_framework::App for AppUi {
     const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
 
     fn sample_count(&self) -> rend3::types::SampleCount {
@@ -448,6 +430,7 @@ impl rend3_framework::App for Ui {
     }
 }
 
+/// The main program.
 fn main() {
     #[cfg(feature = "tracy")]
     let _client = tracy_client::Client::start();    // enable profiler if "tracy" feature is on
@@ -455,7 +438,7 @@ fn main() {
     assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
     profiling::scope!("Main");
     profiling::register_thread!();
-    let app = Ui::new();
+    let app = AppUi::new();
     rend3_framework::start(
         app,
         winit::window::WindowBuilder::new()
