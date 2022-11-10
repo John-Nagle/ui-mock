@@ -9,8 +9,7 @@
 //
 use libui::{CommonState, MenuGroup, MenuGroupLink};
 use super::super::uiinfo::GuiEvent;
-use super::super:: dialogs::guigrid::{GridSelectWindow};
-////use super::super::uiinfo::{UiInfo};
+use super::super:: dialogs::dialoggrid::{GridSelectWindow};
 use core::cell::RefCell;
 use std::rc::Rc;
 

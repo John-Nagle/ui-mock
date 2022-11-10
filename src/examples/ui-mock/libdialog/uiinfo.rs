@@ -15,7 +15,7 @@ use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use libui::{t,GuiState, AppState, CommonState};
 use libui::{load_image};
-use super::dialogs::guilogin::LoginParams;
+use super::dialogs::dialoglogin::LoginParams;
 
 /// User events sent to the main event loop.
 //  These are specific to the application. libui has a few more.

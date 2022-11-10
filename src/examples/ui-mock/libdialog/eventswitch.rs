@@ -8,9 +8,9 @@
 //  November, 2022
 //
 use super::dialogs;
-use dialogs::guilogin::{LoginDialogWindow};
+use dialogs::dialoglogin::{LoginDialogWindow};
+use dialogs::dialoggrid::{GridSelectWindow};
 use dialogs::menuconnected::{MenuConnected};
-use dialogs::guigrid::{GridSelectWindow};
 
 use libui::{t};
 use super::uiinfo;

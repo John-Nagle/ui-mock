@@ -3,8 +3,8 @@
 //
 //  Menus and dialogs. Usually one per file.
 //  Dialogs
-pub mod guilogin;
-pub mod guigrid;
+pub mod dialoglogin;
+pub mod dialoggrid;
 
 //  Menus and submenus
 pub mod menustart;
