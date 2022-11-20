@@ -298,5 +298,10 @@ impl GuiWindow for LoginDialogWindow {
     /// For downcasting
     fn as_any(&self) -> &dyn Any {
         self
+    }
+    
+    /// For downcasting
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }    
 }

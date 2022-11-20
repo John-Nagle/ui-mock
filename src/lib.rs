@@ -34,6 +34,7 @@ pub trait MenuGroup {
     fn draw(&mut self, state: &mut CommonState) -> bool;    // returns true if menu is in use
     fn get_name(&self) -> &'static str;     // name for debug and logging purposes only
     fn as_any(&self) -> &dyn Any;               // for downcasting
+    fn as_any_mut(&mut self) -> &mut dyn Any;   // for downcasting
 }
 
 /// A GUI window
@@ -42,6 +43,7 @@ pub trait GuiWindow {
     fn retain(&self) -> bool { true }           // override and set to false when done
     fn get_id(&self) -> egui::Id;               // get ID of window
     fn as_any(&self) -> &dyn Any;               // for downcasting
+    fn as_any_mut(&mut self) -> &mut dyn Any;   // for downcasting
 }
 
 pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>; 
