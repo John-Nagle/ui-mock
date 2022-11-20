@@ -12,6 +12,7 @@ use super::super::uiinfo::GuiEvent;
 use super::super:: dialogs::dialoggrid::{GridSelectWindow};
 use core::cell::RefCell;
 use std::rc::Rc;
+use core::any::Any;
 
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
@@ -54,6 +55,11 @@ impl MenuGroup for MenuStart {
     fn get_name(&self) -> &'static str {
         "Start"
     }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    } 
 }
 
 

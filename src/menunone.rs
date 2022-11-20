@@ -10,6 +10,7 @@
 use crate::{MenuGroup, MenuGroupLink, CommonState};
 use core::cell::RefCell;
 use std::rc::Rc;
+use core::any::Any;
 
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
@@ -38,5 +39,10 @@ impl MenuGroup for MenuNone {
     /// Ident for debug purposes
     fn get_name(&self) -> &'static str {
         "---"
+    }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

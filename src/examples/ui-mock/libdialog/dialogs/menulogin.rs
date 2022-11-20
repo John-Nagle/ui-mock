@@ -11,6 +11,7 @@ use libui::t;
 use super::super::uiinfo::GuiEvent;
 use core::cell::RefCell;
 use std::rc::Rc;
+use core::any::Any;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
 /// Update the GUI. Called on each frame.
@@ -57,6 +58,11 @@ impl MenuGroup for MenuLogin {
     fn get_name(&self) -> &'static str {
         "Login"
     }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    } 
 }
 
 

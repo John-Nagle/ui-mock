@@ -21,7 +21,7 @@ use super::basicintl::Dictionary;
 use super::guiutil;
 use super::menunone::{MenuNone};
 use crate::t;
-use crate::{MenuGroup};
+use crate::{MenuGroupLink, GuiWindow, GuiWindowLink};
 use rend3::{ExtendedAdapterInfo};
 use simplelog::{SharedLogger};
 /// Configuration
@@ -29,8 +29,6 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200;   // max scrollback for message win
 /// Useful types
 pub type SendAny = dyn Any + Send;                  // Can send anything across a channel. Must be boxed, though.
 pub type SendAnyBoxed = Box<SendAny>;               // the boxed version
-pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;    // a bit much
-pub type MenuGroupLink = Rc<RefCell<dyn MenuGroup>>;
 
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
@@ -125,7 +123,7 @@ impl CommonState {
     /// Set the currently active menu group. Consumes menu group
     //  So, on a state change, we have to build a new menu group.
     pub fn set_menu_group(&mut self, menu_group: MenuGroupLink) {
-        println!("Displaying menu group {}", menu_group.borrow().get_name()); // ***TEMP***
+        log::info!("Displaying menu group {}", menu_group.borrow().get_name());
         self.menu_group = menu_group;
     }
     
@@ -270,12 +268,6 @@ impl <T: AppState> GuiState<T> {
     } 
 }
 
-pub trait GuiWindow {
-    fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState);    // called every frame
-    fn retain(&self) -> bool { true }           // override and set to false when done
-    fn get_id(&self) -> egui::Id;               // get ID of window
-}
-
 /// Text window, with noninteractive content.
 //  The persistent part
 pub struct TextWindow {
@@ -359,7 +351,12 @@ impl GuiWindow for TextWindow {
     //  Access ID
     fn get_id(&self) -> egui::Id {
         self.id
-    }   
+    }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    } 
 }
 
 /// A scrolling text message window.

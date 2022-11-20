@@ -12,6 +12,7 @@ use egui::{menu, Frame};
 use log::{LevelFilter};
 use core::cell::RefCell;
 use std::rc::Rc;
+use core::any::Any;
 use super::menuhelp::{menu_help_about, menu_help_manual};   // submenus
 use super::menuavatar;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
@@ -149,6 +150,11 @@ impl MenuGroup for MenuConnected {
     fn get_name(&self) -> &'static str {
         "Connected"
     }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    } 
 }
 
 

@@ -4,6 +4,7 @@
 //  October 2022
 //
 use std::rc::Rc;
+use core::any::Any;
 use core::cell::RefCell;
 use anyhow::{Error, anyhow};
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -292,5 +293,10 @@ impl GuiWindow for LoginDialogWindow {
     //  Access ID
     fn get_id(&self) -> egui::Id {
         self.id
-    }   
+    }
+    
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    }    
 }
