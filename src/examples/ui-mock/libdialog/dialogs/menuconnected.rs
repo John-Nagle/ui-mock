@@ -129,21 +129,19 @@ impl MenuGroup for MenuConnected {
                 .frame(Frame::none().fill(TRANSLUCENT_GREY_COLOR32))
                 .show(&ctx, |ui| {
                     ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
+                    let response = ui.add(&mut self.move_arrows);
+                    if response.clicked() {
+                        let action = self.move_arrows.decode_response(&response);
+                        println!("Move arrows: {:?}", action);
+                    }
+                    /*
                     if ui
-                        .add(
-                            &mut self.move_arrows
-                            /*
-                            egui::widgets::ImageButton::new(
-                                state.assets.web_icon,  // placeholder for now
-                                egui::Vec2::splat(64.0),
-                            )
-                            .frame(true),
-                            */
-                        )
+                        .add(&mut self.move_arrows)
                         .clicked()
                     {
-                    println!("Clicked on dummy button");
+                        println!("Clicked on dummy button");
                     }
+                    */
                     ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                 });
         }
