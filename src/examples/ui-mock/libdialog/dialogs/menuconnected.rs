@@ -15,6 +15,7 @@ use std::rc::Rc;
 use core::any::Any;
 use super::menuhelp::{menu_help_about, menu_help_manual};   // submenus
 use super::menuavatar;
+use crate::UiAppAssets;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
 
 /// Grey background for button area.
@@ -42,10 +43,10 @@ pub struct MenuConnected {
 
 impl MenuConnected {
     /// Create new, as trait object
-    pub fn new_link(state: &CommonState) -> MenuGroupLink {
+    pub fn new_link(assets: &UiAppAssets) -> MenuGroupLink {
         Rc::new(RefCell::new(MenuConnected{
-            move_arrows: NavArrows::new(state.assets.web_icon, egui::Vec2::splat(64.0), 16.0),
-            rot_arrows: NavArrows::new(state.assets.web_icon, egui::Vec2::splat(64.0), 16.0),           
+            move_arrows: NavArrows::new(assets.move_arrows_icon, egui::Vec2::splat(64.0), 16.0),
+            rot_arrows: NavArrows::new(assets.rot_arrows_icon, egui::Vec2::splat(64.0), 16.0),           
         }))                          // create a trait object to dispatch
     }
 }
@@ -131,18 +132,14 @@ impl MenuGroup for MenuConnected {
                     ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                     let response = ui.add(&mut self.move_arrows);
                     if response.clicked() {
+                        let action = self.rot_arrows.decode_response(&response);
+                        println!("Rot arrows: {:?}", action);
+                    }
+                    let response = ui.add(&mut self.move_arrows);
+                    if response.clicked() {
                         let action = self.move_arrows.decode_response(&response);
                         println!("Move arrows: {:?}", action);
                     }
-                    /*
-                    if ui
-                        .add(&mut self.move_arrows)
-                        .clicked()
-                    {
-                        println!("Clicked on dummy button");
-                    }
-                    */
-                    ////ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                 });
         }
         //  Non-menu items

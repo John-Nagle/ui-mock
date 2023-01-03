@@ -20,7 +20,7 @@ use std::sync::Arc;
 use log::{LevelFilter};
 use std::str::FromStr;
 use anyhow::{Error};
-use libdialog::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams};
+use libdialog::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams, UiAppAssets};
 use libdialog::{handle_gui_event};
 
 /// Base level configuration
@@ -178,12 +178,18 @@ impl AppUi {
                 style: Default::default(),
             });
 
-        //  Icon loading
+        //  Icon loading (obsolete)
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
         let assets = GuiAssets { 
             web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
             };
-
+        //  Icon loading (current). Example content only. Real programs do this at run time, so we can have themes.
+        let move_arrows_icon_bytes = include_bytes!("../../assets/images/move-arrows-128.png");
+        let rot_arrows_icon_bytes = include_bytes!("../../assets/images/rot-arrows-128.png");
+        let ui_app_assets = UiAppAssets {
+            move_arrows_icon: libui::load_canned_icon(move_arrows_icon_bytes, &mut egui_routine, renderer),
+            rot_arrows_icon: libui::load_canned_icon(rot_arrows_icon_bytes, &mut egui_routine, renderer),
+        };    
         let start_time = instant::Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
         let asset_dir = std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
@@ -231,6 +237,7 @@ impl AppUi {
             start_time,
             gui_state,
             quit: false,
+            ui_app_assets,
         });
         self.data.as_mut().unwrap().gui_state.common_state.send_boxed_gui_event(Box::new(GuiEvent::Startup)).unwrap(); // Start up the GUI.
         Ok(())

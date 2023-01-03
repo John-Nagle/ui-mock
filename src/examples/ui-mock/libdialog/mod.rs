@@ -4,5 +4,5 @@ mod dialogs;
 mod uiinfo;
 mod eventswitch;
 
-pub use uiinfo::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams};
+pub use uiinfo::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams, UiAppAssets};
 pub use eventswitch::{handle_gui_event};

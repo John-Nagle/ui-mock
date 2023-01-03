@@ -48,6 +48,13 @@ pub enum SystemMode {
             // -> Exit, Start
 }
 
+/// AppAssets -- compile time assets of the UI.
+pub struct UiAppAssets {
+    pub move_arrows_icon: egui::TextureId,
+    pub rot_arrows_icon: egui::TextureId,
+}
+
+
 /// Part of AppUi
 pub struct UiData {
     //  These keep reference-counted Rend3 objects alive.
@@ -61,6 +68,9 @@ pub struct UiData {
 
     //  The 2D GUI
     pub gui_state: GuiState<UiInfo>,                // state of the GUI
+    
+    //  Assets of the application.
+    pub ui_app_assets: UiAppAssets,
 }
 
 impl UiData {
