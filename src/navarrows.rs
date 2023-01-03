@@ -48,8 +48,8 @@ impl NavArrows {
             if let Some(interact_pos) = response.interact_pointer_pos() {
                 //  Compute position relative to center of button.
                 let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y);          // why not just use one 2d point/vector type?
-                let center: egui::Vec2 = (to_vec2(response.rect.min) + to_vec2(response.rect.max))*0.5;    // Twice the center coords
-                let rel_pos: egui::Vec2 = to_vec2(interact_pos) - center;   // cursor position relative to center of button rect.
+                let center = (to_vec2(response.rect.min) + to_vec2(response.rect.max))*0.5;    // Twice the center coords
+                let rel_pos  = to_vec2(interact_pos) - center;   // cursor position relative to center of button rect.
                 if rel_pos.length() < self.center_button_size { 
                     NavAction::Center
                 } else {
