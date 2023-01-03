@@ -6,7 +6,7 @@
 //  Animats
 //  November 2022
 //
-use libui::{CommonState, MenuGroup, MenuGroupLink};
+use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows};
 use libui::t;
 use egui::{menu, Frame};
 use log::{LevelFilter};
@@ -36,12 +36,17 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 //  The overlay on the main screen. Menus disappear when not used.
 //  Cursor to top or bottom of window restores them.
 pub struct MenuConnected {
+    move_arrows: NavArrows,
+    rot_arrows: NavArrows,
 }
 
 impl MenuConnected {
     /// Create new, as trait object
-    pub fn new_link() -> MenuGroupLink {
-        Rc::new(RefCell::new(MenuConnected{}))                          // create a trait object to dispatch
+    pub fn new_link(state: &CommonState) -> MenuGroupLink {
+        Rc::new(RefCell::new(MenuConnected{
+            move_arrows: NavArrows::new(state.assets.web_icon, egui::Vec2::splat(64.0), 16.0),
+            rot_arrows: NavArrows::new(state.assets.web_icon, egui::Vec2::splat(64.0), 16.0),           
+        }))                          // create a trait object to dispatch
     }
 }
 
@@ -126,11 +131,14 @@ impl MenuGroup for MenuConnected {
                     ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                     if ui
                         .add(
+                            &mut self.move_arrows
+                            /*
                             egui::widgets::ImageButton::new(
                                 state.assets.web_icon,  // placeholder for now
                                 egui::Vec2::splat(64.0),
                             )
                             .frame(true),
+                            */
                         )
                         .clicked()
                     {

@@ -46,7 +46,7 @@ pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event
                     println!("Open replay: {:?}", path_buf); // ***TEMP***
                                                              //  ***NEED TO PASS path_buf and grid to startup and actually go*** This is the dummy version
                     data.gui_state.app_state.change_mode(SystemMode::Connected);
-                    let connected_menu = MenuConnected::new_link();
+                    let connected_menu = MenuConnected::new_link(&data.gui_state.common_state);
                     data.gui_state.common_state.set_menu_group(connected_menu);
                 }
                 None => {
