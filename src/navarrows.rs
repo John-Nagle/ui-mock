@@ -20,7 +20,16 @@ pub struct NavArrows {
     button_image: egui::TextureId,          // the button image
     button_dims: egui::Vec2,                // dimensions of the button
     center_button_size: f32,                // center button of arrows, if nonzero
- 
+}
+
+/// User action - what did the click mean?
+pub enum NavAction {
+        None,
+        Up,
+        Down,
+        Left,
+        Right,
+        Center
 }
 
 impl NavArrows {
@@ -32,21 +41,27 @@ impl NavArrows {
             center_button_size,
         }
     }
-           
-    //  Draw the button
-    ////fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState) {
-    fn draw(&mut self, ui: &mut Ui) {
-        if ui.add(
-            egui::widgets::ImageButton::new(
-                *&self.button_image,
-                *&self.button_dims,
-                )
-                .frame(true),
-            )
-            .clicked() {
-            // Button clicked upon, do something.
+
+    /// Decode the click into the user action.
+    pub fn decode_response(&self, response: &Response) -> NavAction {
+        if response.clicked() {
+            if let Some(interact_pos) = response.interact_pointer_pos() {
+                //  Compute position relative to center of button.
+                let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y);          // why not just use one 2d point/vector type?
+                let center: egui::Vec2 = (to_vec2(response.rect.min) + to_vec2(response.rect.max))*0.5;    // Twice the center coords
+                let rel_pos: egui::Vec2 = to_vec2(interact_pos) - center;   // cursor position relative to center of button rect.
+                if rel_pos.length() < self.center_button_size { 
+                    NavAction::Center
+                } else {
+                    NavAction::Up   // ***TEMP**
+                }
+            } else {
+                NavAction::None                     // ***TEMP***
+            }
+        } else {
+            NavAction::None                         // nothing pushed
         }
-    } 
+    }
 }
 
 impl egui::Widget for &mut NavArrows {
