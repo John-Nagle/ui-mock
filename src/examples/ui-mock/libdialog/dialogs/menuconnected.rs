@@ -42,7 +42,7 @@ pub struct MenuConnected {
 }
 
 impl MenuConnected {
-    /// Create new, as trait object
+    /// Create new, as trait object. Provide needed graphical assets.
     pub fn new_link(assets: &UiAppAssets) -> MenuGroupLink {
         Rc::new(RefCell::new(MenuConnected{
             move_arrows: NavArrows::new(assets.move_arrows_icon, egui::Vec2::splat(64.0), 16.0),
@@ -130,16 +130,18 @@ impl MenuGroup for MenuConnected {
                 .frame(Frame::none().fill(TRANSLUCENT_GREY_COLOR32))
                 .show(&ctx, |ui| {
                     ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
-                    let response = ui.add(&mut self.move_arrows);
-                    if response.clicked() {
-                        let action = self.rot_arrows.decode_response(&response);
-                        println!("Rot arrows: {:?}", action);
-                    }
-                    let response = ui.add(&mut self.move_arrows);
-                    if response.clicked() {
-                        let action = self.move_arrows.decode_response(&response);
-                        println!("Move arrows: {:?}", action);
-                    }
+                        ui.horizontal(|ui| {
+                        let response = ui.add(&mut self.rot_arrows);
+                        if response.clicked() {
+                            let action = self.rot_arrows.decode_response(&response);
+                            println!("Rot arrows: {:?}", action);
+                        }
+                        let response = ui.add(&mut self.move_arrows);
+                        if response.clicked() {
+                            let action = self.move_arrows.decode_response(&response);
+                            println!("Move arrows: {:?}", action);
+                        }
+                    })
                 });
         }
         //  Non-menu items
