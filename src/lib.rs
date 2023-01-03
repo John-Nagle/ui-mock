@@ -1,4 +1,4 @@
-///  libgui.rs -- The 2D GUI
+//! # libgui.rs -- The 2D GUI
 //
 //  Animats
 //  June, 2022
@@ -10,6 +10,7 @@
 mod basicintl;
 mod guiutil;
 mod guistate;
+mod navarrows;  // a widget
 mod menunone;   // the empty menu
 //  Imports for here
 use std::rc::Rc;
@@ -20,6 +21,8 @@ use core::any::Any;
 ////pub use guimenus::{draw};
 pub use guistate::{GuiParams, GuiAssets, GuiState, AppState, CommonState, GuiCommonEvent, MessageLogger, SendAny, SendAnyBoxed, TextWindow};
 pub use guistate::{panic_dialog};
+/// Widgets
+pub use navarrows::{NavArrows};
 /// Utility functions.
 pub use guiutil::{load_canned_icon, load_image, set_default_styles, get_log_file_name, get_executable_name, get_asset_dir, get_cache_dir};
 /// Internationalization
