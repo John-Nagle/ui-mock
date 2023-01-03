@@ -23,6 +23,7 @@ pub struct NavArrows {
 }
 
 /// User action - what did the click mean?
+#[derive(Debug)]
 pub enum NavAction {
         None,
         Up,
@@ -42,7 +43,7 @@ impl NavArrows {
         }
     }
 
-    /// Decode the click into the user action.
+    /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     pub fn decode_response(&self, response: &Response) -> NavAction {
         if response.clicked() {
             if let Some(interact_pos) = response.interact_pointer_pos() {
@@ -51,12 +52,16 @@ impl NavArrows {
                 let center = (to_vec2(response.rect.min) + to_vec2(response.rect.max))*0.5;    // Twice the center coords
                 let rel_pos  = to_vec2(interact_pos) - center;   // cursor position relative to center of button rect.
                 if rel_pos.length() < self.center_button_size { 
-                    NavAction::Center
+                    NavAction::Center                   // inside center button
                 } else {
-                    NavAction::Up   // ***TEMP**
+                    if rel_pos.x.abs() > rel_pos.y.abs() {  // if X dominates
+                        if rel_pos.x > 0.0 { NavAction::Right} else { NavAction::Left }
+                    } else {
+                        if rel_pos.y < 0.0 { NavAction::Up } else {NavAction::Down }    // < 0 is upwards?
+                    }
                 }
             } else {
-                NavAction::None                     // ***TEMP***
+                NavAction::None                     //  Must not in rectangle.
             }
         } else {
             NavAction::None                         // nothing pushed
