@@ -60,13 +60,10 @@ impl NavArrows {
                 let rel_pos  = to_vec2(interact_pos) - center;   // cursor position relative to center of button rect.
                 if rel_pos.length() < self.center_button_size { 
                     NavAction::Center                   // inside center button
-                } else {
-                    if rel_pos.x.abs() > rel_pos.y.abs() {  // if X dominates
+                } else if rel_pos.x.abs() > rel_pos.y.abs() {  // if X dominates
                         if rel_pos.x > 0.0 { NavAction::Right} else { NavAction::Left }
-                    } else {
-                        if rel_pos.y < 0.0 { NavAction::Up } else { NavAction::Down }    // < 0 is upwards?
-                    }
-                }
+                    } else if rel_pos.y < 0.0 { NavAction::Up } else { NavAction::Down }    // < 0 is upwards?
+                
             } else {
                 NavAction::None                     //  Must not be in rectangle.
             }
@@ -99,8 +96,8 @@ impl egui::Widget for &mut NavArrows {
     fn ui(self, ui: &mut Ui) -> Response {
         let response = ui.add(
             egui::widgets::ImageButton::new(
-                *&self.button.0,
-                *&self.button.1,
+                self.button.0,
+                self.button.1,
             )
             .frame(false)
             );
