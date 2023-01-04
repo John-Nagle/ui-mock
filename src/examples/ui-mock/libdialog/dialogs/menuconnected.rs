@@ -13,7 +13,7 @@ use core::any::Any;
 use core::cell::RefCell;
 use egui::{menu, Frame};
 use libui::t;
-use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows};
+use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows, NavAction};
 use log::LevelFilter;
 use std::rc::Rc;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
@@ -183,13 +183,13 @@ impl MenuGroup for MenuConnected {
                     ui.visuals_mut().widgets.inactive.bg_fill = egui::Color32::TRANSPARENT; // transparent button background
                     ui.horizontal(|ui| {
                         let response = ui.add(&mut self.rot_arrows);
-                        if response.clicked() {
-                            let action = self.rot_arrows.decode_response(&response);
+                        let action = self.rot_arrows.decode_response(&response);
+                        if action != NavAction::None {
                             println!("Rot arrows: {:?}", action);
                         }
                         let response = ui.add(&mut self.move_arrows);
-                        if response.clicked() {
-                            let action = self.move_arrows.decode_response(&response);
+                        let action = self.move_arrows.decode_response(&response);
+                        if action != NavAction::None {
                             println!("Move arrows: {:?}", action);
                         }
                     })

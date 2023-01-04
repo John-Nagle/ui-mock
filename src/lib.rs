@@ -32,10 +32,7 @@ pub use guiutil::{
     load_image, set_default_styles,
 };
 /// Widgets
-pub use navarrows::NavArrows;
-/// Dialogs
-////pub use dialogs::guilogin::{LoginParams, LoginDialogWindow, LoginDestination};
-////pub use dialogs::guigrid::{GridSelectParams};
+pub use navarrows::{NavArrows, NavAction};
 
 //  Traits
 /// A group of menus. Libui user sets what menus are to be shown.

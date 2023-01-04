@@ -1,7 +1,10 @@
 //! #  NavArrows.rs -- 4-way navigation button
 //!
-//! Navigation button with four arrows and a center button.
-//! An egui widget.
+//! A general-use 'egui' widget.
+//! A navigation button with four directional arrows and a optional center button.
+//! The user must provide a background button image, and an image of an arrow.
+//! The arrow image should point to the right, and will be rotated into the 
+//! Up, Down, and Left positions.
 //
 //  Animats
 //  Jaunary 2023
@@ -54,12 +57,13 @@ impl NavArrows {
     }
 
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
+    /// Users of this widget must call this on Response to find out what the user is asking for.
     pub fn decode_response(&self, response: &Response) -> NavAction {
-        let response = response.interact(egui::Sense::click_and_drag());
+        let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
         if response.dragged() {
-            println!("Button down on"); // ***TEMP***
             if let Some(interact_pos) = response.hover_pos() {
                 //  Compute position relative to center of button.
+                //  Do case analysis for left, right, center, up, down.
                 let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y); // why not just use one 2d point/vector type?
                 let center = (to_vec2(response.rect.min) + to_vec2(response.rect.max)) * 0.5; // Average for center coords
                 let rel_pos = to_vec2(interact_pos) - center; // cursor position relative to center of button rect.
@@ -76,7 +80,7 @@ impl NavArrows {
                     NavAction::Up
                 } else {
                     NavAction::Down
-                } // < 0 is upwards?
+                } // < 0 is upwards. Tradition.
             } else {
                 NavAction::None //  Must not be in rectangle.
             }
@@ -109,6 +113,7 @@ impl NavArrows {
     }
 }
 
+/// The widget is an image button plus a drawn arrow.
 impl egui::Widget for &mut NavArrows {
     fn ui(self, ui: &mut Ui) -> Response {
         let response =
