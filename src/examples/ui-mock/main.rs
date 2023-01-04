@@ -14,18 +14,19 @@
 mod examplesupport;
 mod libdialog;
 
-use libui::{GuiState, GuiParams, GuiAssets, Dictionary, MessageLogger, GuiCommonEvent, SendAnyBoxed};
-use libui::{t, get_log_file_name, get_executable_name, panic_dialog};
-use std::sync::Arc;
-use log::{LevelFilter};
+use anyhow::Error;
+use libdialog::handle_gui_event;
+use libdialog::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo};
+use libui::{get_executable_name, get_log_file_name, panic_dialog, t};
+use libui::{
+    Dictionary, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger, SendAnyBoxed,
+};
+use log::LevelFilter;
 use std::str::FromStr;
-use anyhow::{Error};
-use libdialog::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams, UiAppAssets};
-use libdialog::{handle_gui_event};
+use std::sync::Arc;
 
 /// Base level configuration
-const MENU_DISPLAY_SECS: u64 = 3;               // hide menus after this much time
-
+const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
@@ -34,22 +35,22 @@ pub struct AppUi {
     data: Option<UiData>,
     //  UI event channel.
     //  We have to do this at the outer level so the logger can access it early.
-    event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>, 
+    event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
     event_recv_channel: Option<crossbeam_channel::Receiver<SendAnyBoxed>>,
 }
 
 impl AppUi {
     /// Create the top-level user interface struct.
     //  This owns everything.
-    #[allow(clippy::new_without_default)]   // don't need a default. Only used once.
+    #[allow(clippy::new_without_default)] // don't need a default. Only used once.
     pub fn new() -> Self {
         //  The message channel which allows other things to send to the UI.
         let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
-        
+
         AppUi {
             data: None,
-            event_recv_channel: Some(event_recv_channel),   // because it will be taken
-            event_send_channel: event_send_channel.clone(),          
+            event_recv_channel: Some(event_recv_channel), // because it will be taken
+            event_send_channel: event_send_channel.clone(),
         }
     }
 
@@ -57,32 +58,34 @@ impl AppUi {
     //  This is how the GUI and other parts of the
     //  system communicate with the main event loop.
     pub fn handle_user_event(&mut self, window: &winit::window::Window, raw_event: SendAnyBoxed) {
-        //  Events can be a GuiEvent or a GuiCommonEvent. 
+        //  Events can be a GuiEvent or a GuiCommonEvent.
         //  The dynamic typing is to get the definition of GuiEvent out of
         //  libui.
         let data = self.data.as_mut().unwrap();
-        if let Some(event) = raw_event.downcast_ref::<GuiEvent>() {          
+        if let Some(event) = raw_event.downcast_ref::<GuiEvent>() {
             log::warn!("GuiEvent: {:?}", event);
             handle_gui_event(data, window, event); // main GUI event handler switch
         } else if let Some(event) = raw_event.downcast_ref::<GuiCommonEvent>() {
             //  Handle standard utility-type events.
             match event {
-                GuiCommonEvent::ErrorMessage((title, messages)) => {   // display message
-                    let msgs: Vec::<&str> = messages.iter().map(|m| m.as_str()).collect();
+                GuiCommonEvent::ErrorMessage((title, messages)) => {
+                    // display message
+                    let msgs: Vec<&str> = messages.iter().map(|m| m.as_str()).collect();
                     data.gui_state.common_state.add_error_window(title, &msgs);
                 }
-                GuiCommonEvent::LogMessage(s) => {
-                    data.gui_state.common_state.add_msg(s.to_string())
-                }
+                GuiCommonEvent::LogMessage(s) => data.gui_state.common_state.add_msg(s.to_string()),
                 GuiCommonEvent::Shutdown => {
-                    data.gui_state.app_state.change_mode(SystemMode::Shutdown);  // shutdown starts
-                    data.quit = true;                   // force quit              
-                }                                       // shut down and exit
+                    data.gui_state.app_state.change_mode(SystemMode::Shutdown); // shutdown starts
+                    data.quit = true; // force quit
+                } // shut down and exit
             }
         } else {
-            log::error!("Invalid non GuiEvent/GuiCommonEvent in handle_user_event: {:?}", raw_event);
+            log::error!(
+                "Invalid non GuiEvent/GuiCommonEvent in handle_user_event: {:?}",
+                raw_event
+            );
         }
-    }    
+    }
     /// Setup of the graphics environment. Returns error.
     fn setup_with_error(
         &mut self,
@@ -171,7 +174,7 @@ impl AppUi {
         // Create the winit/egui integration, which manages our egui context for us.
         let platform =
             egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
-                physical_width: window_size.width as u32,	
+                physical_width: window_size.width as u32,
                 physical_height: window_size.height as u32,
                 scale_factor: window.scale_factor(),
                 font_definitions: egui::FontDefinitions::default(),
@@ -180,57 +183,82 @@ impl AppUi {
 
         //  Icon loading (obsolete)
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
-        let assets = GuiAssets { 
+        let assets = GuiAssets {
             web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
-            };
+        };
         //  Icon loading (current). Example content only. Real programs do this at run time, so we can have themes.
         let move_arrows_icon_bytes = include_bytes!("../../assets/images/move-arrows-128.png");
         let rot_arrows_icon_bytes = include_bytes!("../../assets/images/rot-arrows-128.png");
-        let pressed_button_icon_bytes = include_bytes!("../../assets/images/arrow-pressed-right-64.png");
+        let pressed_button_icon_bytes =
+            include_bytes!("../../assets/images/arrow-pressed-right-64.png");
         let ui_app_assets = UiAppAssets {
-            move_arrows_icon: libui::load_canned_icon(move_arrows_icon_bytes, &mut egui_routine, renderer),
-            rot_arrows_icon: libui::load_canned_icon(rot_arrows_icon_bytes, &mut egui_routine, renderer),
-            pressed_button_icon: libui::load_canned_icon(pressed_button_icon_bytes, &mut egui_routine, renderer),
-        };    
+            move_arrows_icon: libui::load_canned_icon(
+                move_arrows_icon_bytes,
+                &mut egui_routine,
+                renderer,
+            ),
+            rot_arrows_icon: libui::load_canned_icon(
+                rot_arrows_icon_bytes,
+                &mut egui_routine,
+                renderer,
+            ),
+            pressed_button_icon: libui::load_canned_icon(
+                pressed_button_icon_bytes,
+                &mut egui_routine,
+                renderer,
+            ),
+        };
         let start_time = instant::Instant::now();
-        let version = env!("CARGO_PKG_VERSION").to_string();   // Version of main, not libraries
-        let asset_dir = std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
+        let version = env!("CARGO_PKG_VERSION").to_string(); // Version of main, not libraries
+        let asset_dir =
+            std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
         let mut locale_file = asset_dir.clone();
         locale_file.push("locales");
         locale_file.push("menus.json");
         ////let locale_file = asset_dir.to_string() + "locales/menus.json"; // locale file is under in assets
         let lang = Dictionary::get_translation(&[locale_file])
             .expect("Trouble loading language translation files"); // select language
-                                                                   
+
         //// Detection turned off due to https://github.com/frewsxcv/rust-dark-light/issues/17
         ////let dark_mode = dark_light::detect() == dark_light::Mode::Dark; // True if dark mode
         let dark_mode = false; // ***TEMP*** force dark mode as default
-        let log_level = LevelFilter::Warn;                      // warn is default logging level
+        let log_level = LevelFilter::Warn; // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
-        let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone();  // adapter info for About box
-        ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP*** 
+        let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone(); // adapter info for About box
+                                                                                      ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP***
         const GRID_FILE: &str = "grids.json";
         // Read in the grid select params, which requires reading some images.
-        let grid_select_params =
-            GridSelectParams:: read_grid_select_params(&std::path::PathBuf::from_str(GRID_FILE)?, &asset_dir, &mut egui_routine, renderer)?;
+        let grid_select_params = GridSelectParams::read_grid_select_params(
+            &std::path::PathBuf::from_str(GRID_FILE)?,
+            &asset_dir,
+            &mut egui_routine,
+            renderer,
+        )?;
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
             lang,
-            version,                        // because we need version of main program, not libs
+            version, // because we need version of main program, not libs
             asset_dir,
             dark_mode,
             log_level,
             menu_display_secs: MENU_DISPLAY_SECS,
-            gpu_info: adapter_info,             // GPU info
-            ////grid_select_params,
+            gpu_info: adapter_info, // GPU info
+                                    ////grid_select_params,
         };
         let event_send_channel = self.event_send_channel.clone();
         let event_recv_channel = self.event_recv_channel.take().unwrap();
         //  Set initial state of app-level UI info
         let app_state = UiInfo::new(grid_select_params);
         //  Set up main state of the GUI
-        let gui_state = GuiState::new(params, assets, platform, event_send_channel, event_recv_channel, app_state);  
+        let gui_state = GuiState::new(
+            params,
+            assets,
+            platform,
+            event_send_channel,
+            event_recv_channel,
+            app_state,
+        );
         self.data = Some(UiData {
             _object_handle,
             _material_handle,
@@ -241,11 +269,15 @@ impl AppUi {
             quit: false,
             ui_app_assets,
         });
-        self.data.as_mut().unwrap().gui_state.common_state.send_boxed_gui_event(Box::new(GuiEvent::Startup)).unwrap(); // Start up the GUI.
+        self.data
+            .as_mut()
+            .unwrap()
+            .gui_state
+            .common_state
+            .send_boxed_gui_event(Box::new(GuiEvent::Startup))
+            .unwrap(); // Start up the GUI.
         Ok(())
     }
-
-    
 }
 
 /// This is an instance of the Rend3 application framework.
@@ -255,22 +287,25 @@ impl rend3_framework::App for AppUi {
     fn sample_count(&self) -> rend3::types::SampleCount {
         SAMPLE_COUNT
     }
-    
+
     /// Register our loggers.
     //  One logger goes to a file.
     //  One logger goes to a window in the GUI
     fn register_logger(&mut self) {
-        let log_file_name = get_log_file_name().expect("Unable to figure out where to put log files.");    // get appropriate name for platform
-        let _ = simplelog::CombinedLogger::init(
-            vec![
-                ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
-                simplelog::WriteLogger::new(LevelFilter::Warn, simplelog::Config::default(), std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file")),
-                MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
-            ]
-        ); 
-        log::warn!("Logging to {:?}", log_file_name);   // where the log is going         
+        let log_file_name =
+            get_log_file_name().expect("Unable to figure out where to put log files."); // get appropriate name for platform
+        let _ = simplelog::CombinedLogger::init(vec![
+            ////simplelog::TermLogger::new(LevelFilter::Warn, simplelog::Config::default(), simplelog::TerminalMode::Mixed, simplelog::ColorChoice::Auto),
+            simplelog::WriteLogger::new(
+                LevelFilter::Warn,
+                simplelog::Config::default(),
+                std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file"),
+            ),
+            MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
+        ]);
+        log::warn!("Logging to {:?}", log_file_name); // where the log is going
     }
-    
+
     /// Setup of the graphics enviornment, popping up a panic dialog on error.
     fn setup(
         &mut self,
@@ -278,13 +313,12 @@ impl rend3_framework::App for AppUi {
         renderer: &Arc<rend3::Renderer>,
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
-    ) { 
+    ) {
         if let Err(err) = self.setup_with_error(window, renderer, _routines, surface_format) {
             panic_dialog("Start-up failure", &format!("{:?}", err)); // tell user
-            panic!("Start up failure: {:?}", err);   // then panic
+            panic!("Start up failure: {:?}", err); // then panic
         }
     }
-
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
     fn handle_event(
@@ -300,21 +334,27 @@ impl rend3_framework::App for AppUi {
     ) {
         profiling::scope!("Event");
 
-
         //  Handle any user events.
         //  Temporarily uses separate queue due to
         //  bug https://github.com/BVE-Reborn/rend3/issues/406
-        {   let data = self.data.as_mut().unwrap();
-            if !data.gui_state.common_state.event_recv_channel.is_empty() {    // if events queued
+        {
+            let data = self.data.as_mut().unwrap();
+            if !data.gui_state.common_state.event_recv_channel.is_empty() {
+                // if events queued
                 //  Get all events, avoiding double borrow.
-                let events: Vec<SendAnyBoxed> = data.gui_state.common_state.event_recv_channel.try_iter().collect(); 
+                let events: Vec<SendAnyBoxed> = data
+                    .gui_state
+                    .common_state
+                    .event_recv_channel
+                    .try_iter()
+                    .collect();
                 for ev in events {
-                    println!("User event: {:?}", ev);       // ***TEMP***
+                    println!("User event: {:?}", ev); // ***TEMP***
                     self.handle_user_event(window, ev);
                 }
             }
         }
-              
+
         let data = self.data.as_mut().unwrap();
         //  This is where EGUI handles 2D UI events.
         data.gui_state.common_state.platform.handle_event(&event);
@@ -326,7 +366,9 @@ impl rend3_framework::App for AppUi {
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
-                data.gui_state.common_state.platform
+                data.gui_state
+                    .common_state
+                    .platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
                 /*
                 data.gui_state.platform.begin_frame();
@@ -355,7 +397,7 @@ impl rend3_framework::App for AppUi {
 
                 let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
                 */
-                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window);  // build the 2D GUI
+                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
@@ -428,8 +470,8 @@ impl rend3_framework::App for AppUi {
                     data.gui_state.common_state.wake_up_gui();
                 }
                 winit::event::WindowEvent::KeyboardInput { input, .. } => {
-                    let _ = input;   // not yet used
-                    ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
+                    let _ = input; // not yet used
+                                   ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
                 }
                 _ => {}
             },
@@ -441,9 +483,9 @@ impl rend3_framework::App for AppUi {
 /// The main program.
 fn main() {
     #[cfg(feature = "tracy")]
-    let _client = tracy_client::Client::start();    // enable profiler if "tracy" feature is on
+    let _client = tracy_client::Client::start(); // enable profiler if "tracy" feature is on
     #[cfg(feature = "tracy")]
-    assert!(tracy_client::Client::is_running());    // if compiled with wrong version of tracy, will fail
+    assert!(tracy_client::Client::is_running()); // if compiled with wrong version of tracy, will fail
     profiling::scope!("Main");
     profiling::register_thread!();
     let app = AppUi::new();
@@ -451,7 +493,7 @@ fn main() {
         app,
         winit::window::WindowBuilder::new()
             .with_title(get_executable_name().as_str())
-            .with_visible(true) 
-            .with_maximized(true)   // this is not effective on Linux/X11. Has to be re-done at startup.
+            .with_visible(true)
+            .with_maximized(true), // this is not effective on Linux/X11. Has to be re-done at startup.
     )
 }

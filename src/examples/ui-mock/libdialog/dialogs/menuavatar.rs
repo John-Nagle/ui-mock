@@ -7,15 +7,18 @@
 //  These are called from the render thread. Do not spend much time here.
 //
 use crate::t;
+use crate::GuiCommonEvent;
 use egui::Ui;
-use libui::{CommonState};
-use crate::{GuiCommonEvent};
+use libui::CommonState;
 
 //
 /// Avatar->Preferences
 pub fn manu_preferences(_ui: &mut Ui, state: &mut CommonState) {
     //  Unimplemented
-    state.add_error_window(t!("menu.unimplemented", state.get_lang()), &[t!("menu.unimplemented", state.get_lang())]);
+    state.add_error_window(
+        t!("menu.unimplemented", state.get_lang()),
+        &[t!("menu.unimplemented", state.get_lang())],
+    );
 }
 
 /// Avatar->Quit

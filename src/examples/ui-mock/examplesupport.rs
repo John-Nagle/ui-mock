@@ -1,9 +1,8 @@
 //  examplesupport.rs -- misc support items for mock-ui only
 //
 fn vertex(pos: [f32; 3]) -> glam::Vec3 {
-    glam::Vec3::from(pos)	
+    glam::Vec3::from(pos)
 }
-
 
 //  Canned cube, 2 units on a side.
 pub fn create_cube_mesh() -> rend3::types::Mesh {

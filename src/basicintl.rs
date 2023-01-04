@@ -186,7 +186,8 @@ impl Dictionary {
             if let Some(lang) = available.iter().next() {
                 log::error!(
                     "No default language choices available. Picking \"{}\"",
-                    lang);
+                    lang
+                );
                 Ok(lang.clone())
             } else {
                 //  We give up.
@@ -223,9 +224,13 @@ impl Dictionary {
 fn test_translation() {
     use std::str::FromStr;
     //  Initialize the dictionary
-    let locale_file = PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/locales/menus.json")).unwrap(); // test only
+    let locale_file = PathBuf::from_str(concat!(
+        env!["CARGO_MANIFEST_DIR"],
+        "/src/locales/menus.json"
+    ))
+    .unwrap(); // test only
     let dictionary: Dictionary = Dictionary::new(&[locale_file], "fr").unwrap(); // build translations for "fr".
-                                                                                 
+
     //  Demonstrate that it only does the lookup once
     for _ in 1..5 {
         println!("menu.file => {}", t!("menu.file", &dictionary));

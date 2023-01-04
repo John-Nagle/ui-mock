@@ -7,31 +7,29 @@
 //  Animats
 //  November 2022
 //
-use crate::{MenuGroup, MenuGroupLink, CommonState};
+use crate::{CommonState, MenuGroup, MenuGroupLink};
+use core::any::Any;
 use core::cell::RefCell;
 use std::rc::Rc;
-use core::any::Any;
 
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 //
 //  The overlay on the main screen. Menus disappear when not used.
 //  Cursor to top or bottom of window restores them.
-pub struct MenuNone {
-}
+pub struct MenuNone {}
 
-impl MenuNone  {
+impl MenuNone {
     /// Create new, as trait object
     pub fn new_link() -> MenuGroupLink {
-        Rc::new(RefCell::new(MenuNone{}))                          // create a trait object to dispatch
+        Rc::new(RefCell::new(MenuNone {})) // create a trait object to dispatch
     }
 }
 
 impl MenuGroup for MenuNone {
-
     /// Draws the menu set for Login state.
     //  Called on every frame. Do not delay here.
-    fn draw(&mut self, _state: &mut CommonState) -> bool {                          
+    fn draw(&mut self, _state: &mut CommonState) -> bool {
         // Insert egui commands here
         //  Nothing to do, this is MenuNone.
         true
@@ -40,14 +38,14 @@ impl MenuGroup for MenuNone {
     fn get_name(&self) -> &'static str {
         "---"
     }
-    
+
     /// For downcasting
     fn as_any(&self) -> &dyn Any {
         self
     }
-    
+
     /// For downcasting
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
-    } 
+    }
 }

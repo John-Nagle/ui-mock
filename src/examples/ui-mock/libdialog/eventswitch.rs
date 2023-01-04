@@ -8,13 +8,13 @@
 //  November, 2022
 //
 use super::dialogs;
-use dialogs::dialoglogin::{LoginDialogWindow};
-use dialogs::dialoggrid::{GridSelectWindow};
-use dialogs::menuconnected::{MenuConnected};
+use dialogs::dialoggrid::GridSelectWindow;
+use dialogs::dialoglogin::LoginDialogWindow;
+use dialogs::menuconnected::MenuConnected;
 
-use libui::{t};
 use super::uiinfo;
-use uiinfo::{UiData, SystemMode, GuiEvent, pick_replay_file_async};
+use libui::t;
+use uiinfo::{pick_replay_file_async, GuiEvent, SystemMode, UiData};
 
 ///  Handle GuiEvent
 pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event: &GuiEvent) {

@@ -1,8 +1,8 @@
 // #! libdialog - the application-specific dialogs
 
 mod dialogs;
-mod uiinfo;
 mod eventswitch;
+mod uiinfo;
 
-pub use uiinfo::{UiData, UiInfo, SystemMode, GuiEvent, GridSelectParams, UiAppAssets};
-pub use eventswitch::{handle_gui_event};
+pub use eventswitch::handle_gui_event;
+pub use uiinfo::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo};

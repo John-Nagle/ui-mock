@@ -3,12 +3,12 @@
 //
 //  Menus and dialogs. Usually one per file.
 //  Dialogs
-pub mod dialoglogin;
 pub mod dialoggrid;
+pub mod dialoglogin;
 
 //  Menus and submenus
-pub mod menustart;
-pub mod menulogin;
+pub mod menuavatar;
 pub mod menuconnected;
 pub mod menuhelp;
-pub mod menuavatar;
+pub mod menulogin;
+pub mod menustart;
