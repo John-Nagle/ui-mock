@@ -8,6 +8,7 @@
 //
 use egui::{Ui, Response};
 use core::ops::Index;
+use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
 /// NavArrows -- a 4-way arrow with an optional button in the center.
@@ -76,21 +77,31 @@ impl NavArrows {
     /// Draw the appropriate pressed arrow.
     fn draw_pressed_arrow(&self, ui: &mut Ui, response: Response) -> Response {
         let nav_action = self.decode_response(&response);
-        if nav_action == NavAction::None { return response }         // not pressed
+        if nav_action == NavAction::None || nav_action == NavAction::Center { return response }         // not pressed
         //  Where to draw the arrows, and which way to point them.
         const ARROW_UVS: [egui::Rect;6] = [
             egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  None
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Up ***
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Down ***
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 1.0 }, max: egui::Pos2 { x: 1.0, y: 0.0 }},    //  Up ***
+            egui::Rect{ min: egui::Pos2 { x: 1.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 1.0 }},    //  Down ***
             egui::Rect{ min: egui::Pos2 { x: 1.0, y: 1.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Left
             egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 1.0, y: 1.0 }},    //  Right
             egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Center
         ];
+        
+        const ARROW_ROTS: [f32;6] = [
+            0.0, // None
+            PI*1.5, // Up
+            PI*0.5, // Down
+            PI*1.0, // Left
+            PI*0.0, // Right
+            0.0,         // center
+        ];
         let arrow_uv = ARROW_UVS[nav_action as usize];
-        // Draw the button
-        println!("Arrow UV: {:?}", arrow_uv);  // ***TEMP***
-        egui::Image::new(self.arrow.0, self.arrow.1).uv(arrow_uv).paint_at(ui, response.rect); // 
-        ////egui::Image::new(self.arrow.0, self.arrow.1).paint_at(ui, response.rect); // ***TEMP TEST***
+        let arrow_rot = ARROW_ROTS[nav_action as usize];
+        // Draw the arrow if pressed
+        ////println!("Arrow UV: {:?}", arrow_uv);  // ***TEMP***
+        ////egui::Image::new(self.arrow.0, self.arrow.1).uv(arrow_uv).paint_at(ui, response.rect); //
+        egui::Image::new(self.arrow.0, self.arrow.1).rotate(arrow_rot, egui::Vec2::new(0.5,0.5)).paint_at(ui, response.rect);
         response
     }
 }
@@ -105,8 +116,6 @@ impl egui::Widget for &mut NavArrows {
                 .frame(true)
             );
         self.draw_pressed_arrow(ui, response)
-        ////egui::Image::new(self.arrow.0, self.arrow.1).paint_at(ui, result.rect); // ***TEMP TEST***
-        ////result     
     }
 }
 
