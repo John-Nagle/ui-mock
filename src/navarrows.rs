@@ -12,8 +12,8 @@ use egui::{Ui, Response};
 /// NavArrows -- a 4-way arrow with an optional button in the center.
 //  The persistent part.
 pub struct NavArrows {
-    button_image: egui::TextureId,          // the button image
-    button_dims: egui::Vec2,                // dimensions of the button
+    button: (egui::TextureId, egui::Vec2),  // the button image
+    arrow: (egui::TextureId, egui::Vec2),   // the arrow image for pressed direction
     center_button_size: f32,                // center button of arrows, if nonzero
 }
 
@@ -30,10 +30,10 @@ pub enum NavAction {
 
 impl NavArrows {
     /// Image, dimensions of button, 
-    pub fn new(button_image: egui::TextureId, button_dims: egui::Vec2, center_button_size: f32) -> Self {
+    pub fn new(button: (egui::TextureId, egui::Vec2),  arrow: (egui::TextureId, egui::Vec2), center_button_size: f32) -> Self {
         Self {
-            button_image,
-            button_dims,
+            button,
+            arrow,
             center_button_size,
         }
     }
@@ -68,8 +68,8 @@ impl egui::Widget for &mut NavArrows {
     fn ui(self, ui: &mut Ui) -> Response {
         ui.add(
             egui::widgets::ImageButton::new(
-                *&self.button_image,
-                *&self.button_dims,
+                *&self.button.0,
+                *&self.button.1,
                 )
                 .frame(true)
             )     

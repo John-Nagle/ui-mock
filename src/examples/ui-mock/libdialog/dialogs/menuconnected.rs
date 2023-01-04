@@ -44,9 +44,11 @@ pub struct MenuConnected {
 impl MenuConnected {
     /// Create new, as trait object. Provide needed graphical assets.
     pub fn new_link(assets: &UiAppAssets) -> MenuGroupLink {
+        let button_size = egui::Vec2::splat(64.0);
+        let arrow_size = egui::Vec2::new(32.0, 64.0);
         Rc::new(RefCell::new(MenuConnected{
-            move_arrows: NavArrows::new(assets.move_arrows_icon, egui::Vec2::splat(64.0), 16.0),
-            rot_arrows: NavArrows::new(assets.rot_arrows_icon, egui::Vec2::splat(64.0), 16.0),           
+            move_arrows: NavArrows::new((assets.move_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 16.0),
+            rot_arrows: NavArrows::new((assets.rot_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 16.0),           
         }))                          // create a trait object to dispatch
     }
 }

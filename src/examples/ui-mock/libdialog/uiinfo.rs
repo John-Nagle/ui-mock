@@ -52,6 +52,7 @@ pub enum SystemMode {
 pub struct UiAppAssets {
     pub move_arrows_icon: egui::TextureId,
     pub rot_arrows_icon: egui::TextureId,
+    pub pressed_button_icon: egui::TextureId,
 }
 
 
