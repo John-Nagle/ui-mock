@@ -7,7 +7,8 @@
 //  Jaunary 2023
 //
 use egui::{Ui, Response};
-//  Always write TextureId or Vec2 fully qualified to avoid name confusion.
+use core::ops::Index;
+//  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
 /// NavArrows -- a 4-way arrow with an optional button in the center.
 //  The persistent part.
@@ -18,7 +19,7 @@ pub struct NavArrows {
 }
 
 /// User action - what did the click mean?
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum NavAction {
         None,
         Up,
@@ -26,6 +27,15 @@ pub enum NavAction {
         Left,
         Right,
         Center
+}
+
+/// Enum to integer
+impl Index<NavAction> for [usize; 6] {
+    type Output = usize;
+
+    fn index(&self, nav_action: NavAction) -> &Self::Output {
+        &self[nav_action as usize]
+    }
 }
 
 impl NavArrows {
@@ -40,7 +50,7 @@ impl NavArrows {
 
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     pub fn decode_response(&self, response: &Response) -> NavAction {
-        if response.clicked() {
+        if true {
             if let Some(interact_pos) = response.interact_pointer_pos() {
                 //  Compute position relative to center of button.
                 let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y);          // why not just use one 2d point/vector type?
@@ -62,17 +72,41 @@ impl NavArrows {
             NavAction::None                         // nothing pushed
         }
     }
+    
+    /// Draw the appropriate pressed arrow.
+    fn draw_pressed_arrow(&self, ui: &mut Ui, response: Response) -> Response {
+        let nav_action = self.decode_response(&response);
+        if nav_action == NavAction::None { return response }         // not pressed
+        //  Where to draw the arrows, and which way to point them.
+        const ARROW_UVS: [egui::Rect;6] = [
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  None
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Up ***
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Down ***
+            egui::Rect{ min: egui::Pos2 { x: 1.0, y: 1.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Left
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 1.0, y: 1.0 }},    //  Right
+            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Center
+        ];
+        let arrow_uv = ARROW_UVS[nav_action as usize];
+        // Draw the button
+        println!("Arrow UV: {:?}", arrow_uv);  // ***TEMP***
+        egui::Image::new(self.arrow.0, self.arrow.1).uv(arrow_uv).paint_at(ui, response.rect); // 
+        ////egui::Image::new(self.arrow.0, self.arrow.1).paint_at(ui, response.rect); // ***TEMP TEST***
+        response
+    }
 }
 
 impl egui::Widget for &mut NavArrows {
     fn ui(self, ui: &mut Ui) -> Response {
-        ui.add(
+        let response = ui.add(
             egui::widgets::ImageButton::new(
                 *&self.button.0,
                 *&self.button.1,
                 )
                 .frame(true)
-            )     
+            );
+        self.draw_pressed_arrow(ui, response)
+        ////egui::Image::new(self.arrow.0, self.arrow.1).paint_at(ui, result.rect); // ***TEMP TEST***
+        ////result     
     }
 }
 
