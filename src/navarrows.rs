@@ -15,7 +15,7 @@ use std::f32::consts::PI;
 //  The persistent part.
 pub struct NavArrows {
     button: (egui::TextureId, egui::Vec2),  // the button image
-    arrow: (egui::TextureId, egui::Vec2),   // the arrow image for pressed direction
+    arrow: egui::Image,                     // the arrow image for pressed direction
     center_button_size: f32,                // center button of arrows, if nonzero
 }
 
@@ -44,7 +44,7 @@ impl NavArrows {
     pub fn new(button: (egui::TextureId, egui::Vec2),  arrow: (egui::TextureId, egui::Vec2), center_button_size: f32) -> Self {
         Self {
             button,
-            arrow,
+            arrow: egui::Image::new(arrow.0, arrow.1),  // preprocess a bit
             center_button_size,
         }
     }
@@ -90,7 +90,7 @@ impl NavArrows {
         ];
         let arrow_rot = ARROW_ROTS[nav_action as usize];
         // Draw the arrow if pressed
-        egui::Image::new(self.arrow.0, self.arrow.1).rotate(arrow_rot, egui::Vec2::new(0.5,0.5)).paint_at(ui, response.rect);
+        self.arrow.rotate(arrow_rot, egui::Vec2::new(0.5,0.5)).paint_at(ui, response.rect);
         response
     }
 }
@@ -101,11 +101,10 @@ impl egui::Widget for &mut NavArrows {
             egui::widgets::ImageButton::new(
                 *&self.button.0,
                 *&self.button.1,
-                )
-                .frame(false)
+            )
+            .frame(false)
             );
-        self.draw_pressed_arrow(ui, response)
-        ////response
+        self.draw_pressed_arrow(ui, response)   // add arrow indicating pressing
     }
 }
 
