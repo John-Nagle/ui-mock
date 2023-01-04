@@ -51,8 +51,9 @@ impl NavArrows {
 
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     pub fn decode_response(&self, response: &Response) -> NavAction {
-        if true {
-            if let Some(interact_pos) = response.interact_pointer_pos() {
+        if response.is_pointer_button_down_on() {
+            ////println!("Button down on");// ***TEMP***
+            if let Some(interact_pos) = response.hover_pos() {
                 //  Compute position relative to center of button.
                 let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y);          // why not just use one 2d point/vector type?
                 let center = (to_vec2(response.rect.min) + to_vec2(response.rect.max))*0.5;    // Average for center coords
@@ -63,7 +64,7 @@ impl NavArrows {
                     if rel_pos.x.abs() > rel_pos.y.abs() {  // if X dominates
                         if rel_pos.x > 0.0 { NavAction::Right} else { NavAction::Left }
                     } else {
-                        if rel_pos.y < 0.0 { NavAction::Up } else {NavAction::Down }    // < 0 is upwards?
+                        if rel_pos.y < 0.0 { NavAction::Up } else { NavAction::Down }    // < 0 is upwards?
                     }
                 }
             } else {
@@ -78,16 +79,7 @@ impl NavArrows {
     fn draw_pressed_arrow(&self, ui: &mut Ui, response: Response) -> Response {
         let nav_action = self.decode_response(&response);
         if nav_action == NavAction::None || nav_action == NavAction::Center { return response }         // not pressed
-        //  Where to draw the arrows, and which way to point them.
-        const ARROW_UVS: [egui::Rect;6] = [
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  None
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 1.0 }, max: egui::Pos2 { x: 1.0, y: 0.0 }},    //  Up ***
-            egui::Rect{ min: egui::Pos2 { x: 1.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 1.0 }},    //  Down ***
-            egui::Rect{ min: egui::Pos2 { x: 1.0, y: 1.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Left
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 1.0, y: 1.0 }},    //  Right
-            egui::Rect{ min: egui::Pos2 { x: 0.0, y: 0.0 }, max: egui::Pos2 { x: 0.0, y: 0.0 }},    //  Center
-        ];
-        
+        //  Which way to point arrow.        
         const ARROW_ROTS: [f32;6] = [
             0.0, // None
             PI*1.5, // Up
@@ -96,11 +88,8 @@ impl NavArrows {
             PI*0.0, // Right
             0.0,         // center
         ];
-        let arrow_uv = ARROW_UVS[nav_action as usize];
         let arrow_rot = ARROW_ROTS[nav_action as usize];
         // Draw the arrow if pressed
-        ////println!("Arrow UV: {:?}", arrow_uv);  // ***TEMP***
-        ////egui::Image::new(self.arrow.0, self.arrow.1).uv(arrow_uv).paint_at(ui, response.rect); //
         egui::Image::new(self.arrow.0, self.arrow.1).rotate(arrow_rot, egui::Vec2::new(0.5,0.5)).paint_at(ui, response.rect);
         response
     }
