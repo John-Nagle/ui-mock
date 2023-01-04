@@ -55,7 +55,8 @@ impl NavArrows {
 
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     pub fn decode_response(&self, response: &Response) -> NavAction {
-        if response.is_pointer_button_down_on() {
+        let response = response.interact(egui::Sense::click_and_drag());
+        if response.dragged() {
             println!("Button down on"); // ***TEMP***
             if let Some(interact_pos) = response.hover_pos() {
                 //  Compute position relative to center of button.
