@@ -52,7 +52,7 @@ impl NavArrows {
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     pub fn decode_response(&self, response: &Response) -> NavAction {
         if response.is_pointer_button_down_on() {
-            ////println!("Button down on");// ***TEMP***
+            println!("Button down on");// ***TEMP***
             if let Some(interact_pos) = response.hover_pos() {
                 //  Compute position relative to center of button.
                 let to_vec2 = |p: egui::Pos2| egui::Vec2::new(p.x, p.y);          // why not just use one 2d point/vector type?
@@ -102,9 +102,10 @@ impl egui::Widget for &mut NavArrows {
                 *&self.button.0,
                 *&self.button.1,
                 )
-                .frame(true)
+                .frame(false)
             );
         self.draw_pressed_arrow(ui, response)
+        ////response
     }
 }
 

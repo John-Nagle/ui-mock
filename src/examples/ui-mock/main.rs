@@ -186,7 +186,7 @@ impl AppUi {
         //  Icon loading (current). Example content only. Real programs do this at run time, so we can have themes.
         let move_arrows_icon_bytes = include_bytes!("../../assets/images/move-arrows-128.png");
         let rot_arrows_icon_bytes = include_bytes!("../../assets/images/rot-arrows-128.png");
-        let pressed_button_icon_bytes = include_bytes!("../../assets/images/arrow-pressed-right.png");
+        let pressed_button_icon_bytes = include_bytes!("../../assets/images/arrow-pressed-right-64.png");
         let ui_app_assets = UiAppAssets {
             move_arrows_icon: libui::load_canned_icon(move_arrows_icon_bytes, &mut egui_routine, renderer),
             rot_arrows_icon: libui::load_canned_icon(rot_arrows_icon_bytes, &mut egui_routine, renderer),

@@ -47,8 +47,8 @@ impl MenuConnected {
         let button_size = egui::Vec2::splat(64.0);
         let arrow_size = egui::Vec2::splat(64.0);
         Rc::new(RefCell::new(MenuConnected{
-            move_arrows: NavArrows::new((assets.move_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 16.0),
-            rot_arrows: NavArrows::new((assets.rot_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 16.0),           
+            move_arrows: NavArrows::new((assets.move_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 8.0),
+            rot_arrows: NavArrows::new((assets.rot_arrows_icon, button_size), (assets.pressed_button_icon, arrow_size), 8.0),           
         }))                          // create a trait object to dispatch
     }
 }
