@@ -10,7 +10,7 @@
 //  Jaunary 2023
 //
 use core::ops::Index;
-use egui::{Response, Ui};
+use egui::{Response, Ui, WidgetText};
 use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
@@ -19,6 +19,7 @@ use std::f32::consts::PI;
 pub struct NavArrows {
     button: (egui::TextureId, egui::Vec2), // the button image
     arrow: egui::Image,                    // the arrow image for pressed direction
+    hover_text: WidgetText,                // hover text for help       
     center_button_size: f32,               // center button of arrows, if nonzero
 }
 
@@ -48,11 +49,13 @@ impl NavArrows {
         button: (egui::TextureId, egui::Vec2),
         arrow: (egui::TextureId, egui::Vec2),
         center_button_size: f32,
+        hover_text: impl Into<WidgetText>,
     ) -> Self {
         Self {
             button,
             arrow: egui::Image::new(arrow.0, arrow.1), // preprocess a bit
             center_button_size,
+            hover_text: hover_text.into(),
         }
     }
 
@@ -117,7 +120,14 @@ impl NavArrows {
 impl egui::Widget for &mut NavArrows {
     fn ui(self, ui: &mut Ui) -> Response {
         let response =
-            ui.add(egui::widgets::ImageButton::new(self.button.0, self.button.1).frame(false));
+            ui.add(egui::widgets::ImageButton::new(self.button.0, self.button.1)            
+            .frame(false));
+        //  Only show hover text when not clicked
+        let response = if !response.dragged() {
+            response.on_hover_text(self.hover_text.clone())
+        } else {
+            response
+        };
         self.draw_pressed_arrow(ui, response) // add arrow indicating pressing
     }
 }

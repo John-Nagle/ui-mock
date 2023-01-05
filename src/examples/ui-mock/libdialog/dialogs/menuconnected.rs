@@ -51,11 +51,13 @@ impl MenuConnected {
                 (assets.move_arrows_icon, button_size),
                 (assets.pressed_button_icon, arrow_size),
                 8.0,
+                "Move camera",
             ),
             rot_arrows: NavArrows::new(
                 (assets.rot_arrows_icon, button_size),
                 (assets.pressed_button_icon, arrow_size),
                 8.0,
+                "Aim camera"
             ),
         })) // create a trait object to dispatch
     }
