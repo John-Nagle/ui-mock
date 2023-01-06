@@ -162,11 +162,11 @@ impl CommonState {
         } = self.platform.end_frame(Some(window));
         if !platform_output.events.is_empty() {
             self.wake_up_gui(); // reset GUI idle time.
-            self.message_window.add_line(format!(
+            log::debug!(
                 "Platform events: {:?}, {} shapes.",
                 platform_output.events,
                 shapes.len()
-            )); // ***TEMP***
+            );
         }
         //  Tesselate and return paint jobs.
         (self.platform.context().tessellate(shapes), textures_delta)

@@ -370,33 +370,6 @@ impl rend3_framework::App for AppUi {
                     .common_state
                     .platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
-                /*
-                data.gui_state.platform.begin_frame();
-
-                // Insert egui commands here
-                let show_menus = data.gui_state.if_gui_awake();
-                let mut inuse = libui::draw(&mut data.gui_state, show_menus); // draws the GUI
-                inuse |= is_at_fullscreen_window_top_bottom(window, data); // check if need to escape from full screen
-                if inuse {
-                    data.gui_state.wake_up_gui();
-                }
-                let egui::FullOutput {
-                    shapes,
-                    textures_delta,
-                    platform_output,
-                    ..
-                } = data.gui_state.platform.end_frame(Some(window));
-                if !platform_output.events.is_empty() {
-                    data.gui_state.wake_up_gui(); // reset GUI idle time.
-                    data.gui_state.message_window.add_line(format!(
-                        "Platform events: {:?}, {} shapes.",
-                        platform_output.events,
-                        shapes.len()
-                    )); // ***TEMP***
-                }
-
-                let paint_jobs = data.gui_state.platform.context().tessellate(shapes);
-                */
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
