@@ -19,6 +19,7 @@ use std::f32::consts::PI;
 pub struct NavArrows {
     button: (egui::TextureId, egui::Vec2), // the button image
     arrow: egui::Image,                    // the arrow image for pressed direction
+    center_button: egui::Image,            // the center button
     hover_text: WidgetText,                // hover text for help       
     center_button_size: f32,               // center button of arrows, if nonzero
 }
@@ -48,12 +49,14 @@ impl NavArrows {
     pub fn new(
         button: (egui::TextureId, egui::Vec2),
         arrow: (egui::TextureId, egui::Vec2),
+        center_button: (egui::TextureId, egui::Vec2),
         center_button_size: f32,
         hover_text: impl Into<WidgetText>,
     ) -> Self {
         Self {
             button,
             arrow: egui::Image::new(arrow.0, arrow.1), // preprocess a bit
+            center_button: egui::Image::new(center_button.0, center_button.1), // preprocess a bit
             center_button_size,
             hover_text: hover_text.into(),
         }
@@ -95,10 +98,7 @@ impl NavArrows {
     /// Draw the appropriate pressed arrow.
     fn draw_pressed_arrow(&self, ui: &mut Ui, response: Response) -> Response {
         let nav_action = self.decode_response(&response);
-        if nav_action == NavAction::None || nav_action == NavAction::Center {
-            return response;
-        } // not pressed
-          //  Which way to point arrow.
+        //  Which way to point arrow.
         const ARROW_ROTS: [f32; 6] = [
             0.0,      // None
             PI * 1.5, // Up
@@ -107,12 +107,21 @@ impl NavArrows {
             PI * 0.0, // Right
             0.0,      // center
         ];
-        let arrow_rot = ARROW_ROTS[nav_action as usize];
-        // Draw the arrow if pressed
-        self.arrow
-            .rotate(arrow_rot, egui::Vec2::new(0.5, 0.5))
-            .paint_at(ui, response.rect);
-        response
+        match nav_action {
+            NavAction::None => {}     // no press
+            NavAction::Center => {              // center press
+                self.center_button.paint_at(ui, response.rect);
+            }
+            _ => {
+                //  Arrow press
+                let arrow_rot = ARROW_ROTS[nav_action as usize];
+                // Draw the arrow if pressed
+                self.arrow
+                .rotate(arrow_rot, egui::Vec2::new(0.5, 0.5))
+                .paint_at(ui, response.rect);
+            }
+        }
+        response    // pass through response
     }
 }
 

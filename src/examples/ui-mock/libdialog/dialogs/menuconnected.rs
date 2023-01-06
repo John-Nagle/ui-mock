@@ -44,18 +44,20 @@ pub struct MenuConnected {
 impl MenuConnected {
     /// Create new, as trait object. Provide needed graphical assets.
     pub fn new_link(assets: &UiAppAssets) -> MenuGroupLink {
+        //  Two four-way controls with a center reset button
         let button_size = egui::Vec2::splat(64.0);
-        let arrow_size = egui::Vec2::splat(64.0);
         Rc::new(RefCell::new(MenuConnected {
             move_arrows: NavArrows::new(
                 (assets.move_arrows_icon, button_size),
-                (assets.pressed_button_icon, arrow_size),
+                (assets.pressed_arrow_icon, button_size),
+                (assets.pressed_button_icon, button_size),
                 8.0,
                 "Move camera",
             ),
             rot_arrows: NavArrows::new(
                 (assets.rot_arrows_icon, button_size),
-                (assets.pressed_button_icon, arrow_size),
+                (assets.pressed_arrow_icon, button_size),
+                (assets.pressed_button_icon, button_size),
                 8.0,
                 "Aim camera"
             ),
