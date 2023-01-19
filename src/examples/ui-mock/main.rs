@@ -394,7 +394,7 @@ impl rend3_framework::App for AppUi {
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
-                    context: data.gui_state.common_state.context,
+                    context: data.gui_state.common_state.context.clone(),
                 };
 
                 profiling::scope!("3D");

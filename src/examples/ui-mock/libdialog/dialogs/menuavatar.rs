@@ -13,7 +13,7 @@ use libui::CommonState;
 
 //
 /// Avatar->Preferences
-pub fn manu_preferences(_ui: &mut Ui, state: &mut CommonState) {
+pub fn menu_preferences(_ui: &mut Ui, state: &mut CommonState) {
     //  Unimplemented
     state.add_error_window(
         t!("menu.unimplemented", state.get_lang()),
