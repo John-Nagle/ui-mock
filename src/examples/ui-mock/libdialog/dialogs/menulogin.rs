@@ -33,7 +33,7 @@ impl MenuGroup for MenuLogin {
     //  Called on every frame. Do not delay here.
     fn draw(&mut self, state: &mut CommonState) -> bool {
         // Login to a grid
-        let ctx = state.platform.context();
+        let ctx = state.context;
 
         //  Top menu bar
         egui::TopBottomPanel::top("grid_login_container").show(&ctx, |ui| {

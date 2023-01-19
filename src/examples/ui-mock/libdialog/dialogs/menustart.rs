@@ -37,7 +37,7 @@ impl MenuGroup for MenuStart {
     //  Called on every frame. Do not delay here.
     fn draw(&mut self, state: &mut CommonState) -> bool {
         // Insert egui commands here to draw the menus for thie state.
-        let ctx = state.platform.context();
+        let ctx = state.context;
         //  Draw the splash screen with a big set of alternative metaverses.
         //
         egui::CentralPanel::default().show(&ctx, |_ui| {

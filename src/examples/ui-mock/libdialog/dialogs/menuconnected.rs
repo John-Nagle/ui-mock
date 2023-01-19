@@ -70,7 +70,7 @@ impl MenuGroup for MenuConnected {
     //  Called on every frame. Do not delay here.
     fn draw(&mut self, state: &mut CommonState) -> bool {
         // Insert egui commands here
-        let ctx = state.platform.context();
+        let ctx = state.context;
         //  Top menu bar
         let show_menus = state.if_gui_awake(); // show menus only if GUI is needed.
         if show_menus {

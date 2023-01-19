@@ -234,7 +234,7 @@ impl GuiWindow for LoginDialogWindow {
                                     .password(true),
                             );
                         });
-                        ui.with_layout(egui::Layout::right_to_left(), |ui| {
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.checkbox(
                                 &mut self.remember_password,
                                 t!("menu.remember", &state.params.lang),
