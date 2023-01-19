@@ -88,7 +88,8 @@ impl AppUi {
     }
     /// Setup of the graphics environment. Returns error.
     fn setup_with_error(
-        &mut self,
+        &mut self,        
+        event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
         window: &winit::window::Window,
         renderer: &Arc<rend3::Renderer>,
         _routines: &Arc<rend3_framework::DefaultRoutines>,
@@ -323,12 +324,13 @@ impl rend3_framework::App for AppUi {
     /// Setup of the graphics enviornment, popping up a panic dialog on error.
     fn setup(
         &mut self,
+        event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
         window: &winit::window::Window,
         renderer: &Arc<rend3::Renderer>,
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
     ) {
-        if let Err(err) = self.setup_with_error(window, renderer, _routines, surface_format) {
+        if let Err(err) = self.setup_with_error(event_loop, window, renderer, _routines, surface_format) {
             panic_dialog("Start-up failure", &format!("{:?}", err)); // tell user
             panic!("Start up failure: {:?}", err); // then panic
         }
@@ -338,7 +340,7 @@ impl rend3_framework::App for AppUi {
     fn handle_event(
         &mut self,
         window: &winit::window::Window,
-        renderer: &Arc<rend3::Renderer>,
+        renderer: &Arc<rend3::Renderer>,       
         routines: &Arc<rend3_framework::DefaultRoutines>,
         base_rendergraph: &rend3_routine::base::BaseRenderGraph,
         surface: Option<&Arc<rend3::types::Surface>>,
@@ -380,22 +382,27 @@ impl rend3_framework::App for AppUi {
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
+                /* Removed from EGUI example.
                 data.gui_state
                     .common_state
                     .platform
                     .update_time(data.start_time.elapsed().as_secs_f64());
+                */
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
-                    context: data.gui_state.common_state.platform.context(),
+                    context: data.gui_state.common_state.context,
                 };
 
                 profiling::scope!("3D");
                 // Get a frame
+                let frame = surface.unwrap().get_current_texture().unwrap();
+                /*
                 let frame = rend3::util::output::OutputFrame::Surface {
                     surface: Arc::clone(surface.unwrap()),
                 };
+                */
 
                 // Ready up the renderer
                 let (cmd_bufs, ready) = renderer.ready();
