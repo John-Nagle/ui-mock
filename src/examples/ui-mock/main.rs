@@ -170,6 +170,7 @@ impl AppUi {
             // Direction will be normalized
             direction: glam::Vec3::new(-1.0, -4.0, 2.0),
             distance: 400.0,
+            resolution: 2048,       // ***NOT SURE ABOUT THIS***
         });
 /*
         // Create the winit/egui integration, which manages our egui context for us.
@@ -403,24 +404,33 @@ impl rend3_framework::App for AppUi {
                     surface: Arc::clone(surface.unwrap()),
                 };
                 */
-
+                // Swap the instruction buffers so that our frame's changes can be processed.
+                renderer.swap_instruction_buffers();
+                // Evaluate our frame's world-change instructions
+                let mut eval_output = renderer.evaluate_instructions();
+                /*
                 // Ready up the renderer
                 let (cmd_bufs, ready) = renderer.ready();
-
+                */
                 // Lock the routines
                 let pbr_routine = rend3_framework::lock(&routines.pbr);
                 let tonemapping_routine = rend3_framework::lock(&routines.tonemapping);
 
                 // Build a rendergraph
                 let mut graph = rend3::graph::RenderGraph::new();
+                
+                // Import the surface texture into the render graph.
+                let frame_handle =
+                    graph.add_imported_render_target(&frame, 0..1, rend3::graph::ViewportRect::from_size(resolution));
 
                 // Add the default rendergraph without a skybox
                 base_rendergraph.add_to_graph(
                     &mut graph,
-                    &ready,
+                    &eval_output,
                     &pbr_routine,
                     None,
                     &tonemapping_routine,
+                    frame_handle,
                     resolution,
                     SAMPLE_COUNT,
                     glam::Vec4::ZERO,
@@ -428,11 +438,18 @@ impl rend3_framework::App for AppUi {
                 );
 
                 // Add egui on top of all the other passes
+                /*
                 let surface = graph.add_surface_texture();
                 data.egui_routine.add_to_graph(&mut graph, input, surface);
+                */
+                data.egui_routine.add_to_graph(&mut graph, input, frame_handle);
 
                 // Dispatch a render using the built up rendergraph!
-                graph.execute(renderer, frame, cmd_bufs, &ready);
+                ////graph.execute(renderer, frame, cmd_bufs, &ready);
+                graph.execute(renderer, &mut eval_output);
+
+                // Present the frame
+                frame.present();
                 //  Exit if all done.
                 if data.quit {
                     control_flow(winit::event_loop::ControlFlow::Exit);
