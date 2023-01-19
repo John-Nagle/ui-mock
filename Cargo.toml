@@ -48,7 +48,7 @@ instant = { version = "0.1", unix = ["wasm-bindgen"] }
 rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 
 winit = "0.27"
-egui_winit_platform = "0.15.0"
+egui_winit_platform = "0.16.0"
 # Opening URL's
 webbrowser = "0.8.2"
 # Creating textures
