@@ -38,16 +38,17 @@ rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 # Winit integration with egui (turn off the clipboard feature)
 egui-winit = { version = "0.20", default-features = false, features = ["links", "wayland"] }
 
-rend3-egui = "^0.3.0"
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 		
 # Importing png's
 image = { version = "0.24.3", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
 instant = { version = "0.1", unix = ["wasm-bindgen"] }
 
-rend3-routine = { version = "^0.3.0" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 
 winit = "0.27"
+egui_winit_platform = "0.15.0"
 # Opening URL's
 webbrowser = "0.8.2"
 # Creating textures
@@ -92,7 +93,7 @@ wgpu-hal = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d95
 wgpu-types = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
 naga = { git = "https://github.com/gfx-rs/naga.git", rev = "e98bd92" }
 range-alloc = { git = "https://github.com/expenses/gfx.git", rev = "6afbeb6d9733e295404f4fe0ac936591e277a26e" }
-gltf = { git = "https://github.com/gltf-rs/gltf.git", rev = "7031e7a8ec7c991b1b1d29eaf7c531c6f4842083" }
+####gltf = { git = "https://github.com/gltf-rs/gltf.git", rev = "7031e7a8ec7c991b1b1d29eaf7c531c6f4842083" }
 
 
 
