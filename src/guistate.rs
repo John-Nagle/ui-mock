@@ -68,7 +68,8 @@ pub struct CommonState {
     //  Assets - images, etc.
     pub assets: GuiAssets,
     //  Platform data for context
-    pub platform: egui_winit_platform::Platform,
+    pub platform: egui_winit::State,
+    pub context: egui::Context,
     ////pub grid_select_window: GridSelectWindow,   // used at start
     pub message_window: MessageWindow, // miscellaneous messages ***TEMP***
     pub menu_group: MenuGroupLink,     // currently active menu group
@@ -89,7 +90,8 @@ impl CommonState {
     pub fn new(
         params: GuiParams,
         assets: GuiAssets,
-        platform: egui_winit_platform::Platform,
+        platform: egui_winit::State,
+        context: egui::Context,
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
         event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
     ) -> Self {
@@ -101,7 +103,7 @@ impl CommonState {
         );
         ////let grid_select_window = GridSelectWindow::new("Grid select", t!("window.grid_select", &params.lang), &assets, params.grid_select_params.clone());
         //  Set up defaults
-        guiutil::set_default_styles(&platform.context()); // set up color and text defaults.
+        guiutil::set_default_styles(&context); // set up color and text defaults.
         let light_mode_visuals = egui::Visuals::light();
         let dark_mode_visuals = {
             let mut visuals = egui::Visuals::dark();
@@ -113,6 +115,7 @@ impl CommonState {
         ////let (event_send_channel, event_recv_channel) = crossbeam_channel::unbounded(); // message channel
         Self {
             platform,
+            context,
             message_window,
             params: Rc::new(params),
             assets,
@@ -141,7 +144,7 @@ impl CommonState {
         window: &winit::window::Window,
     ) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
-        self.platform.begin_frame();
+        self.context.begin_frame(self.platform.take_egui_input(window));
 
         // egui commands run here
         ////let show_menus = self.if_gui_awake();
@@ -150,7 +153,7 @@ impl CommonState {
         let menu_group = Rc::clone(&self.menu_group);
         let mut inuse = menu_group.borrow_mut().draw(self);
 
-        inuse |= is_at_fullscreen_window_top_bottom(window, &self.platform.context()); // check if need to escape from full screen
+        inuse |= is_at_fullscreen_window_top_bottom(window, &self.context); // check if need to escape from full screen
         if inuse {
             self.wake_up_gui();
         }
@@ -159,7 +162,7 @@ impl CommonState {
             textures_delta,
             platform_output,
             ..
-        } = self.platform.end_frame(Some(window));
+        } = self.context.end_frame();
         if !platform_output.events.is_empty() {
             self.wake_up_gui(); // reset GUI idle time.
             log::debug!(
@@ -169,7 +172,7 @@ impl CommonState {
             );
         }
         //  Tesselate and return paint jobs.
-        (self.platform.context().tessellate(shapes), textures_delta)
+        (self.context.tessellate(shapes), textures_delta)
     }
 
     /// Draw all live windows
@@ -283,7 +286,8 @@ impl<T: AppState> GuiState<T> {
     pub fn new(
         params: GuiParams,
         assets: GuiAssets,
-        platform: egui_winit_platform::Platform,
+        platform: egui_winit::State,
+        context: egui::Context, 
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
         event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
         app_state: T,
@@ -292,6 +296,7 @@ impl<T: AppState> GuiState<T> {
             params,
             assets,
             platform,
+            context,
             event_send_channel,
             event_recv_channel,
         );

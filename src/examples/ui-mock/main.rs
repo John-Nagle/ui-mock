@@ -170,7 +170,7 @@ impl AppUi {
             direction: glam::Vec3::new(-1.0, -4.0, 2.0),
             distance: 400.0,
         });
-
+/*
         // Create the winit/egui integration, which manages our egui context for us.
         let platform =
             egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
@@ -180,6 +180,12 @@ impl AppUi {
                 font_definitions: egui::FontDefinitions::default(),
                 style: Default::default(),
             });
+*/            
+        // Create the egui context
+        let context = egui::Context::default();
+        // Create the winit/egui integration.
+        let mut platform = egui_winit::State::new(event_loop);
+        platform.set_pixels_per_point(window.scale_factor() as f32);
 
         //  Icon loading (obsolete)
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
@@ -262,6 +268,7 @@ impl AppUi {
             params,
             assets,
             platform,
+            context,
             event_send_channel,
             event_recv_channel,
             app_state,
