@@ -373,12 +373,13 @@ impl rend3_framework::App for AppUi {
         }
 
         let data = self.data.as_mut().unwrap();
+        /*
         //  This is where EGUI handles 2D UI events.
-        data.gui_state.common_state.platform.handle_event(&event);
         if data.gui_state.common_state.platform.captures_event(&event) {
             ////println!("GUI captured event: {:?}", event);    // ***TEMP TEST***
             return; // 2D UI consumed this event.
         }
+        */
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
@@ -461,31 +462,40 @@ impl rend3_framework::App for AppUi {
             rend3_framework::Event::MainEventsCleared => {
                 window.request_redraw();
             }
-            rend3_framework::Event::WindowEvent { event, .. } => match event {
-                winit::event::WindowEvent::Resized(size) => {
-                    data.egui_routine
-                        .resize(size.width, size.height, window.scale_factor() as f32);
+            rend3_framework::Event::WindowEvent { event, .. } => {
+            
+                //  This is where EGUI handles 2D UI events.
+                if data.gui_state.common_state.platform.on_event(&data.gui_state.common_state.context, &event).consumed {
+                    return; // 2D UI consumed this event.
                 }
-                winit::event::WindowEvent::CloseRequested => {
-                    control_flow(winit::event_loop::ControlFlow::Exit);
-                }
-                winit::event::WindowEvent::Focused(gained) => {
-                    if gained {
+                
+                match event {
+          
+                    winit::event::WindowEvent::Resized(size) => {
+                        data.egui_routine
+                             .resize(size.width, size.height, window.scale_factor() as f32);
+                    }
+                    winit::event::WindowEvent::CloseRequested => {
+                        control_flow(winit::event_loop::ControlFlow::Exit);
+                    }
+                    winit::event::WindowEvent::Focused(gained) => {
+                        if gained {
+                            data.gui_state.common_state.wake_up_gui();
+                        } // make menus reappear on focus
+                    }
+                    winit::event::WindowEvent::CursorEntered { .. } => {
+                        data.gui_state.common_state.wake_up_gui(); // either entering or leaving makes menus reappear
+                    }
+                    winit::event::WindowEvent::CursorLeft { .. } => {
                         data.gui_state.common_state.wake_up_gui();
-                    } // make menus reappear on focus
-                }
-                winit::event::WindowEvent::CursorEntered { .. } => {
-                    data.gui_state.common_state.wake_up_gui(); // either entering or leaving makes menus reappear
-                }
-                winit::event::WindowEvent::CursorLeft { .. } => {
-                    data.gui_state.common_state.wake_up_gui();
-                }
-                winit::event::WindowEvent::KeyboardInput { input, .. } => {
-                    let _ = input; // not yet used
+                    }
+                    winit::event::WindowEvent::KeyboardInput { input, .. } => {
+                        let _ = input; // not yet used
                                    ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
+                    }
+                    _ => {}
                 }
-                _ => {}
-            },
+            }
             _ => {}
         }
     }
