@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -24,42 +24,34 @@ tracy = ["tracy-client", "profiling/profile-with-tracy"]
 #   This should not be enabled in production builds for content security.
 replay = []
 
-#   UDP replayer - replays UDP captures and outputs a huge JSON file
-#   which can be displayed by another program
-
 [[example]]
 name = "ui-mock"
 path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
-glam = {version = "0.21.2", features = ["bytemuck", "serde"]}	
-rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
-rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e"}
-rend3-gltf = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
-rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
 
-# Egui renderer integration
-rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a972b0ff0a98bb79b2b1c8812e3a823840a5e02e" }
+#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-01-18.
+egui = "0.20.0"
+glam = { version = "0.22", features = ["bytemuck", "serde"]}
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-# The egui immediate mode gui library
-egui = "0.18.1"
-####egui = "0.19.0" ## ***NOTYET*** rend3 integration
-# Winit integration with egui
-egui_winit_platform = "0.15.0"
-# logging
-#### env_logger = { version = "0.9", default-features = false, features = ["termcolor", "atty"] }			
+# Winit integration with egui (turn off the clipboard feature)
+egui-winit = { version = "0.20", default-features = false, features = ["links", "wayland"] }
+
+rend3-egui = "^0.3.0"
+		
 # Importing png's
-image = { version = "0.23.14", default-features = false, features = ["png"] }
+image = { version = "0.24.3", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
-instant = { version = "0.1", features = ["wasm-bindgen"] }
+instant = { version = "0.1", unix = ["wasm-bindgen"] }
 
-# winit = "0.26.1"
-# Windowing
-winit = "0.26"
+rend3-routine = { version = "^0.3.0" }
+
+winit = "0.27"
 # Opening URL's
-webbrowser = "0.5.5"
+webbrowser = "0.8.2"
 # Creating textures
-wgpu = "0.13"
+wgpu = "0.14"
 # File dialogs
 rfd = "0.8.3"
 futures = "0.3.21"
@@ -90,3 +82,17 @@ md5 = "0.7.0"
 zeroize = {version = "1.5.7", features = ["zeroize_derive"]}
 keyring = "1.2.0"
 hex = "0.4.2"
+
+#   Rend3 patches. From Rend3 trunk, 2023-01-18
+
+[patch.crates-io]
+wgpu = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
+wgpu-core = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
+wgpu-hal = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
+wgpu-types = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
+naga = { git = "https://github.com/gfx-rs/naga.git", rev = "e98bd92" }
+range-alloc = { git = "https://github.com/expenses/gfx.git", rev = "6afbeb6d9733e295404f4fe0ac936591e277a26e" }
+gltf = { git = "https://github.com/gltf-rs/gltf.git", rev = "7031e7a8ec7c991b1b1d29eaf7c531c6f4842083" }
+
+
+
