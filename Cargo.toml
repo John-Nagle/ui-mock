@@ -30,18 +30,20 @@ path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
 
-#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-01-18.
-egui = "0.20.0"
+#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-02-13.
+egui = "0.21.0"
 glam = { version = "0.22", features = ["bytemuck", "serde"]}
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
 
 # Winit integration with egui (turn off the clipboard feature)
-egui-winit = { version = "0.20", default-features = false, features = ["links", "wayland"] }
+egui-winit = { version = "0.21", default-features = false, features = ["links", "wayland"] }
 
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
 
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
-		
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
+
+#   Try to get rid of this. It's only used for one texture enum.	
+wgpu = "0.15"
 # Importing png's
 image = { version = "0.24.3", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
@@ -49,12 +51,13 @@ instant = { version = "0.1", unix = ["wasm-bindgen"] }
 
 rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-winit = "0.27"
+## winit = "0.28.1"
+winit = "0.28"
 ####egui_winit_platform = "0.16.0"
 # Opening URL's
 webbrowser = "0.8.2"
 # Creating textures
-wgpu = "0.14"
+# wgpu = "0.14"
 # File dialogs
 rfd = "0.8.3"
 futures = "0.3.21"
@@ -86,16 +89,6 @@ zeroize = {version = "1.5.7", features = ["zeroize_derive"]}
 keyring = "1.2.0"
 hex = "0.4.2"
 
-#   Rend3 patches. From Rend3 trunk, 2023-01-18
-
-[patch.crates-io]
-wgpu = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
-wgpu-core = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
-wgpu-hal = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
-wgpu-types = { git = "https://github.com/gfx-rs/wgpu.git", rev = "fac4731288117d951d0944d96cf0b00fa006dd6c" }
-naga = { git = "https://github.com/gfx-rs/naga.git", rev = "e98bd92" }
-range-alloc = { git = "https://github.com/expenses/gfx.git", rev = "6afbeb6d9733e295404f4fe0ac936591e277a26e" }
-####gltf = { git = "https://github.com/gltf-rs/gltf.git", rev = "7031e7a8ec7c991b1b1d29eaf7c531c6f4842083" }
 
 
 
