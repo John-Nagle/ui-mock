@@ -49,7 +49,7 @@ image = { version = "0.24.3", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
 instant = { version = "0.1", unix = ["wasm-bindgen"] }
 
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
 
 ## winit = "0.28.1"
 winit = "0.28"
@@ -59,7 +59,8 @@ webbrowser = "0.8.2"
 # Creating textures
 # wgpu = "0.14"
 # File dialogs
-rfd = "0.8.3"
+####rfd = "0.8.3"
+rfd = "0.11.1"
 futures = "0.3.21"
 raw-window-handle = "0.4.3"
 # Internationalization
