@@ -4,10 +4,24 @@ version = "0.7.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
-
-# Usable targets:
-# native (on Linux)
-# x86_64-pc-windows-gnu
+#   Usable targets:
+#   - native (on Linux)
+#   - x86_64-pc-windows-gnu
+#
+#   When compiling on Linux for a Linux target, use
+#
+#       cargo build --examples
+#
+#       cargo build --release --examples
+#
+#   When cross-compiling to Windows, use:
+#
+#       cargo build --target x86_64-pc-windows-gnu --examples
+#
+#       cargo build --profile winrelease --target x86_64-pc-windows-gnu --examples
+#
+#   This will require a 16GB RAM computer and a minutes-long link, due to Rust bug #98302.
+#
 
 [package.metadata.bundle]
 identifier = "com.animats.ui-mock"
@@ -61,6 +75,11 @@ instant = { version = "0.1", unix = ["wasm-bindgen"] }
 
 rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
 
+#   Embedding shaders. This forces shaders to be compiled into the executable
+#   rather than loaded at run time. That's because rust-embed won't work cross platoform
+#   where source and target file systems are different. Version must match that used in rend3 so 
+#   that feature merging takes place.
+rust-embed = { version = "6", features = ["debug-embed"]}
 ## winit = "0.28.1"
 winit = "0.28"
 ####egui_winit_platform = "0.16.0"
