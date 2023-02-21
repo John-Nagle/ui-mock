@@ -16,7 +16,7 @@ mod navarrows; // a widget // the empty menu
 use core::any::Any;
 use core::cell::RefCell;
 use std::rc::Rc;
-
+ 
 /// Internationalization
 pub use basicintl::Dictionary;
 pub use guistate::panic_dialog;

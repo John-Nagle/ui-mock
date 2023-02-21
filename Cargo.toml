@@ -15,6 +15,16 @@ category = "Game"
 resources = ["src/images"]
 icon = ["src/images/64x64.png", "src/images/32x32.png"]
 
+[profile.release]
+debug = true
+lto = "thin"
+
+#   Use only when cross-compiling to target "x86_64-pc-windows-gnu"
+#   Ref Rust bug #98302. lto = "thin" fails for target x86_64-pc-windows-gnu. "fat" works, but means minutes-longer link times and more than 8GB of RAM to link.
+[profile.winrelease]
+inherits = "release"
+lto = "fat"
+
 [features]
 #   Replay file is a development feature and will be off for production
 default = ["replay"]
@@ -77,7 +87,7 @@ directories = "4.0"
 tracy-client = {version = "0.13", optional = true }
 profiling = { version = "^1.0.6", default-features = false }
 # System information
-sysinfo = { version = "0.24", default-features = false }
+sysinfo = { version = "0.28", default-features = false }
 # Concurrency
 crossbeam-channel = "0.5"
 # Error handling
