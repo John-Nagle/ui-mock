@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.7.0"
+version = "0.7.2"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -53,35 +53,31 @@ name = "ui-mock"
 path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
-
-#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-02-13.
-egui = "0.21.0"
-glam = { version = "0.22", features = ["bytemuck", "serde"]}
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
+#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-03-09.
+#   Must match libscene and libdialog.
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
 
 # Winit integration with egui (turn off the clipboard feature)
 egui-winit = { version = "0.21", default-features = false, features = ["links", "wayland"] }
-
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
-
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
-
 #   Try to get rid of this. It's only used for one texture enum.	
 wgpu = "0.15"
 # Importing png's
 image = { version = "0.24.3", default-features = false, features = ["png"] }
 # Portable implementation of Instant.
 instant = { version = "0.1", unix = ["wasm-bindgen"] }
-
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "6dd847f" }
-
+egui = "0.21.0"
+glam = { version = "0.22", features = ["bytemuck", "serde"]}
 #   Embedding shaders. This forces shaders to be compiled into the executable
 #   rather than loaded at run time. That's because rust-embed won't work cross platoform
 #   where source and target file systems are different. Version must match that used in rend3 so 
 #   that feature merging takes place.
 rust-embed = { version = "6", features = ["debug-embed"]}
-## winit = "0.28.1"
 winit = "0.28"
+#   End of Rend3 compatibilty section.
+
 ####egui_winit_platform = "0.16.0"
 # Opening URL's
 webbrowser = "0.8.2"
