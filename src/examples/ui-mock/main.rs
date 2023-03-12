@@ -317,7 +317,7 @@ impl rend3_framework::App for AppUi {
                 simplelog::Config::default(),
                 std::fs::File::create(*log_file_name.clone()).expect("Unable to create log file"),
             ),
-            MessageLogger::new_logger(LevelFilter::Warn, self.event_send_channel.clone()),
+            MessageLogger::new_logger(LevelFilter::Error, self.event_send_channel.clone()),
         ]);
         log::warn!("Logging to {:?}", log_file_name); // where the log is going
     }

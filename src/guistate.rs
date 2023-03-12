@@ -502,6 +502,15 @@ pub fn is_at_fullscreen_window_top_bottom(
     }
 }
 
+/// First N chars of a string.  UTF-8 aware, but not grapheme aware. For log entries.
+fn first_n_chars(s: &str, n: usize) -> &str {
+    if let Some((x, _)) = s.char_indices().nth(n) {
+        &s[..x]
+    } else {
+        s
+    }
+}
+
 /// Logging to GUI
 //  This is complicated by its having to outlive
 //  almost everything else. Even the GUI to which
@@ -538,14 +547,16 @@ impl log::Log for MessageLogger {
 
     /// Log an error. Filtering has already taken place.
     fn log(&self, record: &log::Record<'_>) {
+        if record.level() > self.level_filter { return }  // filter out messages below threshold
         // Format for display.
-        //  ***NEED TO TRIM LENGTH***
+        const MAX_LOG_MSG_LENGTH: usize = 100;   // trim msg to this length
         let s = format!(
             "[{}] ({}): {}",
             record.level(),
             record.target(),
             record.args()
         );
+        let s = first_n_chars(&s, MAX_LOG_MSG_LENGTH).to_string();   // trim string
         let event = GuiCommonEvent::LogMessage(s);
         if let Err(e) = CommonState::send_gui_event_on_channel(&self.send_channel, Box::new(event))
         {
