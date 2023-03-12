@@ -452,9 +452,9 @@ impl MessageWindow {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
-            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
-            ////let total_rows = 10;
-            egui::ScrollArea::vertical().show_rows(
+            egui::ScrollArea::vertical()
+                .stick_to_bottom(true)
+                .show_rows(
                 ui,
                 row_height,
                 self.lines.len(),
