@@ -1,4 +1,14 @@
-use super::basicintl::Dictionary;
+//! # guistate.rs -- window and menu management.
+//!
+//! Top menu bar, and a bottom button bar.
+//! Both disappear when not used for a while, for
+//! a clean game screen.
+//
+//  This is the mandatory part of the user interface.
+//  Dialogs and menus use this.
+//
+//  Animats
+//  June 2022
 use super::guiutil;
 use super::menunone::MenuNone;
 use crate::t;
@@ -9,18 +19,7 @@ use rend3::ExtendedAdapterInfo;
 use simplelog::LevelFilter;
 use simplelog::SharedLogger;
 use std::any::Any;
-/// # guistate.rs -- window and menu management.
-//
-//  Top menu bar, and a bottom button bar.
-//  Both disappear when not used for a while, for
-//  a clean game screen.
-//
-//  This is the mandatory part of the user interface.
-//  Dialogs and menus use this.
-//
-//  Animats
-//  June 2022
-//
+
 use std::collections::VecDeque;
 use std::path::PathBuf;
 use std::rc::Rc;
