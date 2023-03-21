@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.7.4"
+version = "0.7.5"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -55,10 +55,10 @@ path = "src/examples/ui-mock/main.rs"
 [dependencies]
 #   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-03-09.
 #   Must match libscene and libdialog.
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "4d10795" }
+rend3 = { version = "^0.3.0" }
+rend3-egui = { version = "^0.3.0" }
+rend3-framework = { version = "^0.3.0" }
+rend3-routine = { version = "^0.3.0" }
 
 # Winit integration with egui (turn off the clipboard feature)
 egui-winit = { version = "0.21", default-features = false, features = ["links", "wayland"] }
@@ -114,6 +114,14 @@ md5 = "0.7.0"
 zeroize = {version = "1.5.7", features = ["zeroize_derive"]}
 keyring = "1.2.0"
 hex = "0.4.2"
+
+
+[patch.crates-io]
+# c2c2d3237
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
 
 
 
