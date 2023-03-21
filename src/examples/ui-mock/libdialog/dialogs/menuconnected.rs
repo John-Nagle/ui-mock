@@ -189,12 +189,12 @@ impl MenuGroup for MenuConnected {
                         let response = ui.add(&mut self.rot_arrows);
                         let action = self.rot_arrows.decode_response(&response);
                         if action != NavAction::None {
-                            println!("Rot arrows: {:?}", action);
+                            state.add_msg(format!("Rotation arrows: {:?}", action));
                         }
                         let response = ui.add(&mut self.move_arrows);
                         let action = self.move_arrows.decode_response(&response);
                         if action != NavAction::None {
-                            println!("Move arrows: {:?}", action);
+                            state.add_msg(format!("Move arrows: {:?}", action));
                         }
                     })
                 });
