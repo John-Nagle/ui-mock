@@ -23,6 +23,7 @@ use std::any::Any;
 use std::collections::VecDeque;
 use std::path::PathBuf;
 use std::rc::Rc;
+use crate::Dictionary;
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200; // max scrollback for message window
 /// Useful types
