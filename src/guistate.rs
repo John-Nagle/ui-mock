@@ -373,7 +373,8 @@ impl GuiWindow for TextWindow {
                     });
                 } else {
                     //  Multi-line message, can become scrollable.
-                    egui::ScrollArea::vertical().show_rows(
+                    egui::ScrollArea::both()
+                        .show_rows(
                         ui,
                         row_height,
                         total_rows,
@@ -382,7 +383,7 @@ impl GuiWindow for TextWindow {
                                 if row >= self.message.len() {
                                     break;
                                 } // prevent scrolling off end
-                                ui.label(self.message[row].as_str());
+                                ui.add(egui::Label::new(self.message[row].as_str()).wrap(false));
                             }
                         },
                     );
@@ -452,7 +453,7 @@ impl MessageWindow {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
-            egui::ScrollArea::vertical()
+            egui::ScrollArea::both()
                 .stick_to_bottom(true)
                 .show_rows(
                 ui,
@@ -464,7 +465,7 @@ impl MessageWindow {
                             break;
                         }
                         let text = &self.lines[row];
-                        ui.label(text);
+                        ui.add(egui::Label::new(text).wrap(false));
                     }
                 },
             );
