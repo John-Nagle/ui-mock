@@ -11,8 +11,9 @@ mod basicintl;
 mod guistate;
 mod guiutil;
 mod menunone;
-mod navarrows; // a widget // the empty menu
-                           //  Imports for here
+mod navarrows; // a widget
+mod statgraph;  // a widget
+
 use core::any::Any;
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -33,6 +34,7 @@ pub use guiutil::{
 };
 /// Widgets
 pub use navarrows::{NavArrows, NavAction};
+pub use statgraph::{StatGraph};
 
 //  Traits
 /// A group of menus. Libui user sets what menus are to be shown.
