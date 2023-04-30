@@ -276,5 +276,8 @@ So GuiWindow and MenuGroup need to implement incoming_message, which takes a dyn
 Any window or group which gets dynamic updates needs to implement this. 
 Incoming messages are passed to incoming_message of the currrent MenuGroup and to any open GuiWindow.
 Don't send too many messages. Event-driven, not periodic.
+
+Coded that framework. Can't pass CommonState to windows, though, because CommonState is at the
+same ownership level as the list of windows. May need to re-organize CommonState.
     
     

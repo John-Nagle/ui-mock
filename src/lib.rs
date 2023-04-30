@@ -42,7 +42,7 @@ pub trait MenuGroup {
     /// Draw the item. Called every frame.
     fn draw(&mut self, state: &mut CommonState) -> bool; // returns true if menu is in use
     ///  Pass event to a GUI item. Override to get events.
-    fn pass_event(&mut self, /*state: &mut CommonState,*/ event: &SendAnyBoxed) {}
+    fn pass_event(&mut self, _state: &mut CommonState, _event: &SendAnyBoxed) {}
     /// Name for debug and logging purposes only
     fn get_name(&self) -> &'static str; 
     /// For downcasting. Little used, may be removed.
@@ -60,7 +60,7 @@ pub trait GuiWindow {
         true
     } // override and set to false when done
     ///  Pass event to a GUI item. Override to get events.
-    fn pass_event(&mut self, /*state: &mut CommonState,*/ event: &SendAnyBoxed) {}
+    fn pass_event(&mut self, _state: &mut CommonState, _event: &SendAnyBoxed) {}
     /// GetID  of window.
     fn get_id(&self) -> egui::Id; 
     /// For downcasting. 
