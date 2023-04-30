@@ -39,21 +39,34 @@ pub use statgraph::{StatGraph};
 //  Traits
 /// A group of menus. Libui user sets what menus are to be shown.
 pub trait MenuGroup {
+    /// Draw the item. Called every frame.
     fn draw(&mut self, state: &mut CommonState) -> bool; // returns true if menu is in use
-    fn get_name(&self) -> &'static str; // name for debug and logging purposes only
-    fn as_any(&self) -> &dyn Any; // for downcasting
-    fn as_any_mut(&mut self) -> &mut dyn Any; // for downcasting
+    ///  Pass event to a GUI item. Override to get events.
+    fn pass_event(&mut self, /*state: &mut CommonState,*/ event: &SendAnyBoxed) {}
+    /// Name for debug and logging purposes only
+    fn get_name(&self) -> &'static str; 
+    /// For downcasting. Little used, may be removed.
+    fn as_any(&self) -> &dyn Any;
+    /// For downcasting. 
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
 /// A GUI window
 pub trait GuiWindow {
+    /// Draw the item. Called every frame.
     fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState); // called every frame
+    /// Retain this window? Override and set to false for a window to close itself.
     fn retain(&self) -> bool {
         true
     } // override and set to false when done
-    fn get_id(&self) -> egui::Id; // get ID of window
-    fn as_any(&self) -> &dyn Any; // for downcasting
-    fn as_any_mut(&mut self) -> &mut dyn Any; // for downcasting
+    ///  Pass event to a GUI item. Override to get events.
+    fn pass_event(&mut self, /*state: &mut CommonState,*/ event: &SendAnyBoxed) {}
+    /// GetID  of window.
+    fn get_id(&self) -> egui::Id; 
+    /// For downcasting. 
+    fn as_any(&self) -> &dyn Any;
+    /// For downcasting. 
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
 pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;

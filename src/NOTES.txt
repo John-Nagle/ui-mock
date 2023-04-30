@@ -204,6 +204,77 @@ Getting close to integration.
    So, when a mutable window needs mutable access to the GUI  state, it's a double borrow.
    Need to separate ownership of windows and GUI state.
    But how? If both are members of a larger structure, it's still a double borrow.
+  
+2023-04-17
+
+Adding statistics widget.
+- Where are values for statistics stored?
+- In what type?
+- If that's part of UiInfo...
+  - Is it locked, or updated via msg to the render thread?
+    - Probably via msg. 
+      - Once per second?
+  - Draw functions need access to UiInfo, which is part of AppState, not just CommonState.
+  - And the main draw function is fn draw(&mut self, state: &mut CommonState) -> bool; // returns true if menu is in use
+  - This is a problem, because AppState is a generic. Can't use AppState instead of CommonState without making everything generic. 
+    - MenuGroup can be sent as "Any", but all MenuGroup structs are the same. That's not generic.
+    - Can't pass UiState to Draw, even if generic, because that would lead to a double borrow. Both UiState and CommonState are part of AppState.
+    - Already hit this for log level, which is why that didn't work.
+    - This structure isn't good.
+  - Possibilities:
+    - What we really want is for all draw fns to have access to GuiState, not just CommonState.
+      - GuiState is a generic, and contains AppState and CommonState.
+      - AppState is already a trait.
+    - Option 1: All draw stuff becomes generic.
+    - Option 2: AppState gets boxed and handled via Any, downcast when needed.
    
+   
+2023-04-29
+
+Ownership and generic problems, as above.
+MenuGroup and GuiWindow need to pass GuiState around, instead of CommonState.
+
+/// All GUI windows persistent state.  Includes the generic part.
+pub struct GuiState<T: AppState> {
+    pub common_state: CommonState, // same regardless of generic
+    pub app_state: T,              // application-specific state
+}
+
+OK, suppose we make app_state a dyn any, and downcast when needed. 
+That should work.
+Do MenuGroup and GuiWindow actually have to be dyn any? Check. Doesn't look like it.
+   
+/// A group of menus. Libui user sets what menus are to be shown.
+pub trait MenuGroup {
+    fn draw(&mut self, state: &mut CommonState) -> bool; // returns true if menu is in use
+    fn get_name(&self) -> &'static str; // name for debug and logging purposes only
+    fn as_any(&self) -> &dyn Any; // for downcasting
+    fn as_any_mut(&mut self) -> &mut dyn Any; // for downcasting
+}
+
+/// A GUI window
+pub trait GuiWindow {
+    fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState); // called every frame
+    fn retain(&self) -> bool {
+        true
+    } // override and set to false when done
+    fn get_id(&self) -> egui::Id; // get ID of window
+    fn as_any(&self) -> &dyn Any; // for downcasting
+    fn as_any_mut(&mut self) -> &mut dyn Any; // for downcasting
+}
+
+pub type GuiWindowLink = Rc<RefCell<dyn GuiWindow>>;
+pub type MenuGroupLink = Rc<RefCell<dyn MenuGroup>>;
+
+2023-04-30
+
+Solving the wrong problem.
+Correct solution - model/view/controller.
+Most dialogs do not need dynamic updates from messages.
+Those that do need to implement a function to process them.
+So GuiWindow and MenuGroup need to implement incoming_message, which takes a dyn any.
+Any window or group which gets dynamic updates needs to implement this. 
+Incoming messages are passed to incoming_message of the currrent MenuGroup and to any open GuiWindow.
+Don't send too many messages. Event-driven, not periodic.
     
     
