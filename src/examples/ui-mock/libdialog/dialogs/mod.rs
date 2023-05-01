@@ -5,6 +5,7 @@
 //  Dialogs
 pub mod dialoggrid;
 pub mod dialoglogin;
+pub mod dialogstats;
 
 //  Menus and submenus
 pub mod menuavatar;
