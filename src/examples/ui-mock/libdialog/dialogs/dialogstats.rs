@@ -9,7 +9,20 @@ use std::rc::Rc;
 use core::any::Any;
 use crate::GuiAssets;
 use libui::{ GuiWindow, SendAnyBoxed, CommonState };
-/// Basic info about a grid for the splash page
+
+/// Event sent once per second to statistics window to update statistics.
+pub struct StatisticsEvent {
+    frame_time_average: f32,            // frames per second, last second
+    frame_time_longest: f32,            // longest frame time, seconds
+    sine_wave: f32,                     // just something to graph
+}
+
+impl StatisticsEvent {
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
 
 /// The performance statistics window.
 /// The persistent part.
@@ -74,8 +87,12 @@ impl GuiWindow for StatisticsWindow {
     }
     
     /// Incoming message event.
-    fn pass_event(&mut self, _state: &mut CommonState, _event: &SendAnyBoxed) {
+    /// We get all GUI events, but only care about one type.
+    fn pass_event(&mut self, _state: &mut CommonState, event: &SendAnyBoxed) {
+        //  Is this the event we care about, the statistics event?
+        if let Some(ev) =  event.downcast_ref::<StatisticsEvent>() {
         //  ***MORE***
+        }
     }
 
     /// If this is in the dynamic widgets list, drop if retain is false.
