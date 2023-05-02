@@ -11,10 +11,30 @@ use crate::GuiAssets;
 use libui::{ GuiWindow, SendAnyBoxed, CommonState };
 
 /// Event sent once per second to statistics window to update statistics.
+#[derive(Default, Clone, Copy, Debug)]
 pub struct StatisticsEvent {
-    frame_time_average: f32,            // frames per second, last second
-    frame_time_longest: f32,            // longest frame time, seconds
-    sine_wave: f32,                     // just something to graph
+    /// Frames per second, last second
+    frame_time_average: f32,
+    /// Longest frame time, last second.            
+    frame_time_longest: f32,            
+    /// UDP queue length, current
+    udp_queue_len: u32,
+    /// Move task fell behind, count, cumulative
+    move_task_lagging: usize,
+    /// UDP round trip time (seconds)
+    udp_round_trip_time: f32,
+    /// UDP Packets sent (cumulative)
+    packets_sent: usize,
+    /// UDP packets received (cumulative)
+    packets_received: usize,
+    /// UDP Packets that had to be retransmitted (cumulative)
+    packets_retransmitted: usize, 
+    /// Incoming UDP packet numbers that were never seen, and thus lost.
+    packets_lost: usize,
+    /// Asset queue length (current)
+    asset_queue_len: usize,
+    /// Assets bytes_loaded (cumulative)
+    asset_bytes_loaded: usize,
 }
 
 impl StatisticsEvent {

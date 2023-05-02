@@ -16,6 +16,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::time::{Instant, Duration};
 
 /// User events sent to the main event loop.
 //  These are specific to the application. libui has a few more.
@@ -76,16 +77,64 @@ pub struct UiData {
 
 impl UiData {}
 
+
+/// Useful statistical info
+#[derive(Debug)]
+pub struct FrameStatistics {
+    /// Time previous frame started
+    last_frame_time: Instant,
+    /// Last statistics time
+    last_statistics: Instant,
+    /// Longest frame time since reset
+    longest_frame_time: Duration,
+    /// Frame count
+    frame_count: usize,
+}
+
+impl FrameStatistics {
+    /// Usual new
+    pub fn new() -> Self {
+        let now = Instant::now();
+        Self { 
+            last_frame_time: now,
+            last_statistics: now,
+            longest_frame_time: Duration::new(0,0),
+            frame_count: 0
+        }
+    }
+    
+    /// Per frame update
+    pub fn frame_update(&mut self, now: Instant) -> Duration {
+        let elapsed = now.duration_since(self.last_frame_time);
+        self.last_frame_time = now;
+        self.frame_count += 1;
+        self.longest_frame_time = self.longest_frame_time.max(elapsed);
+        elapsed                                 // returns duration
+    }
+    
+    /// Get frame statistics and reset
+    pub fn reset(&mut self) -> (usize, Duration, Duration) {
+        let statistics_elapsed = self.last_frame_time.duration_since(self.last_statistics);
+        let result = (self.frame_count, statistics_elapsed, self.longest_frame_time);
+        self.last_statistics = self.last_frame_time;
+        self.longest_frame_time = Duration::new(0,0);
+        self.frame_count = 0;
+        result              // (frame_count, statistics_elapsed, longest_frame_time)
+    }
+}
+
 /// Generic parameter to GuiState, containing app-specific info.
 //  Data passed through GuiState, but not interpreted by it.
 #[derive(Debug)]
 pub struct UiInfo {
-    //  Primary system mode
+    ///  Primary system mode
     system_mode: SystemMode, // primary operating mode
-    //  Selected grid
+    /// Selected grid
     pub selected_grid: Option<GridSelectParams>, // params of selected grid, if any
-    //  All the grids, read-only and shareable
+    ///  All the grids, read-only and shareable
     pub grid_select_params: Rc<Vec<GridSelectParams>>,
+    /// Useful satistical info
+    pub frame_statistics: FrameStatistics,
 }
 
 impl UiInfo {
@@ -95,6 +144,7 @@ impl UiInfo {
             system_mode: SystemMode::Startup, // start in Startup mode
             selected_grid: None,              // with no grid
             grid_select_params: Rc::new(grid_select_params), // all possible grids
+            frame_statistics: FrameStatistics::new(),
         }
     }
     /// Change main system mode. Login, select grid, run, etc.

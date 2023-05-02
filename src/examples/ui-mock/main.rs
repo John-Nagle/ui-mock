@@ -24,11 +24,13 @@ use libui::{
 use log::LevelFilter;
 use std::str::FromStr;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
+const STATISTICS_INTERVAL: Duration = Duration::new(0, 0);   // statistics this often
 
-const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
+const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One; // anti-aliasing
 
 /// The application.
 pub struct AppUi {
@@ -373,23 +375,18 @@ impl rend3_framework::App for AppUi {
         }
 
         let data = self.data.as_mut().unwrap();
-        /*
-        //  This is where EGUI handles 2D UI events.
-        if data.gui_state.common_state.platform.captures_event(&event) {
-            ////println!("GUI captured event: {:?}", event);    // ***TEMP TEST***
-            return; // 2D UI consumed this event.
-        }
-        */
 
         match event {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
-                /* Removed from EGUI example.
-                data.gui_state
-                    .common_state
-                    .platform
-                    .update_time(data.start_time.elapsed().as_secs_f64());
-                */
+                //  Calculate frame statistics
+                let now = Instant::now();
+                if data.gui_state.app_state.frame_statistics.frame_update(now) > STATISTICS_INTERVAL {
+                    let (frame_count, statistics_time, worst_frame_time) = data.gui_state.app_state.frame_statistics.reset();
+                    println!("Frames: {}, average time {}, worst time {}", frame_count, (frame_count as f32) / statistics_time.as_secs_f32(), worst_frame_time.as_secs_f32()); // ***TEMP***
+                    //  ***MORE***
+                }
+                //  Build the 2D GUI
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
@@ -400,19 +397,10 @@ impl rend3_framework::App for AppUi {
                 profiling::scope!("3D");
                 // Get a frame
                 let frame = surface.unwrap().get_current_texture().unwrap();
-                /*
-                let frame = rend3::util::output::OutputFrame::Surface {
-                    surface: Arc::clone(surface.unwrap()),
-                };
-                */
                 // Swap the instruction buffers so that our frame's changes can be processed.
                 renderer.swap_instruction_buffers();
                 // Evaluate our frame's world-change instructions
                 let mut eval_output = renderer.evaluate_instructions();
-                /*
-                // Ready up the renderer
-                let (cmd_bufs, ready) = renderer.ready();
-                */
                 // Lock the routines
                 let pbr_routine = rend3_framework::lock(&routines.pbr);
                 let tonemapping_routine = rend3_framework::lock(&routines.tonemapping);
