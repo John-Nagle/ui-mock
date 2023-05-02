@@ -84,7 +84,7 @@ pub struct FrameStatistics {
     /// Time previous frame started
     last_frame_time: Instant,
     /// Last statistics time
-    last_statistics: Instant,
+    last_statistics_time: Instant,
     /// Longest frame time since reset
     longest_frame_time: Duration,
     /// Frame count
@@ -97,7 +97,7 @@ impl FrameStatistics {
         let now = Instant::now();
         Self { 
             last_frame_time: now,
-            last_statistics: now,
+            last_statistics_time: now,
             longest_frame_time: Duration::new(0,0),
             frame_count: 0
         }
@@ -105,18 +105,19 @@ impl FrameStatistics {
     
     /// Per frame update
     pub fn frame_update(&mut self, now: Instant) -> Duration {
-        let elapsed = now.duration_since(self.last_frame_time);
+        let since_stats = now.duration_since(self.last_statistics_time);
+        let frame_time = now.duration_since(self.last_frame_time);
         self.last_frame_time = now;
         self.frame_count += 1;
-        self.longest_frame_time = self.longest_frame_time.max(elapsed);
-        elapsed                                 // returns duration
+        self.longest_frame_time = self.longest_frame_time.max(frame_time);
+        since_stats                                 // returns duration
     }
     
     /// Get frame statistics and reset
     pub fn reset(&mut self) -> (usize, Duration, Duration) {
-        let statistics_elapsed = self.last_frame_time.duration_since(self.last_statistics);
+        let statistics_elapsed = self.last_frame_time.duration_since(self.last_statistics_time);
         let result = (self.frame_count, statistics_elapsed, self.longest_frame_time);
-        self.last_statistics = self.last_frame_time;
+        self.last_statistics_time = self.last_frame_time;
         self.longest_frame_time = Duration::new(0,0);
         self.frame_count = 0;
         result              // (frame_count, statistics_elapsed, longest_frame_time)

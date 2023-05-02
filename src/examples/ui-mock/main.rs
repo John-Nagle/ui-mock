@@ -28,7 +28,7 @@ use std::time::{Duration, Instant};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
-const STATISTICS_INTERVAL: Duration = Duration::new(0, 0);   // statistics this often
+const STATISTICS_INTERVAL: Duration = Duration::new(1, 0);   // statistics this often
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One; // anti-aliasing
 
@@ -383,7 +383,10 @@ impl rend3_framework::App for AppUi {
                 let now = Instant::now();
                 if data.gui_state.app_state.frame_statistics.frame_update(now) > STATISTICS_INTERVAL {
                     let (frame_count, statistics_time, worst_frame_time) = data.gui_state.app_state.frame_statistics.reset();
-                    println!("Frames: {}, average time {}, worst time {}", frame_count, (frame_count as f32) / statistics_time.as_secs_f32(), worst_frame_time.as_secs_f32()); // ***TEMP***
+                    println!("Frames: {}, average time {}, worst time {}", 
+                        frame_count, 
+                        statistics_time.as_secs_f32() / (frame_count.max(1) as f32), 
+                        worst_frame_time.as_secs_f32()); // ***TEMP***
                     //  ***MORE***
                 }
                 //  Build the 2D GUI
