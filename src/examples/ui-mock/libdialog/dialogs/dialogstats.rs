@@ -3,11 +3,13 @@
 //! Displays useful performance graphs.
 //
 //  Animats
-//  October 2022
+//  May 2023
 //
+use std::rc::Rc;
 use core::any::Any;
+use core::cell::RefCell;
 use crate::GuiAssets;
-use libui::{ GuiWindow, SendAnyBoxed, CommonState };
+use libui::{ t, GuiWindow, GuiWindowLink, SendAnyBoxed, CommonState };
 
 /// Event sent once per second to statistics window to update statistics.
 /// These represent most of the potential bottlenecks.
@@ -56,8 +58,16 @@ pub struct StatisticsWindow {
 }
 
 impl StatisticsWindow {
+
+    /// Open the statistics window.
+    pub fn open_window(state: &mut CommonState) {
+        //  Add window if not already open
+        let window = Self::new_link("stats", t!("Performance statistics", state.get_lang()));
+        state.add_window(window).expect("Unable to open statistics window");     
+    }
+    
     /// Create statistics window data areas.
-    pub fn new(
+    fn new(
         id: &str,
         title: &str,
     ) -> Self {
@@ -66,13 +76,11 @@ impl StatisticsWindow {
             title: title.to_string(),
             is_open: true,
         }
-    }
-/*    
+    }   
     /// As link
-    pub fn new_link(id: egui::Id, grid: &GridSelectParams) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, grid)))
+    fn new_link(id: &str, title: &str) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, title)))
     }
-*/
 
     /// Reopen previously closed window, with old contents.
     pub fn reopen(&mut self) {
@@ -134,5 +142,4 @@ impl GuiWindow for StatisticsWindow {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
-
 }

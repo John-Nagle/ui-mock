@@ -8,6 +8,7 @@
 //
 use super::menuavatar;
 use super::menuhelp::{menu_help_about, menu_help_manual}; // submenus
+use super::dialogstats::StatisticsWindow;
 use crate::UiAppAssets;
 use core::any::Any;
 use core::cell::RefCell;
@@ -165,6 +166,12 @@ impl MenuGroup for MenuConnected {
                         });
                         //  ***MOVE LOG LEVEL TO STATE*** params is read-only.
                         ////state.params.log_level = log_level;     // update log level
+                        //  Statistics menu
+                        if ui.button(t!("menu.developer.statistics", state.get_lang())).clicked() {
+                            ////println!("Statistics menu");
+                            StatisticsWindow::open_window(state);
+                        }
+                        //  End statistics menu
                         #[cfg(feature = "replay")]
                         if ui
                             .button(t!("menu.developer.save_replay", state.get_lang()))
