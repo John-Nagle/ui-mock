@@ -16,7 +16,7 @@ mod libdialog;
 
 use anyhow::Error;
 use libdialog::handle_gui_event;
-use libdialog::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo};
+use libdialog::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo, StatisticsEvent};
 use libui::{get_executable_name, get_log_file_name, panic_dialog, t};
 use libui::{
     Dictionary, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger, SendAnyBoxed,
@@ -174,17 +174,6 @@ impl AppUi {
             distance: 400.0,
             resolution: 2048,       // ***NOT SURE ABOUT THIS***
         });
-/*
-        // Create the winit/egui integration, which manages our egui context for us.
-        let platform =
-            egui_winit_platform::Platform::new(egui_winit_platform::PlatformDescriptor {
-                physical_width: window_size.width as u32,
-                physical_height: window_size.height as u32,
-                scale_factor: window.scale_factor(),
-                font_definitions: egui::FontDefinitions::default(),
-                style: Default::default(),
-            });
-*/            
         // Create the egui context
         let context = egui::Context::default();
         // Create the winit/egui integration.
@@ -388,6 +377,16 @@ impl rend3_framework::App for AppUi {
                         statistics_time.as_secs_f32() / (frame_count.max(1) as f32), 
                         worst_frame_time.as_secs_f32()); // ***TEMP***
                     //  ***MORE***
+                    //  Send 1 second statistics to GUI
+                    let stats_msg = StatisticsEvent {
+                        frame_time_average: statistics_time.as_secs_f32() / (frame_count.max(1) as f32),
+                        frame_time_longest: worst_frame_time.as_secs_f32(),
+                        .. Default::default()
+                    };
+                    if let Err(e) = data.gui_state.common_state.send_boxed_gui_event(Box::new(stats_msg)) {
+                        log::warn!("GUI has shut down, exiting: {:?}", e);
+                        data.quit = true;
+                    }
                 }
                 //  Build the 2D GUI
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI

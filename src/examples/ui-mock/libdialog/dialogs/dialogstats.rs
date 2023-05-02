@@ -1,40 +1,40 @@
 //! #  dialogstats.rs  -- statistics dialog
-//
-//  This is the first screen displayed on startup.
+//!
+//! Displays useful performance graphs.
 //
 //  Animats
 //  October 2022
 //
-use std::rc::Rc;
 use core::any::Any;
 use crate::GuiAssets;
 use libui::{ GuiWindow, SendAnyBoxed, CommonState };
 
 /// Event sent once per second to statistics window to update statistics.
+/// These represent most of the potential bottlenecks.
 #[derive(Default, Clone, Copy, Debug)]
 pub struct StatisticsEvent {
     /// Frames per second, last second
-    frame_time_average: f32,
+    pub frame_time_average: f32,
     /// Longest frame time, last second.            
-    frame_time_longest: f32,            
+    pub frame_time_longest: f32,            
     /// UDP queue length, current
-    udp_queue_len: u32,
+    pub udp_queue_len: u32,
     /// Move task fell behind, count, cumulative
-    move_task_lagging: usize,
+    pub move_task_lagging: usize,
     /// UDP round trip time (seconds)
-    udp_round_trip_time: f32,
+    pub udp_round_trip_time: f32,
     /// UDP Packets sent (cumulative)
-    packets_sent: usize,
+    pub packets_sent: usize,
     /// UDP packets received (cumulative)
-    packets_received: usize,
+    pub packets_received: usize,
     /// UDP Packets that had to be retransmitted (cumulative)
-    packets_retransmitted: usize, 
+    pub packets_retransmitted: usize, 
     /// Incoming UDP packet numbers that were never seen, and thus lost.
-    packets_lost: usize,
+    pub packets_lost: usize,
     /// Asset queue length (current)
-    asset_queue_len: usize,
+    pub asset_queue_len: usize,
     /// Assets bytes_loaded (cumulative)
-    asset_bytes_loaded: usize,
+    pub asset_bytes_loaded: usize,
 }
 
 impl StatisticsEvent {
