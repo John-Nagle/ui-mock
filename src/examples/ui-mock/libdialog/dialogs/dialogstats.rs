@@ -9,7 +9,7 @@ use std::rc::Rc;
 use core::any::Any;
 use core::cell::RefCell;
 use crate::GuiAssets;
-use libui::{ t, GuiWindow, GuiWindowLink, SendAnyBoxed, CommonState };
+use libui::{ t, GuiWindow, GuiWindowLink, StatGraph, SendAnyBoxed, CommonState };
 
 /// Event sent once per second to statistics window to update statistics.
 /// These represent most of the potential bottlenecks.
@@ -57,6 +57,10 @@ pub struct StatisticsWindow {
     id: egui::Id,        
     /// True if open. Set to false to make it close.
     is_open: bool,
+    /// Graph: FPS
+    frame_time_average: StatGraph,
+    /// Graph: worst FPS
+    frame_time_longest: StatGraph,
 }
 
 impl StatisticsWindow {
@@ -64,7 +68,8 @@ impl StatisticsWindow {
     /// Open the statistics window.
     pub fn open_window(state: &mut CommonState) {
         //  Add window if not already open
-        let window = Self::new_link("stats", t!("Performance statistics", state.get_lang()));
+        let length = 100;   // save 100 seconds of data for now
+        let window = Self::new_link("stats", t!("Performance statistics", state.get_lang()), length, state);
         state.add_window(window).expect("Unable to open statistics window");     
     }
     
@@ -72,16 +77,22 @@ impl StatisticsWindow {
     fn new(
         id: &str,
         title: &str,
+        length: usize,
+        state: &mut CommonState,
     ) -> Self {
         StatisticsWindow {
             id: egui::Id::new(id),
             title: title.to_string(),
             is_open: true,
+            frame_time_average: StatGraph::new(t!("dialog.statistics.frame_time", state.get_lang()), t!("dialog.statistics.frame_time_hover", state.get_lang()), 
+                [0.0, 100.0], length),
+            frame_time_longest: StatGraph::new(t!("dialog.statistics.frame_time_worst", state.get_lang()), t!("dialog.statistics.frame_time_worst_hover", state.get_lang()), 
+                [0.0, 100.0], length),                
         }
     }   
     /// As link
-    fn new_link(id: &str, title: &str) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, title)))
+    fn new_link(id: &str, title: &str, length: usize, state: &mut CommonState) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, title, length, state)))
     }
 
     /// Reopen previously closed window, with old contents.
@@ -121,6 +132,9 @@ impl GuiWindow for StatisticsWindow {
     fn pass_event(&mut self, _state: &mut CommonState, event: &SendAnyBoxed) {
         //  Is this the event we care about, the statistics event?
         if let Some(ev) =  event.downcast_ref::<StatisticsEvent>() {
+            //  Push data into plot
+            self.frame_time_average.push(ev.frame_time_average);
+            self.frame_time_longest.push(ev.frame_time_longest);
         //  ***MORE***
         }
     }

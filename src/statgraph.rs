@@ -64,7 +64,9 @@ pub struct StatGraph {
     /// Help text for graph
     hover_text: WidgetText,
     /// Y range
-    y_range: [f32;2],       
+    y_range: [f32;2], 
+    /// The actual data.
+    time_series: TimeSeries,      
 }
 
 impl StatGraph {
@@ -73,17 +75,25 @@ impl StatGraph {
         title: impl Into<WidgetText>,
         hover_text: impl Into<WidgetText>,
         y_range: [f32;2],
+        length: usize,
     ) -> Self {
         Self {
             title: title.into(),
             hover_text: hover_text.into(),
             y_range,
+            time_series: TimeSeries::new(length),
         }
+    }
+    
+    /// Add a value
+    pub fn push(&mut self, v: f32) {
+        self.time_series.push(v)
     }
 }
 
 /// The widget is a graph
 impl egui::Widget for &mut StatGraph {
+    /// Draw. Called every frame if open.
     fn ui(self, ui: &mut Ui) -> Response {
         ui.label("Statistics graph placeholder")
     }
