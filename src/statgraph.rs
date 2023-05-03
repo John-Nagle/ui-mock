@@ -9,9 +9,8 @@
 //
 ////use core::ops::Index;
 use egui::{Response, Ui, WidgetText};
-use egui::plot::{Line, Plot, PlotPoints};
+////use egui::plot::{Line, Plot, PlotPoints};
 use std::collections::VecDeque;
-use core::iter::Map;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
 /// Time series of equally spaced data
@@ -50,8 +49,8 @@ impl TimeSeries {
     }
     
     /// Return time series as a generator of plot points
-    pub fn as_plot_points(&self) -> impl Iterator<Item = [f64;2]> +'_ {
-        self.values.iter().enumerate().map(|(i, &y)| [i as f64, y as f64])
+    pub fn as_plot_points(&self) -> impl Iterator<Item = egui::plot::PlotPoint> +'_ {
+        self.values.iter().enumerate().map(|(i, &y)| egui::plot::PlotPoint::new(i as f64, y as f64))
     }
 }
     
@@ -95,6 +94,12 @@ impl StatGraph {
 impl egui::Widget for &mut StatGraph {
     /// Draw. Called every frame if open.
     fn ui(self, ui: &mut Ui) -> Response {
-        ui.label("Statistics graph placeholder")
+        ui.label("Statistics graph placeholder");
+        let temp_values: Vec<egui::plot::PlotPoint> = self.time_series.as_plot_points().collect();  // ***TEMP*** inefficient
+        let temp_values = egui::plot::PlotPoints::Owned(temp_values);// ***TEMP*** try to do this as a generator
+        egui::plot::Plot::new("my_plot")
+            .view_aspect(2.0)
+            ////.show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(egui::plot::PlotPoints::Generator(self.time_series.as_plot_points())))).response
+            .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values))).response
     }
 }
