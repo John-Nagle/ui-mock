@@ -18,7 +18,8 @@ pub struct StatisticsEvent {
     /// Frames per second, last second
     pub frame_time_average: f32,
     /// Longest frame time, last second.            
-    pub frame_time_longest: f32,            
+    pub frame_time_longest: f32,  
+/*          
     /// UDP queue length, current
     pub udp_queue_len: u32,
     /// Move task fell behind, count, cumulative
@@ -37,6 +38,7 @@ pub struct StatisticsEvent {
     pub asset_queue_len: usize,
     /// Assets bytes_loaded (cumulative)
     pub asset_bytes_loaded: usize,
+*/
 }
 
 impl StatisticsEvent {
