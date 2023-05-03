@@ -10,6 +10,7 @@ use core::any::Any;
 use core::cell::RefCell;
 use crate::GuiAssets;
 use libui::{ t, GuiWindow, GuiWindowLink, StatGraph, SendAnyBoxed, CommonState };
+use egui::Widget;
 
 /// Event sent once per second to statistics window to update statistics.
 /// These represent most of the potential bottlenecks.
@@ -115,9 +116,11 @@ impl GuiWindow for StatisticsWindow {
                 egui::Grid::new("statistics box")
                     .min_col_width(MIMIMUM_STATISTICS_BOX_WIDTH)
                     .show(ui, |ui| {
-                        ui.label("FPS");    // ***TEMP***
+                        ui.label("Frame time");    // ***TEMP***
+                        self.frame_time_average.ui(ui);
                         ui.end_row();
-                        ui.label("Sinewave");   // ***TEMP***
+                        ui.label("Worst frame time");   // ***TEMP***
+                        self.frame_time_longest.ui(ui);
                         ui.end_row();
                 });
             });
@@ -135,7 +138,6 @@ impl GuiWindow for StatisticsWindow {
             //  Push data into plot
             self.frame_time_average.push(ev.frame_time_average);
             self.frame_time_longest.push(ev.frame_time_longest);
-        //  ***MORE***
         }
     }
 
