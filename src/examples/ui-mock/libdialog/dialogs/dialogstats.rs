@@ -86,9 +86,9 @@ impl StatisticsWindow {
             title: title.to_string(),
             is_open: true,
             frame_time_average: StatGraph::new(t!("dialog.statistics.frame_time", state.get_lang()), t!("dialog.statistics.frame_time_hover", state.get_lang()), 
-                [0.0, 100.0], length),
+                [0.0, 100.0], length, "fta"),
             frame_time_longest: StatGraph::new(t!("dialog.statistics.frame_time_worst", state.get_lang()), t!("dialog.statistics.frame_time_worst_hover", state.get_lang()), 
-                [0.0, 100.0], length),                
+                [0.0, 100.0], length, "ftl"),                
         }
     }   
     /// As link

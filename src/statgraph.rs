@@ -58,33 +58,38 @@ impl TimeSeries {
 /// StatGraph -- one statistics graph, scrolling time to the left.
 //  The persistent part.
 pub struct StatGraph {
-    /// Title of graphi
+    /// Title of graph
     title: WidgetText,
     /// Help text for graph
     hover_text: WidgetText,
     /// Y range
-    y_range: [f32;2], 
+    y_range: [f32;2],
+    /// Unique ID
+    id: egui::Id,
     /// The actual data.
-    time_series: TimeSeries,      
+    time_series: TimeSeries,
+
 }
 
 impl StatGraph {
-    /// Image, dimensions of button,
+    /// Usual new
     pub fn new(
         title: impl Into<WidgetText>,
         hover_text: impl Into<WidgetText>,
         y_range: [f32;2],
         length: usize,
+        id: &str,
     ) -> Self {
         Self {
             title: title.into(),
             hover_text: hover_text.into(),
             y_range,
+            id: egui::Id::new(id),
             time_series: TimeSeries::new(length),
         }
     }
     
-    /// Add a value
+    /// Add a value to the time series.
     pub fn push(&mut self, v: f32) {
         self.time_series.push(v)
     }
@@ -97,7 +102,7 @@ impl egui::Widget for &mut StatGraph {
         ui.label("Statistics graph placeholder");
         let temp_values: Vec<egui::plot::PlotPoint> = self.time_series.as_plot_points().collect();  // ***TEMP*** inefficient
         let temp_values = egui::plot::PlotPoints::Owned(temp_values);// ***TEMP*** try to do this as a generator
-        egui::plot::Plot::new("my_plot")
+        egui::plot::Plot::new(self.id)
             .view_aspect(2.0)
             ////.show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(egui::plot::PlotPoints::Generator(self.time_series.as_plot_points())))).response
             .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values))).response
