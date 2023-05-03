@@ -134,7 +134,9 @@ impl GuiWindow for StatisticsWindow {
     /// We get all GUI events, but only care about one type.
     fn pass_event(&mut self, _state: &mut CommonState, event: &SendAnyBoxed) {
         //  Is this the event we care about, the statistics event?
+        println!("Pass event {:?}", event);// ***TEMP***
         if let Some(ev) =  event.downcast_ref::<StatisticsEvent>() {
+            println!("Pass stat event {:?}", ev);// ***TEMP***
             //  Push data into plot
             self.frame_time_average.push(ev.frame_time_average);
             self.frame_time_longest.push(ev.frame_time_longest);

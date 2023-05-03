@@ -91,7 +91,8 @@ impl StatGraph {
     
     /// Add a value to the time series.
     pub fn push(&mut self, v: f32) {
-        self.time_series.push(v)
+        self.time_series.push(v);
+        println!("Statgraph push {}", v);// ***TEMP***
     }
 }
 
@@ -99,7 +100,6 @@ impl StatGraph {
 impl egui::Widget for &mut StatGraph {
     /// Draw. Called every frame if open.
     fn ui(self, ui: &mut Ui) -> Response {
-        ui.label("Statistics graph placeholder");
         let temp_values: Vec<egui::plot::PlotPoint> = self.time_series.as_plot_points().collect();  // ***TEMP*** inefficient
         let temp_values = egui::plot::PlotPoints::Owned(temp_values);// ***TEMP*** try to do this as a generator
         egui::plot::Plot::new(self.id)
