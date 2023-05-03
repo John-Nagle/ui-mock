@@ -285,6 +285,25 @@ impl AppUi {
             .unwrap(); // Start up the GUI.
         Ok(())
     }
+    
+    /// Frame statistics update, called once per frame.
+    /// Only does something once per second.
+    fn frame_statistics_update(data: &mut UiData) {
+        //  Calculate frame statistics
+        let now = Instant::now();
+        if data.gui_state.app_state.frame_statistics.frame_update(now) < STATISTICS_INTERVAL { return } // too soon?
+        //  Only once per second past this point.
+        let (frame_count, statistics_time, worst_frame_time) = data.gui_state.app_state.frame_statistics.reset();
+        //  ***MORE***
+        //  Send 1 second statistics to GUI
+        let stats_msg = StatisticsEvent {
+            frame_time_average: statistics_time.as_secs_f32() / (frame_count.max(1) as f32),
+            frame_time_longest: worst_frame_time.as_secs_f32(),
+            .. Default::default()
+        };
+        //  Pass directly to GUI, without going through a queue.
+        data.gui_state.common_state.pass_event(Box::new(stats_msg));
+    }
 }
 
 /// This is an instance of the Rend3 application framework.
@@ -369,26 +388,7 @@ impl rend3_framework::App for AppUi {
             rend3_framework::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
                 //  Calculate frame statistics
-                let now = Instant::now();
-                if data.gui_state.app_state.frame_statistics.frame_update(now) > STATISTICS_INTERVAL {
-                    let (frame_count, statistics_time, worst_frame_time) = data.gui_state.app_state.frame_statistics.reset();
-                    println!("Frames: {}, average time {}, worst time {}", 
-                        frame_count, 
-                        statistics_time.as_secs_f32() / (frame_count.max(1) as f32), 
-                        worst_frame_time.as_secs_f32()); // ***TEMP***
-                    //  ***MORE***
-                    //  Send 1 second statistics to GUI
-                    let stats_msg = StatisticsEvent {
-                        frame_time_average: statistics_time.as_secs_f32() / (frame_count.max(1) as f32),
-                        frame_time_longest: worst_frame_time.as_secs_f32(),
-                        .. Default::default()
-                    };
-                    data.gui_state.common_state.pass_event(Box::new(stats_msg));
-                    ////if let Err(e) = data.gui_state.common_state.send_boxed_gui_event(Box::new(stats_msg)) {
-                    ////    log::warn!("GUI has shut down, exiting: {:?}", e);
-                    ////    data.quit = true;
-                    ////}
-                }
+                Self::frame_statistics_update(data);
                 //  Build the 2D GUI
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
                 let input = rend3_egui::Input {

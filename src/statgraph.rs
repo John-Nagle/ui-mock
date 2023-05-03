@@ -92,7 +92,6 @@ impl StatGraph {
     /// Add a value to the time series.
     pub fn push(&mut self, v: f32) {
         self.time_series.push(v);
-        println!("Statgraph push {}", v);// ***TEMP***
     }
 }
 
