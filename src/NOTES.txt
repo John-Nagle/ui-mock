@@ -280,4 +280,9 @@ Don't send too many messages. Event-driven, not periodic.
 Coded that framework. Can't pass CommonState to windows, though, because CommonState is at the
 same ownership level as the list of windows. May need to re-organize CommonState.
     
+2023-05-02
+
+The event queue system is a mess. Some of those channels aren't doing anything.
+We're putting update events from the render thread on a qeueue read by nobody, and
+addressed to the render thread anyway. This is silly.
     

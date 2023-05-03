@@ -218,13 +218,13 @@ impl CommonState {
     /// Send message to all windows.
     /// Don't overdo this, because it is a broadcast.
     /// Windows must ignore messages they don't need.
-    pub fn pass_event(&mut self, event: &SendAnyBoxed) {
-        Rc::clone(&self.menu_group).borrow_mut().pass_event(self, event);    // pass to menu group, if it wants events.
+    pub fn pass_event(&mut self, event: SendAnyBoxed) {
+        Rc::clone(&self.menu_group).borrow_mut().pass_event(self, &event);    // pass to menu group, if it wants events.
         //  Send to all. Ones that don't need it will ignore it.
         //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
         let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(Rc::clone).collect();
         for window in &todo_list {
-            window.borrow_mut().pass_event(self, event)
+            window.borrow_mut().pass_event(self, &event)
         }
     }
 

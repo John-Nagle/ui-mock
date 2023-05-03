@@ -383,10 +383,11 @@ impl rend3_framework::App for AppUi {
                         frame_time_longest: worst_frame_time.as_secs_f32(),
                         .. Default::default()
                     };
-                    if let Err(e) = data.gui_state.common_state.send_boxed_gui_event(Box::new(stats_msg)) {
-                        log::warn!("GUI has shut down, exiting: {:?}", e);
-                        data.quit = true;
-                    }
+                    data.gui_state.common_state.pass_event(Box::new(stats_msg));
+                    ////if let Err(e) = data.gui_state.common_state.send_boxed_gui_event(Box::new(stats_msg)) {
+                    ////    log::warn!("GUI has shut down, exiting: {:?}", e);
+                    ////    data.quit = true;
+                    ////}
                 }
                 //  Build the 2D GUI
                 let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
