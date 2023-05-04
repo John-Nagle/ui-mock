@@ -104,7 +104,7 @@ impl egui::Widget for &mut StatGraph {
         let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
         let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
         egui::plot::Plot::new(self.id)
-            .view_aspect(4.0)
+            .view_aspect(5.0)
             .width(200.0)
             .include_x(0.0)
             .include_x(self.time_series.length as f64)
