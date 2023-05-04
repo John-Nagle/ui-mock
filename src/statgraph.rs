@@ -99,11 +99,15 @@ impl StatGraph {
 impl egui::Widget for &mut StatGraph {
     /// Draw. Called every frame if open.
     fn ui(self, ui: &mut Ui) -> Response {
-        let temp_values: Vec<egui::plot::PlotPoint> = self.time_series.as_plot_points().collect();  // ***TEMP*** inefficient
-        let temp_values = egui::plot::PlotPoints::Owned(temp_values);// ***TEMP*** try to do this as a generator
+        let values = self.time_series.as_plot_points();  // returns an iterator.
+        //  Unfortunately, Line wont't yet take an iterator.
+        let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
+        let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
         egui::plot::Plot::new(self.id)
-            .view_aspect(2.0)
-            ////.show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(egui::plot::PlotPoints::Generator(self.time_series.as_plot_points())))).response
-            .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values))).response
+            .view_aspect(4.0)
+            .width(200.0)
+            .include_y(self.y_range[0])
+            .include_y(self.y_range[1])
+            .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values).fill(0.0))).response
     }
 }
