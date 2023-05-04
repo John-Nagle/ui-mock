@@ -110,6 +110,7 @@ impl egui::Widget for &mut StatGraph {
             .include_x(self.time_series.length as f64)
             .include_y(self.y_range[0])
             .include_y(self.y_range[1])
+            .show_x(false)
             .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values).fill(0.0))).response
     }
 }

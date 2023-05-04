@@ -119,7 +119,7 @@ impl GuiWindow for StatisticsWindow {
                         ui.label("Frame time");    // ***TEMP***
                         self.frame_time_average.ui(ui);
                         ui.end_row();
-                        ui.label("Worst frame time");   // ***TEMP***
+                        ui.label("Worst\nframe time");   // ***TEMP***
                         self.frame_time_longest.ui(ui);
                         ui.end_row();
                 });
