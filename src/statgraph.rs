@@ -99,18 +99,21 @@ impl StatGraph {
 impl egui::Widget for &mut StatGraph {
     /// Draw. Called every frame if open.
     fn ui(self, ui: &mut Ui) -> Response {
-        let values = self.time_series.as_plot_points();  // returns an iterator.
-        //  Unfortunately, Line wont't yet take an iterator.
-        let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
-        let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
-        egui::plot::Plot::new(self.id)
-            .view_aspect(5.0)
-            .width(200.0)
-            .include_x(0.0)
-            .include_x(self.time_series.length as f64)
-            .include_y(self.y_range[0])
-            .include_y(self.y_range[1])
-            .show_x(false)
-            .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values).fill(0.0))).response
+        ui.vertical(|ui| {
+            ui.label(self.title.clone());
+            let values = self.time_series.as_plot_points();  // returns an iterator.
+            //  Unfortunately, Line wont't yet take an iterator.
+            let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
+            let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
+            egui::plot::Plot::new(self.id)
+                .view_aspect(6.0)
+                .width(300.0)
+                .include_x(0.0)
+                .include_x(self.time_series.length as f64)
+                .include_y(self.y_range[0])
+                .include_y(self.y_range[1])
+                .show_x(false)
+                .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values).fill(0.0))).response
+        }).response
     }
 }

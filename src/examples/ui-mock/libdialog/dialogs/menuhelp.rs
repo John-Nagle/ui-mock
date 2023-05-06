@@ -1,11 +1,11 @@
-use egui::Ui;
-///#  menuhelp.rs -- the help menu
+//! #  menuhelp.rs -- the help menu
 //
 //  This is a submenu called by menuconnected.
 //
 //  Animats
 //  November 2022
 //
+use egui::Ui;
 use libui::{t, CommonState, TextWindow};
 /// Configuration
 const HELP_PAGE: &str =

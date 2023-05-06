@@ -105,7 +105,6 @@ impl StatisticsWindow {
 impl GuiWindow for StatisticsWindow {
     /// Usual draw function
     fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState) {
-        const MIMIMUM_STATISTICS_BOX_WIDTH: f32 = 100.0;
         if self.is_open {
             let mut not_cancelled = true;
             let window = egui::containers::Window::new(self.title.as_str())
@@ -113,15 +112,12 @@ impl GuiWindow for StatisticsWindow {
                 .collapsible(true)
                 .open(&mut not_cancelled);
             window.show(ctx, |ui| {
-                egui::Grid::new("statistics box")
-                    .min_col_width(MIMIMUM_STATISTICS_BOX_WIDTH)
-                    .show(ui, |ui| {
-                        ui.label("Frame time");    // ***TEMP***
-                        self.frame_time_average.ui(ui);
-                        ui.end_row();
-                        ui.label("Worst\nframe time");   // ***TEMP***
-                        self.frame_time_longest.ui(ui);
-                        ui.end_row();
+                ui.vertical(|ui| {
+                    self.frame_time_average.ui(ui);
+                    ui.separator();
+                    ui.end_row();
+                    self.frame_time_longest.ui(ui);
+                    ui.end_row();
                 });
             });
             if !not_cancelled {
