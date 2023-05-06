@@ -60,8 +60,6 @@ impl TimeSeries {
 pub struct StatGraph {
     /// Title of graph
     title: WidgetText,
-    /// Help text for graph
-    hover_text: WidgetText,
     /// Y range
     y_range: [f32;2],
     /// Unique ID
@@ -75,14 +73,12 @@ impl StatGraph {
     /// Usual new
     pub fn new(
         title: impl Into<WidgetText>,
-        hover_text: impl Into<WidgetText>,
         y_range: [f32;2],
         length: usize,
         id: &str,
     ) -> Self {
         Self {
             title: title.into(),
-            hover_text: hover_text.into(),
             y_range,
             id: egui::Id::new(id),
             time_series: TimeSeries::new(length),
@@ -106,8 +102,8 @@ impl egui::Widget for &mut StatGraph {
             let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
             let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
             egui::plot::Plot::new(self.id)
-                .view_aspect(6.0)
-                .width(300.0)
+                .view_aspect(5.0)
+                ////.width(250.0)
                 .include_x(0.0)
                 .include_x(self.time_series.length as f64)
                 .include_y(self.y_range[0])
