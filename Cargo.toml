@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.7.8"
+version = "0.7.9"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -96,8 +96,8 @@ dark-light = "0.2.3"
 # Preferences
 directories = "4.0"
 # Performance monitoring
-tracy-client = {version = "0.13", optional = true }
-profiling = { version = "^1.0.6", default-features = false }
+tracy-client = {version = "0.15.1", optional = true }
+profiling = { version = "^1.0.8", default-features = false }
 # System information
 sysinfo = { version = "0.28", default-features = false }
 # Concurrency
