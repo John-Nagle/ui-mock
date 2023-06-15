@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.7.9"
+version = "0.7.10"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -96,7 +96,7 @@ dark-light = "0.2.3"
 # Preferences
 directories = "4.0"
 # Performance monitoring
-tracy-client = {version = "0.15.1", optional = true }
+tracy-client = {version = "0.15.2", optional = true }
 profiling = { version = "^1.0.8", default-features = false }
 # System information
 sysinfo = { version = "0.28", default-features = false }
@@ -111,6 +111,7 @@ md5 = "0.7.0"
 zeroize = {version = "1.5.7", features = ["zeroize_derive"]}
 keyring = "1.2.0"
 hex = "0.4.2"
+git-version = "0.3.5"
 
 
 [patch.crates-io]

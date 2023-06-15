@@ -24,7 +24,7 @@ pub use guistate::panic_dialog;
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
 pub use guistate::{
-    AppState, CommonState, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger, SendAny,
+    AppState, CommonState, GuiAssets, GuiCommonEvent, GuiParams, ExecutableVersion, GuiState, MessageLogger, SendAny,
     SendAnyBoxed, TextWindow,
 };
 /// Utility functions.

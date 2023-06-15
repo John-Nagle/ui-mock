@@ -30,16 +30,52 @@ const MESSAGE_SCROLLBACK_LIMIT: usize = 200; // max scrollback for message windo
 pub type SendAny = dyn Any + Send; // Can send anything across a channel. Must be boxed, though.
 pub type SendAnyBoxed = Box<SendAny>; // the boxed version
 
+/// Program executable version information
+#[derive (Clone, Debug)]
+pub struct ExecutableVersion {
+    /// Program name
+    pub program_name: String,
+    /// Major version, from Cargo,
+    pub major_version: String,
+    /// Minor version
+    pub minor_version: String,
+    /// Patch version
+    pub patch_version: String,
+    /// Git build ID
+    pub git_build_id: String,
+}
+
+impl ExecutableVersion {
+    /// Get Cargo version as a string.
+    pub fn get_cargo_version(&self) -> String {
+        format!("{}.{}.{}", self.major_version, self.minor_version, self.patch_version)
+    }
+}
+
+impl std::fmt::Display for ExecutableVersion {
+    /// Full version info in human readable form.
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {}, build {}", self.program_name, self.get_cargo_version(), self.git_build_id)
+    }
+}
+
 /// Initial values needed to initialize the GUI.
 pub struct GuiParams {
-    pub version: String,        // main program version
+    // main program version
+    ////pub version: String,
+    pub executable_version: ExecutableVersion,
+    /// Asset directory.    
     pub asset_dir: PathBuf,     // the asset directory
+    /// Translation dictionary for chosen language.
     pub lang: Dictionary,       // translation dictionary for chosen language
-    pub dark_mode: bool,        // true if in dark mode
-    pub log_level: LevelFilter, // logging level
-    pub menu_display_secs: u64, // (secs) display menus for this long
+    /// True if in dark mode.
+    pub dark_mode: bool,
+    /// Logging level, which needs to move elsewhere because this is not a constant.
+    pub log_level: LevelFilter,
+    /// Display menus for this long (secs)
+    pub menu_display_secs: u64,
+    /// GPU info
     pub gpu_info: ExtendedAdapterInfo, // GPU info
-                                ////pub grid_select_params: Vec<GridSelectParams>,  // grid info
 }
 
 /// Common events any app can use.

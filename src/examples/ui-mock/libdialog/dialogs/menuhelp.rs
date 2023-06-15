@@ -40,7 +40,7 @@ pub fn menu_help_about(_ui: &mut Ui, state: &mut CommonState) {
     let version = format!(
         "{}: {}",
         t!("message.version", state.get_lang()),
-        state.params.version
+        state.params.executable_version
     );
     msgs.push(version.as_str());
     use sysinfo::SystemExt;

@@ -19,7 +19,7 @@ use libdialog::handle_gui_event;
 use libdialog::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo, StatisticsEvent};
 use libui::{get_executable_name, get_log_file_name, panic_dialog, t};
 use libui::{
-    Dictionary, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger, SendAnyBoxed,
+    Dictionary, GuiAssets, GuiCommonEvent, GuiParams, ExecutableVersion, GuiState, MessageLogger, SendAnyBoxed,
 };
 use log::LevelFilter;
 use std::str::FromStr;
@@ -240,11 +240,21 @@ impl AppUi {
             &mut egui_routine,
             renderer,
         )?;
+        
+        //  Info about the executable program.
+        const BUILD_ID: &str = git_version::git_version!(); // build info, computed at compile time
+        let executable_version = ExecutableVersion {
+            program_name: env!("CARGO_PKG_NAME").trim().to_string(),           
+            major_version: env!("CARGO_PKG_VERSION_MAJOR").trim().to_string(),
+            minor_version: env!("CARGO_PKG_VERSION_MINOR").trim().to_string(),
+            patch_version: env!("CARGO_PKG_VERSION_PATCH").trim().to_string(),
+            git_build_id: BUILD_ID.trim().to_string(),
+        };
         //  Initialization data for the GUI.
         //  Just what's needed to bring the GUI up initially
         let params = GuiParams {
             lang,
-            version, // because we need version of main program, not libs
+            executable_version, // because we need version of main program, not libs
             asset_dir,
             dark_mode,
             log_level,
