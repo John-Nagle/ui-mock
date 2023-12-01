@@ -23,6 +23,7 @@ use std::any::Any;
 use std::collections::VecDeque;
 use std::path::PathBuf;
 use std::rc::Rc;
+use std::time::{Instant};
 use crate::Dictionary;
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200; // max scrollback for message window
@@ -114,7 +115,7 @@ pub struct CommonState {
     //  Misc.
     pub msg_ok: String,                      // translated OK message
     unique_id: usize,                        // unique ID, serial
-    last_interaction_time: instant::Instant, // time of last user 2D interaction
+    last_interaction_time: Instant, // time of last user 2D interaction
     pub event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
     pub event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
     pub light_mode_visuals: egui::Visuals, // light mode colors, etc.
@@ -159,7 +160,7 @@ impl CommonState {
             menu_group: MenuNone::new_link(),
             msg_ok,
             unique_id: 0,
-            last_interaction_time: instant::Instant::now(),
+            last_interaction_time: Instant::now(),
             event_send_channel,
             event_recv_channel,
             light_mode_visuals,
@@ -280,7 +281,7 @@ impl CommonState {
 
     /// Call this for anything that indicates the GUI should be awakened to show menus.
     pub fn wake_up_gui(&mut self) {
-        self.last_interaction_time = instant::Instant::now();
+        self.last_interaction_time = Instant::now();
     }
 
     /// Should GUI be shown?

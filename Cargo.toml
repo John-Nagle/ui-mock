@@ -53,29 +53,29 @@ name = "ui-mock"
 path = "src/examples/ui-mock/main.rs"
 
 [dependencies]
-#   Compatible with Rend3 0.3.0's Cargo.toml file as of 2023-03-09.
-#   Must match libscene and libdialog.
-rend3 = { version = "^0.3.0" }
-rend3-egui = { version = "^0.3.0" }
-rend3-framework = { version = "^0.3.0" }
-rend3-routine = { version = "^0.3.0" }
-
-# Winit integration with egui (turn off the clipboard feature)
-egui-winit = { version = "0.21", default-features = false, features = ["links", "wayland"] }
-#   Try to get rid of this. It's only used for one texture enum.	
-wgpu = "0.15"
-# Importing png's
-image = { version = "0.24.3", default-features = false, features = ["png"] }
-# Portable implementation of Instant.
-instant = { version = "0.1", unix = ["wasm-bindgen"] }
-egui = "0.21.0"
-glam = { version = "0.22", features = ["bytemuck", "serde"]}
-#   Embedding shaders. This forces shaders to be compiled into the executable
-#   rather than loaded at run time. That's because rust-embed won't work cross platoform
-#   where source and target file systems are different. Version must match that used in rend3 so 
-#   that feature merging takes place.
-rust-embed = { version = "6", features = ["debug-embed"]}
+#   Rendering-related
+env_logger = { version = "0.10.1" }
+glam = {version = "0.24", features = ["bytemuck"]}
+histogram = "0.6.9"
+image = { version = "0.23", default-features = false, features = ["png", "jpeg"]}
+pico-args = "0.4"
+pollster = "0.2.4"
+profiling = { version = "1", default-features = false }
+#   Using pinned version of Rend3 0.3 Unreleased because the API changed from 0.2 and 0.3 isn't released yet.
+rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+rustc-hash = "1"
+smallvec = "1"
+tracy-client = {version = "0.16", optional = true }
+#   WGPU only for texture format, which is also re-imported via Rend3.
+wgpu = "0.18"
+wgpu-profiler = "0.15.0"
 winit = "0.28"
+egui = "0.24"
+egui-wgpu = "0.24"
+egui-winit = "0.24.1"
 #   End of Rend3 compatibilty section.
 
 ####egui_winit_platform = "0.16.0"
@@ -95,9 +95,6 @@ oxilangtag = "0.1.3"
 dark-light = "0.2.3"
 # Preferences
 directories = "4.0"
-# Performance monitoring
-tracy-client = {version = "0.15.2", optional = true }
-profiling = { version = "^1.0.8", default-features = false }
 # System information
 sysinfo = { version = "0.28", default-features = false }
 # Concurrency
@@ -113,13 +110,6 @@ keyring = "1.2.0"
 hex = "0.4.2"
 git-version = "0.3.5"
 
-
-[patch.crates-io]
-# c2c2d3237
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c2c2d3237" }
 
 
 
