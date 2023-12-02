@@ -209,7 +209,7 @@ impl CommonState {
             );
         }
         //  Tesselate and return paint jobs.
-        (self.context.tessellate(shapes, 0.0), textures_delta)
+        (self.context.tessellate(shapes, window.scale_factor() as f32), textures_delta)
     }
 
     /// Draw all live windows
