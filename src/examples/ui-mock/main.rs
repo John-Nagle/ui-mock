@@ -177,8 +177,10 @@ impl AppUi {
         // Create the egui context
         let context = egui::Context::default();
         // Create the winit/egui integration.
-        let mut platform = egui_winit::State::new(event_loop);
-        platform.set_pixels_per_point(window.scale_factor() as f32);
+        ////let mut platform = egui_winit::State::new(event_loop);
+        ////platform.set_pixels_per_point(window.scale_factor() as f32);
+        //  Copied from Rend3 egui example.
+        let platform = egui_winit::State::new(egui::ViewportId::default(), &window, Some(window.scale_factor() as f32), None);
 
         //  Icon loading (obsolete)
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
@@ -214,7 +216,7 @@ impl AppUi {
                 renderer,
             ),
         };
-        let start_time = instant::Instant::now();
+        let start_time = Instant::now();
         let version = env!("CARGO_PKG_VERSION").to_string(); // Version of main, not libraries
         let asset_dir =
             std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
@@ -423,7 +425,7 @@ impl rend3_framework::App for AppUi {
                 
                 // Import the surface texture into the render graph.
                 let frame_handle =
-                    graph.add_imported_render_target(&frame, 0..1, rend3::graph::ViewportRect::from_size(resolution));
+                    graph.add_imported_render_target(&frame, 0..1, 0..1, rend3::graph::ViewportRect::from_size(resolution));
 
                 // Add the default rendergraph without a skybox
                 base_rendergraph.add_to_graph(
@@ -466,7 +468,7 @@ impl rend3_framework::App for AppUi {
             rend3_framework::Event::WindowEvent { event, .. } => {
             
                 //  This is where EGUI handles 2D UI events.
-                if data.gui_state.common_state.platform.on_event(&data.gui_state.common_state.context, &event).consumed {
+                if data.gui_state.common_state.platform.on_window_event(&data.gui_state.common_state.context, &event).consumed {
                     return; // 2D UI consumed this event.
                 }
                 

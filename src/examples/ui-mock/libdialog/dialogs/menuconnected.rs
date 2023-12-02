@@ -37,12 +37,12 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 //
 //  The overlay on the main screen. Menus disappear when not used.
 //  Cursor to top or bottom of window restores them.
-pub struct MenuConnected {
-    move_arrows: NavArrows,
-    rot_arrows: NavArrows,
+pub struct MenuConnected<'a> {
+    move_arrows: NavArrows<'a>,
+    rot_arrows: NavArrows<'a>,
 }
 
-impl MenuConnected {
+impl MenuConnected<'_> {
     /// Create new, as trait object. Provide needed graphical assets.
     pub fn new_link(assets: &UiAppAssets) -> MenuGroupLink {
         //  Two four-way controls with a center reset button
@@ -66,7 +66,7 @@ impl MenuConnected {
     }
 }
 
-impl MenuGroup for MenuConnected {
+impl MenuGroup for MenuConnected<'_> {
     /// Draws the menu set for Login state.
     //  Called on every frame. Do not delay here.
     fn draw(&mut self, state: &mut CommonState) -> bool {
@@ -220,11 +220,12 @@ impl MenuGroup for MenuConnected {
 
     /// For downcasting
     fn as_any(&self) -> &dyn Any {
-        self
+        todo!(); //// self
     }
 
     /// For downcasting
     fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
+        todo!(); //// self
     }
+
 }

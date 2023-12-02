@@ -65,7 +65,7 @@ pub struct UiData {
     pub _directional_handle: rend3::types::DirectionalLightHandle,
 
     pub egui_routine: rend3_egui::EguiRenderRoutine,
-    pub start_time: instant::Instant,
+    pub start_time: Instant,
     pub quit: bool, // global quit flag
 
     //  The 2D GUI

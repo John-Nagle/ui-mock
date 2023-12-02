@@ -8,7 +8,7 @@
 use std::rc::Rc;
 use core::any::Any;
 use core::cell::RefCell;
-use crate::GuiAssets;
+////use crate::GuiAssets;
 use libui::{ t, GuiWindow, GuiWindowLink, StatGraph, SendAnyBoxed, CommonState };
 use egui::Widget;
 
@@ -104,7 +104,7 @@ impl StatisticsWindow {
 
 impl GuiWindow for StatisticsWindow {
     /// Usual draw function
-    fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState) {
+    fn draw(&mut self, ctx: &egui::Context, _state: &mut CommonState) {
         if self.is_open {
             let mut not_cancelled = true;
             let window = egui::containers::Window::new(self.title.as_str())
@@ -149,11 +149,13 @@ impl GuiWindow for StatisticsWindow {
 
     /// For downcasting
     fn as_any(&self) -> &dyn Any {
-        self
+        todo!();    // lifetime problem
+        ////self
     }
 
     /// For downcasting
     fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
+        todo!();    // lifetime problem
+        ////self
     }
 }

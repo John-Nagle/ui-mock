@@ -80,10 +80,10 @@ impl GridSelectWindow {
                             //  Grid page open
                             if ui
                                 .add(
-                                    egui::widgets::ImageButton::new(
+                                    egui::widgets::ImageButton::new((
                                         self.web_icon,
                                         egui::Vec2::new(128.0, 128.0),
-                                    )
+                                    ))
                                     .frame(true),
                                 )
                                 .clicked()

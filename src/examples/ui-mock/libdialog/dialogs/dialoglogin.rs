@@ -57,9 +57,9 @@ pub struct LoginParams {
 }
 
 impl LoginParams {
-    pub const CREDENTIAL_PREFIX: &str = "metaverse"; // credential keys are prefixed with this.
-    pub const CRED_TYPE_PASS: &str = "pass";
-    pub const CRED_TYPE_TOKEN: &str = "token";
+    pub const CREDENTIAL_PREFIX: &'static str = "metaverse"; // credential keys are prefixed with this.
+    pub const CRED_TYPE_PASS: &'static str = "pass";
+    pub const CRED_TYPE_TOKEN: &'static str = "token";
     const PASSWORD_PREFIX: &'static str = "$1$"; // precedes password MD5 in hex. SL convention.
 
     /// New, without password    
