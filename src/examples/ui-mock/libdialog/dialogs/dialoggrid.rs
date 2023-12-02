@@ -67,10 +67,10 @@ impl GridSelectWindow {
                             //  Grid select
                             if ui
                                 .add(
-                                    egui::widgets::ImageButton::new(
+                                    egui::widgets::ImageButton::new((
                                         grid.picture_bar,
                                         egui::Vec2::new(1024.0, 128.0),
-                                    )
+                                    ))
                                     .frame(true),
                                 )
                                 .clicked()
