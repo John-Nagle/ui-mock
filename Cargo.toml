@@ -76,6 +76,7 @@ winit = "0.28"
 egui = "0.24"
 egui-wgpu = "0.24"
 egui-winit = "0.24.1"
+egui_plot = "0.24.1"
 #   End of Rend3 compatibilty section.
 
 ####egui_winit_platform = "0.16.0"

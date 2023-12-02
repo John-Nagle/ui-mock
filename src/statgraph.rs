@@ -9,7 +9,7 @@
 //
 ////use core::ops::Index;
 use egui::{Response, Ui, WidgetText};
-////use egui::plot::{Line, Plot, PlotPoints};
+////use egui_plot::{Line, Plot, PlotPoints};
 use std::collections::VecDeque;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
@@ -49,8 +49,8 @@ impl TimeSeries {
     }
     
     /// Return time series as a generator of plot points
-    pub fn as_plot_points(&self) -> impl Iterator<Item = egui::plot::PlotPoint> +'_ {
-        self.values.iter().enumerate().map(|(i, &y)| egui::plot::PlotPoint::new(i as f64, y as f64))
+    pub fn as_plot_points(&self) -> impl Iterator<Item = egui_plot::PlotPoint> +'_ {
+        self.values.iter().enumerate().map(|(i, &y)| egui_plot::PlotPoint::new(i as f64, y as f64))
     }
 }
     
@@ -99,9 +99,9 @@ impl egui::Widget for &mut StatGraph {
             ui.label(self.title.clone());
             let values = self.time_series.as_plot_points();  // returns an iterator.
             //  Unfortunately, Line wont't yet take an iterator.
-            let temp_values_1: Vec<egui::plot::PlotPoint> = values.collect();   // so we have to make a list of values
-            let temp_values = egui::plot::PlotPoints::Owned(temp_values_1);
-            egui::plot::Plot::new(self.id)
+            let temp_values_1: Vec<egui_plot::PlotPoint> = values.collect();   // so we have to make a list of values
+            let temp_values = egui_plot::PlotPoints::Owned(temp_values_1);
+            egui_plot::Plot::new(self.id)
                 .view_aspect(5.0)
                 ////.width(250.0)
                 .include_x(0.0)
@@ -109,7 +109,7 @@ impl egui::Widget for &mut StatGraph {
                 .include_y(self.y_range[0])
                 .include_y(self.y_range[1])
                 .show_x(false)
-                .show(ui, |plot_ui| plot_ui.line(egui::plot::Line::new(temp_values).fill(0.0))).response
+                .show(ui, |plot_ui| plot_ui.line(egui_plot::Line::new(temp_values).fill(0.0))).response
         }).response
     }
 }

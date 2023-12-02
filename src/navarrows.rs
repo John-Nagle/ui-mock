@@ -16,10 +16,10 @@ use std::f32::consts::PI;
 
 /// NavArrows -- a 4-way arrow with an optional button in the center.
 //  The persistent part.
-pub struct NavArrows {
+pub struct NavArrows<'a> {
     button: (egui::TextureId, egui::Vec2), // the button image
-    arrow: egui::Image,                    // the arrow image for pressed direction
-    center_button: egui::Image,            // the center button
+    arrow: egui::Image<'a>,                // the arrow image for pressed direction
+    center_button: egui::Image<'a>,        // the center button
     hover_text: WidgetText,                // hover text for help       
     center_button_size: f32,               // center button of arrows, if nonzero
 }
@@ -44,7 +44,7 @@ impl Index<NavAction> for [usize; 6] {
     }
 }
 
-impl NavArrows {
+impl NavArrows<'_> {
     /// Image, dimensions of button,
     pub fn new(
         button: (egui::TextureId, egui::Vec2),
@@ -55,8 +55,8 @@ impl NavArrows {
     ) -> Self {
         Self {
             button,
-            arrow: egui::Image::new(arrow.0, arrow.1), // preprocess a bit
-            center_button: egui::Image::new(center_button.0, center_button.1), // preprocess a bit
+            arrow: egui::Image::new((arrow.0, arrow.1)), // preprocess a bit
+            center_button: egui::Image::new((center_button.0, center_button.1)), // preprocess a bit
             center_button_size,
             hover_text: hover_text.into(),
         }
@@ -116,7 +116,7 @@ impl NavArrows {
                 //  Arrow press
                 let arrow_rot = ARROW_ROTS[nav_action as usize];
                 // Draw the arrow if pressed
-                self.arrow
+                self.arrow.clone()
                 .rotate(arrow_rot, egui::Vec2::new(0.5, 0.5))
                 .paint_at(ui, response.rect);
             }
@@ -126,10 +126,10 @@ impl NavArrows {
 }
 
 /// The widget is an image button plus a drawn arrow.
-impl egui::Widget for &mut NavArrows {
+impl egui::Widget for &mut NavArrows<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         let response =
-            ui.add(egui::widgets::ImageButton::new(self.button.0, self.button.1)            
+            ui.add(egui::widgets::ImageButton::new((self.button.0, self.button.1))            
             .frame(false));
         //  Only show hover text when not clicked
         let response = if !response.dragged() {
