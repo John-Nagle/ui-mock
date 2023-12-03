@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.7.10"
+version = "0.8.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
