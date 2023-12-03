@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.8.0"
+version = "0.8.1"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -57,7 +57,7 @@ path = "src/examples/ui-mock/main.rs"
 env_logger = { version = "0.10.1" }
 glam = {version = "0.24", features = ["bytemuck"]}
 histogram = "0.6.9"
-image = { version = "0.23", default-features = false, features = ["png", "jpeg"]}
+image = { version = "0.24", default-features = false, features = ["png", "jpeg"]}
 pico-args = "0.4"
 pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
