@@ -62,10 +62,15 @@ pico-args = "0.4"
 pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 #   Using pinned version of Rend3 0.3 Unreleased because the API changed from 0.2 and 0.3 isn't released yet.
-rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+# rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+# rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+# rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+# rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
+
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "0e01337" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "0e01337" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "0e01337" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "0e01337" }
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
