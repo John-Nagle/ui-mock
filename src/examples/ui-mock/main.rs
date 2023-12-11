@@ -123,7 +123,10 @@ impl AppUi {
         //
         // All handles are refcounted, so we only need to hang onto the handle until we
         // make an object.
-        let mesh_handle = renderer.add_mesh(mesh);
+        let mesh_handle = match renderer.add_mesh(mesh) {
+            Ok(handle) => handle,
+            Err(e) => { return Err(anyhow::anyhow!("{:?}", e)) } // because WGPU errors are not Send, cloneable, or copyable.
+        };
 
         // Add PBR material with all defaults except a single color.
         let material = rend3_routine::pbr::PbrMaterial {
