@@ -67,21 +67,28 @@ profiling = { version = "1", default-features = false }
 # rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 # rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "9065f1e" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "9065f1e" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "9065f1e" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "9065f1e" }
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
 wgpu = "0.18"
 wgpu-profiler = "0.15.0"
-winit = "0.28"
-egui = "0.24"
-egui-wgpu = "0.24"
-egui-winit = "0.24.1"
-egui_plot = "0.24.1"
+winit = "0.29"
+#### egui = "0.24"
+#### egui-wgpu = "0.24"
+#### egui-winit = "0.24"
+#### egui_plot = "0.24"
+
+# The egui immediate mode gui library
+egui = {git = "https://github.com/emilk/egui.git", branch="master"}
+egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
+# Winit integration with egui (turn off the clipboard feature)
+egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
+
 #   End of Rend3 compatibilty section.
 
 ####egui_winit_platform = "0.16.0"

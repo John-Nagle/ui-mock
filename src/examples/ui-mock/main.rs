@@ -89,6 +89,7 @@ impl AppUi {
         }
     }
     /// Setup of the graphics environment. Returns error.
+/*
     fn setup_with_error(
         &mut self,        
         event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
@@ -97,23 +98,25 @@ impl AppUi {
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
     ) -> Result<(), Error> {
+*/
+    fn setup_with_error(&mut self, context: rend3_framework::SetupContext<'_>) -> Result<(), Error> {
         //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
         ////window.set_visible(true); // ***TEMP TEST***
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
-        window.set_visible(true);
-        window.set_maximized(true);
+        ////window.set_visible(true);
+        ////window.set_maximized(true);
         ////window.set_decorations(false);
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
-        let window_size = window.inner_size();
+        let window_size = context.resolution;
 
         // Create the egui render routine
         let mut egui_routine = rend3_egui::EguiRenderRoutine::new(
-            renderer,
-            surface_format,
+            context.renderer,
+            context.surface_format,
             rend3::types::SampleCount::One,
-            window_size.width,
-            window_size.height,
-            window.scale_factor() as f32,
+            window_size.x,
+            window_size.y,
+            context.scale_factor,
         );
 
         // Create mesh and calculate smooth normals based on vertices
@@ -123,7 +126,7 @@ impl AppUi {
         //
         // All handles are refcounted, so we only need to hang onto the handle until we
         // make an object.
-        let mesh_handle = match renderer.add_mesh(mesh) {
+        let mesh_handle = match context.renderer.add_mesh(mesh) {
             Ok(handle) => handle,
             Err(e) => { return Err(anyhow::anyhow!("{:?}", e)) } // because WGPU errors are not Send, cloneable, or copyable.
         };
@@ -134,7 +137,7 @@ impl AppUi {
             transparency: rend3_routine::pbr::Transparency::Blend,
             ..rend3_routine::pbr::PbrMaterial::default()
         };
-        let _material_handle = renderer.add_material(material);
+        let _material_handle = context.renderer.add_material(material);
 
         // Combine the mesh and the material with a location to give an object.
         let object = rend3::types::Object {
@@ -147,7 +150,7 @@ impl AppUi {
         // even if they are deleted.
         //
         // We need to keep the object handle alive.
-        let _object_handle = renderer.add_object(object);
+        let _object_handle = context.renderer.add_object(object);
 
         let camera_pitch = std::f32::consts::FRAC_PI_4;
         let camera_yaw = -std::f32::consts::FRAC_PI_4;
@@ -158,7 +161,7 @@ impl AppUi {
         let view = view * glam::Mat4::from_translation((-camera_location).into());
 
         // Set camera location data
-        renderer.set_camera_data(rend3::types::Camera {
+        context.renderer.set_camera_data(rend3::types::Camera {
             projection: rend3::types::CameraProjection::Perspective {
                 vfov: 60.0,
                 near: 0.1,
@@ -169,7 +172,7 @@ impl AppUi {
         // Create a single directional light
         //
         // We need to keep the directional light handle alive.
-        let _directional_handle = renderer.add_directional_light(rend3::types::DirectionalLight {
+        let _directional_handle = context.renderer.add_directional_light(rend3::types::DirectionalLight {
             color: glam::Vec3::ONE,
             intensity: 10.0,
             // Direction will be normalized
@@ -178,17 +181,18 @@ impl AppUi {
             resolution: 2048,       // ***NOT SURE ABOUT THIS***
         });
         // Create the egui context
-        let context = egui::Context::default();
+        let egui_context = egui::Context::default();
         // Create the winit/egui integration.
         ////let mut platform = egui_winit::State::new(event_loop);
         ////platform.set_pixels_per_point(window.scale_factor() as f32);
         //  Copied from Rend3 egui example.
-        let platform = egui_winit::State::new(egui::ViewportId::default(), &window, Some(window.scale_factor() as f32), None);
+        let platform = egui_winit::State::new(egui::ViewportId::default(), 
+            &context.window, Some(egui_context.window.scale_factor() as f32), None);
 
         //  Icon loading (obsolete)
         let web_icon_bytes = include_bytes!("../../assets/images/iconweb.png");
         let assets = GuiAssets {
-            web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, renderer),
+            web_icon: libui::load_canned_icon(web_icon_bytes, &mut egui_routine, context.renderer),
         };
         //  Icon loading (current). Example content only. Real programs do this at run time, so we can have themes.
         let move_arrows_icon_bytes = include_bytes!("../../assets/images/move-arrows-128.png");
@@ -201,22 +205,22 @@ impl AppUi {
             move_arrows_icon: libui::load_canned_icon(
                 move_arrows_icon_bytes,
                 &mut egui_routine,
-                renderer,
+                context.renderer,
             ),
             rot_arrows_icon: libui::load_canned_icon(
                 rot_arrows_icon_bytes,
                 &mut egui_routine,
-                renderer,
+                context.renderer,
             ),
             pressed_arrow_icon: libui::load_canned_icon(
                 pressed_arrow_icon_bytes,
                 &mut egui_routine,
-                renderer,
+                context.renderer,
             ),
             pressed_button_icon: libui::load_canned_icon(
                 pressed_button_icon_bytes,
                 &mut egui_routine,
-                renderer,
+                context.renderer,
             ),
         };
         let start_time = Instant::now();
@@ -235,7 +239,7 @@ impl AppUi {
         let dark_mode = false; // ***TEMP*** force dark mode as default
         let log_level = LevelFilter::Warn; // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
-        let adapter_info: rend3::ExtendedAdapterInfo = renderer.adapter_info.clone(); // adapter info for About box
+        let adapter_info: rend3::ExtendedAdapterInfo = context.renderer.adapter_info.clone(); // adapter info for About box
                                                                                       ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP***
         const GRID_FILE: &str = "grids.json";
         // Read in the grid select params, which requires reading some images.
@@ -243,7 +247,7 @@ impl AppUi {
             &std::path::PathBuf::from_str(GRID_FILE)?,
             &asset_dir,
             &mut egui_routine,
-            renderer,
+            context.renderer,
         )?;
         
         //  Info about the executable program.
@@ -276,7 +280,7 @@ impl AppUi {
             params,
             assets,
             platform,
-            context,
+            egui_context,
             event_send_channel,
             event_recv_channel,
             app_state,
@@ -348,6 +352,8 @@ impl rend3_framework::App for AppUi {
     }
 
     /// Setup of the graphics enviornment, popping up a panic dialog on error.
+    fn setup(&mut self, context: rend3_framework::SetupContext<'_>) {
+/*
     fn setup(
         &mut self,
         event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
@@ -356,13 +362,84 @@ impl rend3_framework::App for AppUi {
         _routines: &Arc<rend3_framework::DefaultRoutines>,
         surface_format: rend3::types::TextureFormat,
     ) {
-        if let Err(err) = self.setup_with_error(event_loop, window, renderer, _routines, surface_format) {
+ */
+        if let Err(err) = self.setup_with_error(context) {
             panic_dialog("Start-up failure", &format!("{:?}", err)); // tell user
             panic!("Start up failure: {:?}", err); // then panic
         }
     }
 
+    /// The redraw event, which has its own trait item
+    fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_, ()>) {
+        profiling::scope!("Redraw.");
+        //  Calculate frame statistics
+        Self::frame_statistics_update(data);
+        //  Build the 2D GUI
+        let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(context.window); // build the 2D GUI
+        let input = rend3_egui::Input {
+            clipped_meshes: &paint_jobs,
+            textures_delta,
+            context: data.gui_state.common_state.context.clone(),
+        };
+
+        profiling::scope!("3D");
+        // Get a frame
+        let frame = context.surface.unwrap().get_current_texture().unwrap();
+        // Swap the instruction buffers so that our frame's changes can be processed.
+        context.renderer.swap_instruction_buffers();
+        // Evaluate our frame's world-change instructions
+        let mut eval_output = context.renderer.evaluate_instructions();
+        // Lock the routines
+        let pbr_routine = rend3_framework::lock(&context.routines.pbr);
+        let tonemapping_routine = rend3_framework::lock(&context.routines.tonemapping);
+
+        // Build a rendergraph
+        let mut graph = rend3::graph::RenderGraph::new();
+                
+        // Import the surface texture into the render graph.
+        let frame_handle =
+            graph.add_imported_render_target(&frame, 0..1, 0..1,
+                rend3::graph::ViewportRect::from_size(context.resolution));
+
+        // Add the default rendergraph without a skybox
+        base_rendergraph.add_to_graph(
+            &mut graph,
+            &eval_output,
+            &pbr_routine,
+            None,
+            &tonemapping_routine,
+            frame_handle,
+            resolution,
+            SAMPLE_COUNT,
+            glam::Vec4::ZERO,
+            glam::Vec4::new(0.10, 0.05, 0.10, 1.0), // Nice scene-referred purple
+        );
+
+        // Add egui on top of all the other passes
+        /*
+        let surface = graph.add_surface_texture();
+        data.egui_routine.add_to_graph(&mut graph, input, surface);
+        */
+        data.egui_routine.add_to_graph(&mut graph, input, frame_handle);
+
+        // Dispatch a render using the built up rendergraph!
+        ////graph.execute(renderer, frame, cmd_bufs, &ready);
+        graph.execute(context.renderer, &mut eval_output);
+
+        // Present the frame
+        frame.present();
+        //  Exit if all done.
+        if data.quit {
+            control_flow(winit::event_loop::ControlFlow::Exit);
+        } else {
+            control_flow(winit::event_loop::ControlFlow::Poll);
+        }
+        profiling::finish_frame!(); // end of frame for Tracy purposes
+        context.window.request_redraw();    // and do it again
+    }
+
     /// The event loop. This runs forever, or at least until the user causes an exit.
+/*
     fn handle_event(
         &mut self,
         window: &winit::window::Window,
@@ -371,9 +448,12 @@ impl rend3_framework::App for AppUi {
         base_rendergraph: &rend3_routine::base::BaseRenderGraph,
         surface: Option<&Arc<rend3::types::Surface>>,
         resolution: glam::UVec2,
-        event: rend3_framework::Event<'_, ()>,
+        event: winit::event::Event<()>,
         control_flow: impl FnOnce(winit::event_loop::ControlFlow),
     ) {
+*/
+    fn handle_event(&mut self, context: rend3_framework::EventContext<'_>, event: winit::event::Event<()>) {
+
         profiling::scope!("Event");
 
         //  Handle any user events.
@@ -392,7 +472,7 @@ impl rend3_framework::App for AppUi {
                     .collect();
                 for ev in events {
                     println!("User event: {:?}", ev); // ***TEMP***
-                    self.handle_user_event(window, ev);
+                    self.handle_user_event(context.window, ev);
                 }
             }
         }
@@ -400,12 +480,13 @@ impl rend3_framework::App for AppUi {
         let data = self.data.as_mut().unwrap();
 
         match event {
-            rend3_framework::Event::RedrawRequested(..) => {
+/*
+            winit::event::Event::RedrawRequested(..) => {
                 profiling::scope!("Redraw.");
                 //  Calculate frame statistics
                 Self::frame_statistics_update(data);
                 //  Build the 2D GUI
-                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(window); // build the 2D GUI
+                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(context.window); // build the 2D GUI
                 let input = rend3_egui::Input {
                     clipped_meshes: &paint_jobs,
                     textures_delta,
@@ -414,21 +495,22 @@ impl rend3_framework::App for AppUi {
 
                 profiling::scope!("3D");
                 // Get a frame
-                let frame = surface.unwrap().get_current_texture().unwrap();
+                let frame = context.surface.unwrap().get_current_texture().unwrap();
                 // Swap the instruction buffers so that our frame's changes can be processed.
-                renderer.swap_instruction_buffers();
+                context.renderer.swap_instruction_buffers();
                 // Evaluate our frame's world-change instructions
-                let mut eval_output = renderer.evaluate_instructions();
+                let mut eval_output = context.renderer.evaluate_instructions();
                 // Lock the routines
-                let pbr_routine = rend3_framework::lock(&routines.pbr);
-                let tonemapping_routine = rend3_framework::lock(&routines.tonemapping);
+                let pbr_routine = rend3_framework::lock(&context.routines.pbr);
+                let tonemapping_routine = rend3_framework::lock(&context.routines.tonemapping);
 
                 // Build a rendergraph
                 let mut graph = rend3::graph::RenderGraph::new();
                 
                 // Import the surface texture into the render graph.
                 let frame_handle =
-                    graph.add_imported_render_target(&frame, 0..1, 0..1, rend3::graph::ViewportRect::from_size(resolution));
+                    graph.add_imported_render_target(&frame, 0..1, 0..1,
+                        rend3::graph::ViewportRect::from_size(context.resolution));
 
                 // Add the default rendergraph without a skybox
                 base_rendergraph.add_to_graph(
@@ -453,7 +535,7 @@ impl rend3_framework::App for AppUi {
 
                 // Dispatch a render using the built up rendergraph!
                 ////graph.execute(renderer, frame, cmd_bufs, &ready);
-                graph.execute(renderer, &mut eval_output);
+                graph.execute(context.renderer, &mut eval_output);
 
                 // Present the frame
                 frame.present();
@@ -464,11 +546,11 @@ impl rend3_framework::App for AppUi {
                     control_flow(winit::event_loop::ControlFlow::Poll);
                 }
                 profiling::finish_frame!(); // end of frame for Tracy purposes
+                context.window.request_redraw();    // and do it again
             }
-            rend3_framework::Event::MainEventsCleared => {
-                window.request_redraw();
-            }
-            rend3_framework::Event::WindowEvent { event, .. } => {
+
+*/
+            winit::event::Event::WindowEvent { event, .. } => {
             
                 //  This is where EGUI handles 2D UI events.
                 if data.gui_state.common_state.platform.on_window_event(&data.gui_state.common_state.context, &event).consumed {
