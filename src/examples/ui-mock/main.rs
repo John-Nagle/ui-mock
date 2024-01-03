@@ -373,6 +373,7 @@ impl rend3_framework::App for AppUi {
     fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_, ()>) {
         profiling::scope!("Redraw.");
         //  Calculate frame statistics
+        let data = self.data.as_mut().unwrap();
         Self::frame_statistics_update(data);
         //  Build the 2D GUI
         let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(context.window); // build the 2D GUI
