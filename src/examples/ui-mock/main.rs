@@ -606,8 +606,8 @@ impl rend3_framework::App for AppUi {
                     winit::event::WindowEvent::CursorLeft { .. } => {
                         data.gui_state.common_state.wake_up_gui();
                     }
-                    winit::event::WindowEvent::KeyboardInput { input, .. } => {
-                        let _ = input; // not yet used
+                    winit::event::WindowEvent::KeyboardInput { .. } => {
+                        ////let _ = input; // not yet used
                                    ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
                     }
                     _ => {}
