@@ -23,7 +23,6 @@ use libui::{
 };
 use log::LevelFilter;
 use std::str::FromStr;
-use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 /// Base level configuration
@@ -462,13 +461,12 @@ impl rend3_framework::App for AppUi {
         // Present the frame
         ////frame.present();
         //  Exit if all done.
-        if data.quit {
-            control_flow(winit::event_loop::ControlFlow::Exit);
-        } else {
-            control_flow(winit::event_loop::ControlFlow::Poll);
-        }
         profiling::finish_frame!(); // end of frame for Tracy purposes
-        ////context.window.request_redraw();    // and do it again
+        if data.quit {
+            context.event_loop_window_target.as_ref().unwrap().exit();
+            ////control_flow(winit::event_loop::ControlFlow::Exit);
+        }
+
     }
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
@@ -586,7 +584,8 @@ impl rend3_framework::App for AppUi {
             winit::event::Event::WindowEvent { event, .. } => {
             
                 //  This is where EGUI handles 2D UI events.
-                if data.gui_state.common_state.platform.on_window_event(&data.gui_state.common_state.context, &event).consumed {
+                ////if data.gui_state.common_state.platform.on_window_event(&data.gui_state.common_state.context, &event).consumed {
+                if data.gui_state.common_state.platform.on_window_event(&context.window.as_ref().unwrap(), &event).consumed {
                     return; // 2D UI consumed this event.
                 }
                 
@@ -594,10 +593,7 @@ impl rend3_framework::App for AppUi {
           
                     winit::event::WindowEvent::Resized(size) => {
                         data.egui_routine
-                             .resize(size.width, size.height, context.window.scale_factor() as f32);
-                    }
-                    winit::event::WindowEvent::CloseRequested => {
-                        control_flow(winit::event_loop::ControlFlow::Exit);
+                             .resize(size.width, size.height, context.window.as_ref().unwrap().scale_factor() as f32);
                     }
                     winit::event::WindowEvent::Focused(gained) => {
                         if gained {
