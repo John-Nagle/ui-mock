@@ -114,7 +114,7 @@ sysinfo = { version = "0.28", default-features = false }
 crossbeam-channel = "0.5"
 # Error handling
 log = "0.4.17"
-simplelog = "0.10.0"
+simplelog = "0.12"
 anyhow = "1.0"
 # Security
 md5 = "0.7.0"
