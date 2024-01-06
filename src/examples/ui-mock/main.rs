@@ -1,4 +1,4 @@
-// # Main program of user interface
+//! # Main program of user interface
 //
 //  This is a mockup of the user interface for
 //  a metaverse viewer. It has windows and menus,
@@ -88,16 +88,6 @@ impl AppUi {
         }
     }
     /// Setup of the graphics environment. Returns error.
-/*
-    fn setup_with_error(
-        &mut self,        
-        event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
-        window: &winit::window::Window,
-        renderer: &Arc<rend3::Renderer>,
-        _routines: &Arc<rend3_framework::DefaultRoutines>,
-        surface_format: rend3::types::TextureFormat,
-    ) -> Result<(), Error> {
-*/
     fn setup_with_error(&mut self, context: rend3_framework::SetupContext<'_>) -> Result<(), Error> {
         //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
         ////window.set_visible(true); // ***TEMP TEST***
@@ -105,7 +95,8 @@ impl AppUi {
         ////window.set_visible(true);
         ////window.set_maximized(true);
         ////window.set_decorations(false);
-        ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
+        ////context.windowing.as_ref().unwrap().window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
+        ////context.windowing.as_ref().unwrap().window.set_maximized(true);
         let window_size = context.resolution;
 
         // Create the egui render routine
@@ -181,14 +172,7 @@ impl AppUi {
         });
         // Create the egui context
         let egui_context = egui::Context::default();
-        // Create the winit/egui integration.
-        ////let mut platform = egui_winit::State::new(event_loop);
-        ////platform.set_pixels_per_point(window.scale_factor() as f32);
         //  Copied from Rend3 egui example.
-/*
-        let platform = egui_winit::State::new(egui::ViewportId::default(), 
-            &context.window, Some(egui_context.window.scale_factor() as f32), None);
-*/
         let platform = if let Some(windowing) = context.windowing {
             Some(egui_winit::State::new(
                 egui_context.clone(),
@@ -364,16 +348,6 @@ impl rend3_framework::App for AppUi {
 
     /// Setup of the graphics enviornment, popping up a panic dialog on error.
     fn setup(&mut self, context: rend3_framework::SetupContext<'_>) {
-/*
-    fn setup(
-        &mut self,
-        event_loop: &winit::event_loop::EventLoop<rend3_framework::UserResizeEvent<()>>,
-        window: &winit::window::Window,
-        renderer: &Arc<rend3::Renderer>,
-        _routines: &Arc<rend3_framework::DefaultRoutines>,
-        surface_format: rend3::types::TextureFormat,
-    ) {
- */
         if let Err(err) = self.setup_with_error(context) {
             panic_dialog("Start-up failure", &format!("{:?}", err)); // tell user
             panic!("Start up failure: {:?}", err); // then panic
@@ -396,8 +370,6 @@ impl rend3_framework::App for AppUi {
         };
 
         profiling::scope!("3D");
-        ////// Get a frame
-        ////let frame = context.surface.unwrap().get_current_texture().unwrap();
         // Swap the instruction buffers so that our frame's changes can be processed.
         context.renderer.swap_instruction_buffers();
         // Evaluate our frame's world-change instructions
@@ -415,20 +387,6 @@ impl rend3_framework::App for AppUi {
                 rend3::graph::ViewportRect::from_size(context.resolution));
 
         // Add the default rendergraph without a skybox
-/*
-        context.base_rendergraph.add_to_graph(
-            &mut graph,
-            &eval_output,
-            &pbr_routine,
-            None,
-            &tonemapping_routine,
-            frame_handle,
-            context.resolution,
-            SAMPLE_COUNT,
-            glam::Vec4::ZERO,
-            glam::Vec4::new(0.10, 0.05, 0.10, 1.0), // Nice scene-referred purple
-        );
-*/
         context.base_rendergraph.add_to_graph(
             &mut graph,
             rend3_routine::base::BaseRenderGraphInputs {
@@ -455,11 +413,8 @@ impl rend3_framework::App for AppUi {
         data.egui_routine.add_to_graph(&mut graph, input, frame_handle);
 
         // Dispatch a render using the built up rendergraph!
-        ////graph.execute(renderer, frame, cmd_bufs, &ready);
         graph.execute(context.renderer, &mut eval_output);
 
-        // Present the frame
-        ////frame.present();
         //  Exit if all done.
         profiling::finish_frame!(); // end of frame for Tracy purposes
         if data.quit {
@@ -470,19 +425,6 @@ impl rend3_framework::App for AppUi {
     }
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
-/*
-    fn handle_event(
-        &mut self,
-        window: &winit::window::Window,
-        renderer: &Arc<rend3::Renderer>,       
-        routines: &Arc<rend3_framework::DefaultRoutines>,
-        base_rendergraph: &rend3_routine::base::BaseRenderGraph,
-        surface: Option<&Arc<rend3::types::Surface>>,
-        resolution: glam::UVec2,
-        event: winit::event::Event<()>,
-        control_flow: impl FnOnce(winit::event_loop::ControlFlow),
-    ) {
-*/
     fn handle_event(&mut self, context: rend3_framework::EventContext<'_>, event: winit::event::Event<()>) {
 
         profiling::scope!("Event");
@@ -511,76 +453,7 @@ impl rend3_framework::App for AppUi {
         let data = self.data.as_mut().unwrap();
 
         match event {
-/*
-            winit::event::Event::RedrawRequested(..) => {
-                profiling::scope!("Redraw.");
-                //  Calculate frame statistics
-                Self::frame_statistics_update(data);
-                //  Build the 2D GUI
-                let (paint_jobs, textures_delta) = data.gui_state.common_state.draw_all(context.window); // build the 2D GUI
-                let input = rend3_egui::Input {
-                    clipped_meshes: &paint_jobs,
-                    textures_delta,
-                    context: data.gui_state.common_state.context.clone(),
-                };
 
-                profiling::scope!("3D");
-                // Get a frame
-                let frame = context.surface.unwrap().get_current_texture().unwrap();
-                // Swap the instruction buffers so that our frame's changes can be processed.
-                context.renderer.swap_instruction_buffers();
-                // Evaluate our frame's world-change instructions
-                let mut eval_output = context.renderer.evaluate_instructions();
-                // Lock the routines
-                let pbr_routine = rend3_framework::lock(&context.routines.pbr);
-                let tonemapping_routine = rend3_framework::lock(&context.routines.tonemapping);
-
-                // Build a rendergraph
-                let mut graph = rend3::graph::RenderGraph::new();
-                
-                // Import the surface texture into the render graph.
-                let frame_handle =
-                    graph.add_imported_render_target(&frame, 0..1, 0..1,
-                        rend3::graph::ViewportRect::from_size(context.resolution));
-
-                // Add the default rendergraph without a skybox
-                base_rendergraph.add_to_graph(
-                    &mut graph,
-                    &eval_output,
-                    &pbr_routine,
-                    None,
-                    &tonemapping_routine,
-                    frame_handle,
-                    resolution,
-                    SAMPLE_COUNT,
-                    glam::Vec4::ZERO,
-                    glam::Vec4::new(0.10, 0.05, 0.10, 1.0), // Nice scene-referred purple
-                );
-
-                // Add egui on top of all the other passes
-                /*
-                let surface = graph.add_surface_texture();
-                data.egui_routine.add_to_graph(&mut graph, input, surface);
-                */
-                data.egui_routine.add_to_graph(&mut graph, input, frame_handle);
-
-                // Dispatch a render using the built up rendergraph!
-                ////graph.execute(renderer, frame, cmd_bufs, &ready);
-                graph.execute(context.renderer, &mut eval_output);
-
-                // Present the frame
-                frame.present();
-                //  Exit if all done.
-                if data.quit {
-                    control_flow(winit::event_loop::ControlFlow::Exit);
-                } else {
-                    control_flow(winit::event_loop::ControlFlow::Poll);
-                }
-                profiling::finish_frame!(); // end of frame for Tracy purposes
-                context.window.request_redraw();    // and do it again
-            }
-
-*/
             winit::event::Event::WindowEvent { event, .. } => {
             
                 //  This is where EGUI handles 2D UI events.
