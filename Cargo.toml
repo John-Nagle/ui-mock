@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.9.2"
+version = "0.9.5"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -67,16 +67,16 @@ profiling = { version = "1", default-features = false }
 # rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 # rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "a68c76a" }
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
-wgpu = "0.18"
-wgpu-profiler = "0.15.0"
+wgpu = "0.19"
+wgpu-profiler = "^0.16.0"
 winit = "0.29"
 #### egui = "0.24"
 #### egui-wgpu = "0.24"
@@ -84,10 +84,13 @@ winit = "0.29"
 #### egui_plot = "0.24"
 
 # The egui immediate mode gui library
-egui = {git = "https://github.com/emilk/egui.git", branch="master"}
-egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
+## egui = {git = "https://github.com/emilk/egui.git", branch="master"}
+## egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
 # Winit integration with egui (turn off the clipboard feature)
-egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
+## egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
+egui = "0.26"
+egui_plot = "0.26"
+egui-winit = "0.26"
 
 #   End of Rend3 compatibilty section.
 
@@ -114,7 +117,7 @@ sysinfo = { version = "0.28", default-features = false }
 crossbeam-channel = "0.5"
 # Error handling
 log = "0.4.17"
-simplelog = "0.12"
+simplelog = { version = "*", default-features = false }
 anyhow = "1.0"
 # Security
 md5 = "0.7.0"
