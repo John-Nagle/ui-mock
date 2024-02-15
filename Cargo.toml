@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.9.3"
+version = "0.9.4"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -75,7 +75,7 @@ rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
-wgpu = "0.18"
+wgpu = "^0.18"
 wgpu-profiler = "0.15.0"
 winit = "0.29"
 #### egui = "0.24"
