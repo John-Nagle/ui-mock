@@ -13,6 +13,7 @@ mod guiutil;
 mod menunone;
 mod navarrows; // a widget
 mod statgraph;  // a widget
+mod piemenu; // a widget
 
 use core::any::Any;
 use core::cell::RefCell;
@@ -34,6 +35,7 @@ pub use guiutil::{
 };
 /// Widgets
 pub use navarrows::{NavArrows, NavAction};
+pub use piemenu::{PieMenu};
 pub use statgraph::{StatGraph};
 
 //  Traits
