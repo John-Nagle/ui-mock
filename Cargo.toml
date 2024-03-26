@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.9.5"
+version = "0.9.6"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -55,27 +55,18 @@ path = "src/examples/ui-mock/main.rs"
 [dependencies]
 #   Rendering-related
 env_logger = { version = "0.10.1" }
-glam = {version = "0.24", features = ["bytemuck"]}
+glam = {version = "^0.25", features = ["bytemuck"]}
 histogram = "0.6.9"
 image = { version = "0.24", default-features = false, features = ["png", "jpeg"]}
 pico-args = "0.4"
 pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
-#   Using pinned version of Rend3 0.3 Unreleased because the API changed from 0.2 and 0.3 isn't released yet.
-# rend3 = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-# rend3-routine = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-# rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
-# rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-####rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-####rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-####rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-####rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-
-rend3-framework = { path = '/home/john/projects/rend3/rend3-framework' }
-rend3 = { path = '/home/john/projects/rend3/rend3' }
-rend3-egui = { path = '/home/john/projects/rend3/rend3-egui' }
-rend3-routine = { path = '/home/john/projects//rend3/rend3-routine' }
+# March 2024 version of Rend3.
+rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "87f9ac4" }
+rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "87f9ac4" }
+rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "87f9ac4" }
+rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "87f9ac4" }
 
 rustc-hash = "1"
 smallvec = "1"
