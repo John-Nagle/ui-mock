@@ -17,28 +17,41 @@ use std::f32::consts::PI;
 
 /// PieMenu -- N-choice circular menu
 //  The persistent part.
-pub struct PieMenu<'a> {
-    button: (egui::TextureId, egui::Vec2), // the button image
-    arrow: egui::Image<'a>,                // the arrow image for pressed direction
-    center_button: egui::Image<'a>,        // the center button
-    hover_text: WidgetText,                // hover text for help       
-    center_button_size: f32,               // center button of arrows, if nonzero
+pub struct PieMenu {
+    /// Radius of entire button
+    radius: f32,
+    /// Center radius of button
+    center_radius: f32,
+    /// Text of button segments, clockwise from top.
+    button_text: Vec<egui::RichText>,
+    /// Line color
+    line_color: egui::Color32,
+    /// Background color
+    background_color: egui::Color32,
+    /// Hover color
+    hover_color: egui::Color32,
+    /// Hover help text
+    hover_text: WidgetText,
 }
 
-impl PieMenu<'_> {
+impl PieMenu {
     /// Image, dimensions of button,
     pub fn new(
-        button: (egui::TextureId, egui::Vec2),
-        arrow: (egui::TextureId, egui::Vec2),
-        center_button: (egui::TextureId, egui::Vec2),
-        center_button_size: f32,
+        radius: f32,
+        center_radius: f32,
+        button_text: &[egui::RichText],
+        line_color: egui::Color32,
+        background_color: egui::Color32,
+        hover_color: egui::Color32,
         hover_text: impl Into<WidgetText>,
     ) -> Self {
         Self {
-            button,
-            arrow: egui::Image::new((arrow.0, arrow.1)), // preprocess a bit
-            center_button: egui::Image::new((center_button.0, center_button.1)), // preprocess a bit
-            center_button_size,
+            radius,
+            center_radius,
+            button_text: button_text.iter().map(|s| s.clone()).collect(),
+            line_color,			
+            background_color,	
+            hover_color,
             hover_text: hover_text.into(),
         }
     }
@@ -109,11 +122,11 @@ impl PieMenu<'_> {
 }
 
 /// The widget is a circle with clickable pie slices.
-impl egui::Widget for &mut PieMenu<'_> {
+impl egui::Widget for &mut PieMenu {
     fn ui(self, ui: &mut Ui) -> Response {
         let response =
-            ui.add(egui::widgets::ImageButton::new((self.button.0, self.button.1))            
-            .frame(false));
+            ui.label("Pie menu dummy");          
+            ////.frame(true);
         //  Only show hover text when not clicked
         let response = if !response.dragged() {
             response.on_hover_text(self.hover_text.clone())
