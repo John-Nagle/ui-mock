@@ -67,10 +67,16 @@ profiling = { version = "1", default-features = false }
 # rend3-framework = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 # rend3-egui = { git = 'https://github.com/BVE-Reborn/rend3.git' }
 
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+####rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+####rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+####rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+####rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "c7c2d85" }
+
+rend3-framework = { path = '/home/john/projects/rend3/rend3-framework' }
+rend3 = { path = '/home/john/projects/rend3/rend3' }
+rend3-egui = { path = '/home/john/projects/rend3/rend3-egui' }
+rend3-routine = { path = '/home/john/projects//rend3/rend3-routine' }
+
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
