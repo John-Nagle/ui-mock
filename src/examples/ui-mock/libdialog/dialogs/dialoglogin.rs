@@ -341,6 +341,13 @@ impl GuiWindow for LoginDialogWindow {
                 let _ = state.send_boxed_gui_event(Box::new(GuiEvent::Startup));
                 // back to ground state
             }
+            //  Successful fake login.
+            if accepted {
+                ////state.app_state.change_mode(SystemMode::Connected);
+                let _ = state.send_boxed_gui_event(Box::new(GuiEvent::Connected));
+                ////let connected_menu = MenuConnected::new_link(&data.ui_app_assets);
+                ////state.set_menu_group(connected_menu);
+            }
         }
     }
 

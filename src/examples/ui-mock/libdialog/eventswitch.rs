@@ -100,5 +100,11 @@ pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event
         GuiEvent::LoginStart(_login_params) => {
             data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
         }
+        GuiEvent::Connected => {
+            println!("Connected, show 3D world");
+            data.gui_state.app_state.change_mode(SystemMode::Connected);
+            let connected_menu = MenuConnected::new_link(&data.ui_app_assets);
+            data.gui_state.common_state.set_menu_group(connected_menu);
+        }
     }
 }

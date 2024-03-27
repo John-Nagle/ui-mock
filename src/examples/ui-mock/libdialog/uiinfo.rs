@@ -27,6 +27,7 @@ pub enum GuiEvent {
     SaveReplay(PathBuf),         // save into a replay file
     LoginTo(GridSelectParams),   // ask for login params
     LoginStart(LoginParams),     // start the login process
+    Connected,                   // dummy connected state
                                  ////Login(ConnectInfo),                         // login dialog result
 }
 
