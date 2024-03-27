@@ -83,10 +83,7 @@ impl GuiWindow for ClickWindow {
                 .collapsible(false)
                 .open(&mut not_cancelled);
             window.show(ctx, |ui| {
-                ui.vertical(|ui| {
-                    ui.label("Dummy");
-                    ui.end_row();
-                });
+                ui.add(&mut self.click_menu);
             });
             if !not_cancelled {
                 self.is_open = false;
