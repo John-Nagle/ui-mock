@@ -175,5 +175,17 @@
     "menu.log_level.trace": {
         "en": "Trace",
         "fr": "Trace"
+    },
+    "menu.world.pie_menu": {
+        "en": "Pie menu",
+        "fr": "Menu circulaire"
+    },
+    "menu.pie_menu.sit": {
+        "en": "Sit",
+        "fr": "S’asseoir"
+    },
+    "menu.pie_menu.inspect": {
+        "en": "Inspect",
+        "fr": "Inspecter"
     }
 }

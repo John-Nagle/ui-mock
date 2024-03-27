@@ -14,7 +14,7 @@ use core::any::Any;
 use core::cell::RefCell;
 use egui::{menu, Frame};
 use libui::t;
-use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows, NavAction};
+use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows, NavAction, PieMenu};
 use log::LevelFilter;
 use std::rc::Rc;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
@@ -32,6 +32,9 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
     TRANSLUCENT_GREY_ALPHA,
 );
 
+const PIE_MENU_RADIUS: f32 = 50.0;   // size of pie menu
+const PIE_MENU_CONTENT: [&str;4] = ["menu.pie_menu.sit", "menu.pie_menu.inspect", "", ""];
+
 /// Update the GUI. Called on each frame.
 //  Returns true if the GUI is active and should not disappear.
 //
@@ -40,6 +43,7 @@ const TRANSLUCENT_GREY_COLOR32: egui::Color32 = egui::Color32::from_rgba_premult
 pub struct MenuConnected<'a> {
     move_arrows: NavArrows<'a>,
     rot_arrows: NavArrows<'a>,
+    pie_menu: PieMenu,
 }
 
 impl MenuConnected<'_> {
@@ -62,6 +66,15 @@ impl MenuConnected<'_> {
                 8.0,
                 "Aim camera"
             ),
+            pie_menu: PieMenu::new(
+                PIE_MENU_RADIUS,
+                PIE_MENU_RADIUS/4.0,
+                PIE_MENU_CONTENT.iter().map	(|w| (*w).into()).collect::<Vec<_>>().as_slice(),
+                egui::Color32::BLACK, // line color
+                egui::Color32::TRANSPARENT, // background color
+                egui::Color32::GREEN, // hover color
+                "Pie menu",
+            ),                
         })) // create a trait object to dispatch
     }
 }
@@ -104,9 +117,9 @@ impl MenuGroup for MenuConnected<'_> {
                     });
                     ui.menu_button(t!("menu.world", state.get_lang()), |ui| {
                         //  ***MORE***
-                        // Help menu
+                        // World menu
                         if ui
-                            .button(t!("menu.unimplemented", state.get_lang()))
+                            .button(t!("menu.world.pie_menu", state.get_lang()))
                             .clicked()
                         {}
                     });

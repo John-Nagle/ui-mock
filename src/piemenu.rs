@@ -23,7 +23,7 @@ pub struct PieMenu {
     /// Center radius of button
     center_radius: f32,
     /// Text of button segments, clockwise from top.
-    button_text: Vec<egui::RichText>,
+    button_text: Vec<egui::WidgetText>,
     /// Line color
     line_color: egui::Color32,
     /// Background color
@@ -39,7 +39,7 @@ impl PieMenu {
     pub fn new(
         radius: f32,
         center_radius: f32,
-        button_text: &[egui::RichText],
+        button_text: &[egui::WidgetText],
         line_color: egui::Color32,
         background_color: egui::Color32,
         hover_color: egui::Color32,
@@ -48,7 +48,7 @@ impl PieMenu {
         Self {
             radius,
             center_radius,
-            button_text: button_text.iter().map(|s| s.clone()).collect(),
+            button_text: button_text.iter().map(|s| (*s).clone()).collect(),
             line_color,			
             background_color,	
             hover_color,
