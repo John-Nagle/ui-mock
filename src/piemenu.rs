@@ -15,6 +15,8 @@ use egui::{Response, Ui, WidgetText};
 use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
+const LINE_WIDTH: f32 = 2.0;            // line width for drawing
+
 /// PieMenu -- N-choice circular menu
 //  The persistent part.
 pub struct PieMenu {
@@ -124,6 +126,11 @@ impl PieMenu {
 /// The widget is a circle with clickable pie slices.
 impl egui::Widget for &mut PieMenu {
     fn ui(self, ui: &mut Ui) -> Response {
+        let stroke = egui::Stroke::new(LINE_WIDTH, self.line_color);
+        let (response, painter) =
+            ui.allocate_painter(egui::Vec2::new(self.radius*2.0, self.radius*2.0), egui::Sense::hover());
+        painter.circle(egui::Pos2::new(self.radius, self.radius), self.radius, self.background_color, stroke);
+/*
         let response =
             ui.label("Pie menu dummy");          
             ////.frame(true);
@@ -134,6 +141,7 @@ impl egui::Widget for &mut PieMenu {
             response
         };
         ////self.draw_pressed_arrow(ui, response) // add arrow indicating pressing
+*/
         response
     }
 }

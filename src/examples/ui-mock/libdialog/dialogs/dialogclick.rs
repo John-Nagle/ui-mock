@@ -54,8 +54,8 @@ impl ClickWindow {
                 Self::CLICK_MENU_RADIUS,
                 Self::CLICK_MENU_RADIUS/4.0,
                 Self::CLICK_MENU_CONTENT.iter().map	(|w| (*w).into()).collect::<Vec<_>>().as_slice(),
-                egui::Color32::BLACK, // line color
-                egui::Color32::TRANSPARENT, // background color
+                egui::Color32::RED, // line color
+                egui::Color32::from_gray(32), // background color
                 egui::Color32::GREEN, // hover color
                 "Pie menu",
             ),                
