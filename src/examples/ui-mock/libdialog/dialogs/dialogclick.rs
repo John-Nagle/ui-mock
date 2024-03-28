@@ -53,8 +53,8 @@ impl ClickWindow {
                 radius,
                 radius/4.0,
                 Self::CLICK_MENU_CONTENT.iter().map	(|w| (*w).into()).collect::<Vec<_>>().as_slice(),
-                egui::Color32::RED, // line color
-                egui::Color32::from_gray(32), // background color
+                egui::Color32::BLACK, // line color
+                egui::Color32::from_gray(32).gamma_multiply(0.5), // background color
                 egui::Color32::GREEN, // hover color
                 title,
             ),                
@@ -77,11 +77,14 @@ impl GuiWindow for ClickWindow {
     fn draw(&mut self, ctx: &egui::Context, _state: &mut CommonState) {
         if self.is_open {
             let mut not_cancelled = true;
+            let frame = egui::Frame::none()
+            .fill(egui::Color32::TRANSPARENT);
             let window = egui::containers::Window::new("")
                 .id(self.id)
                 .collapsible(false)
                 .open(&mut not_cancelled)
                 .title_bar(false)
+                .frame(frame)
                 .fixed_size(egui::Vec2::new(self.click_menu.get_radius()*2.0, self.click_menu.get_radius()*2.0));
             window.show(ctx, |ui| {
                 ui.add(&mut self.click_menu);
