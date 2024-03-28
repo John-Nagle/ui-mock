@@ -132,22 +132,19 @@ impl PieMenu {
 impl egui::Widget for &mut PieMenu {
     fn ui(self, ui: &mut Ui) -> Response {
         let stroke = egui::Stroke::new(LINE_WIDTH, self.line_color);
-        let (response, painter) =
+        let (response, ref mut painter) =
             ui.allocate_painter(egui::Vec2::new(self.radius*2.0, self.radius*2.0), egui::Sense::hover());
+        painter.set_clip_rect(response.rect); // clip drawing to widget rect
         let center = response.rect.center();
+        //  Outer circle
         painter.circle(center, self.radius, self.background_color, stroke);
-/*
-        let response =
-            ui.label("Pie menu dummy");          
-            ////.frame(true);
-        //  Only show hover text when not clicked
-        let response = if !response.dragged() {
-            response.on_hover_text(self.hover_text.clone())
-        } else {
-            response
-        };
-        ////self.draw_pressed_arrow(ui, response) // add arrow indicating pressing
-*/
+        //  Inner circle
+        painter.circle(center, self.center_radius, egui::Color32::TRANSPARENT, stroke);
+        let pie_cut = |v: egui::Vec2| { painter.line_segment([center + v*self.center_radius, center + v*self.radius], stroke); };
+        pie_cut(egui::Vec2::new(0.0, 1.0));
+        pie_cut(egui::Vec2::new(0.0, -1.0));
+        pie_cut(egui::Vec2::new(1.0, 0.0));
+        pie_cut(egui::Vec2::new(-1.0, 0.0));
         response
     }
 }
