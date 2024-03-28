@@ -121,6 +121,11 @@ impl PieMenu {
         response    // pass through response
     }
     */
+    
+    /// Radius of click menu.
+    pub fn get_radius(&self) -> f32 {
+        self.radius
+    }
 }
 
 /// The widget is a circle with clickable pie slices.
@@ -129,7 +134,8 @@ impl egui::Widget for &mut PieMenu {
         let stroke = egui::Stroke::new(LINE_WIDTH, self.line_color);
         let (response, painter) =
             ui.allocate_painter(egui::Vec2::new(self.radius*2.0, self.radius*2.0), egui::Sense::hover());
-        painter.circle(egui::Pos2::new(self.radius, self.radius), self.radius, self.background_color, stroke);
+        let center = response.rect.center();
+        painter.circle(center, self.radius, self.background_color, stroke);
 /*
         let response =
             ui.label("Pie menu dummy");          

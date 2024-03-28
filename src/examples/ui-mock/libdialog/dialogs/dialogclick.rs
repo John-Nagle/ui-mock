@@ -28,14 +28,13 @@ pub struct ClickWindow {
 
 impl ClickWindow {
 
-    const CLICK_MENU_RADIUS: f32 = 50.0;   // size of pie menu
+    const CLICK_MENU_RADIUS: f32 = 80.0;   // size of pie menu
     const CLICK_MENU_CONTENT: [&'static str;4] = ["menu.pie_menu.sit", "menu.pie_menu.inspect", "", ""];
 
     /// Open the click window.
     pub fn open_window(state: &mut CommonState) {
         //  Add window if not already open
-        let length = 100;   // save 100 seconds of data for now
-        let window = Self::new_link("click", t!("menu.world.pie_menu", state.get_lang()), length, state);
+        let window = Self::new_link("click", t!("menu.world.pie_menu", state.get_lang()), Self::CLICK_MENU_RADIUS, state);
         state.add_window(window).expect("Unable to open click window");     
     }
     
@@ -43,7 +42,7 @@ impl ClickWindow {
     fn new(
         id: &str,
         title: &str,
-        length: usize,
+        radius: f32,
         state: &mut CommonState,
     ) -> Self {
         ClickWindow {
@@ -51,20 +50,20 @@ impl ClickWindow {
             title: title.to_string(),
             is_open: true,
             click_menu: PieMenu::new(
-                Self::CLICK_MENU_RADIUS,
-                Self::CLICK_MENU_RADIUS/4.0,
+                radius,
+                radius/4.0,
                 Self::CLICK_MENU_CONTENT.iter().map	(|w| (*w).into()).collect::<Vec<_>>().as_slice(),
                 egui::Color32::RED, // line color
                 egui::Color32::from_gray(32), // background color
                 egui::Color32::GREEN, // hover color
-                "Pie menu",
+                title,
             ),                
 
         }
     }   
     /// As link
-    fn new_link(id: &str, title: &str, length: usize, state: &mut CommonState) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, title, length, state)))
+    fn new_link(id: &str, title: &str, radius: f32, state: &mut CommonState) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, title, radius, state)))
     }
 
     /// Reopen previously closed window, with old contents.
@@ -78,10 +77,12 @@ impl GuiWindow for ClickWindow {
     fn draw(&mut self, ctx: &egui::Context, _state: &mut CommonState) {
         if self.is_open {
             let mut not_cancelled = true;
-            let window = egui::containers::Window::new(self.title.as_str())
+            let window = egui::containers::Window::new("")
                 .id(self.id)
                 .collapsible(false)
-                .open(&mut not_cancelled);
+                .open(&mut not_cancelled)
+                .title_bar(false)
+                .fixed_size(egui::Vec2::new(self.click_menu.get_radius()*2.0, self.click_menu.get_radius()*2.0));
             window.show(ctx, |ui| {
                 ui.add(&mut self.click_menu);
             });
