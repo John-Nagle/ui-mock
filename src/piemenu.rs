@@ -78,16 +78,25 @@ impl PieMenu {
 
 impl PieMenu {
     /// Draw pie-shaped wedge with hole in center.
-    /// This really should have Bezier curves for the curved sections,
-    /// but for now it's just lines.
     fn draw_wedge(&self, painter: &mut egui::Painter, center: egui::Pos2, wedge_number: usize, fill_color: egui::Color32) {
         let dir1 = self.cut_vectors[wedge_number];   // first vector of wedge
         let dir2 = self.cut_vectors[(wedge_number + 1) % self.button_text.len()]; // second vector of wedge
+        let interp = |f: f32| (dir1 * (1.0 - f) + dir2 * f).normalized();
+        //  Approximate a wedge with curved inner and outer edges. 
+        //  A Bezier curve would be more elegant, but this is just a background to show what's active.
         let points = vec![
             center + dir1 * self.center_radius,
             center + dir1 * (self.radius - LINE_WIDTH*0.5),
+            center + interp(0.25) * (self.radius - LINE_WIDTH*0.5),
+            center + interp(0.375) * (self.radius - LINE_WIDTH*0.5),
+            center + interp(0.50) * (self.radius - LINE_WIDTH*0.5),
+            center + interp(0.625) * (self.radius - LINE_WIDTH*0.5),
+            center + interp(0.75) * (self.radius - LINE_WIDTH*0.5),
             center + dir2 * (self.radius - LINE_WIDTH*0.5),
             center + dir2 * self.center_radius,
+            center + interp(0.75) * self.center_radius,            
+            center + interp(0.5) * self.center_radius,
+            center + interp(0.25) * self.center_radius,            
         ];
         let stroke = egui::Stroke::new(LINE_WIDTH, self.line_color);
         let wedge  = epaint::PathShape::convex_polygon(points, fill_color, stroke);
@@ -109,7 +118,7 @@ impl egui::Widget for &mut PieMenu {
         //  This drawing clear thing doesn't work.
         painter.circle(center, self.center_radius, egui::Color32::TRANSPARENT, stroke);  
         //  Draw emphasized wedge.
-        self.draw_wedge(painter, center, 2, egui::Color32::BLUE);   // ***TEMP***      
+        self.draw_wedge(painter, center, 2, egui::Color32::DARK_RED.gamma_multiply(0.75));   // ***TEMP***      
         //  Draw the radial dividing lines and text.
         let pie_cut = |v: egui::Vec2| { painter.line_segment([center + v*self.center_radius, center + v*self.radius], stroke); };
         let text_pos_on_radial = |dir: egui::Vec2| dir*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
