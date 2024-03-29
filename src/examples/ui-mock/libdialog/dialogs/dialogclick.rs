@@ -53,6 +53,7 @@ impl ClickWindow {
                 radius,
                 radius/4.0,
                 Self::CLICK_MENU_CONTENT.iter().map	(|w| (state.get_lang().translate(*w)).into()).collect::<Vec<_>>().as_slice(),
+                egui::Color32::WHITE,   // text color
                 egui::Color32::BLACK, // line color
                 egui::Color32::from_gray(32).gamma_multiply(0.5), // background color
                 egui::Color32::GREEN, // hover color

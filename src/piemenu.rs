@@ -27,6 +27,8 @@ pub struct PieMenu {
     center_radius: f32,
     /// Text of button segments, clockwise from top.
     button_text: Vec<egui::WidgetText>,
+    /// Text color
+    text_color: egui::Color32,
     /// Line color
     line_color: egui::Color32,
     /// Background color
@@ -45,6 +47,7 @@ impl PieMenu {
         radius: f32,
         center_radius: f32,
         button_text: &[egui::WidgetText],
+        text_color: egui::Color32,
         line_color: egui::Color32,
         background_color: egui::Color32,
         hover_color: egui::Color32,
@@ -57,6 +60,7 @@ impl PieMenu {
             radius,
             center_radius,
             button_text: button_text.iter().map(|s| (*s).clone()).collect(),
+            text_color,
             line_color,			
             background_color,	
             hover_color,
@@ -80,21 +84,13 @@ impl egui::Widget for &mut PieMenu {
             ui.allocate_painter(egui::Vec2::new(self.radius*2.0, self.radius*2.0), egui::Sense::hover());
         painter.set_clip_rect(response.rect); // clip drawing to widget rect
         let center = response.rect.center();
-        //  Outer circle
-        painter.circle(center, self.radius, self.background_color, stroke);
-        //  Inner circle
-        painter.circle(center, self.center_radius, egui::Color32::TRANSPARENT, stroke);
+        //  Draw outer circle.
+        painter.circle(center, self.radius - LINE_WIDTH*0.5, self.background_color, stroke);
+        //  Draw inner circle.
+        //  This drawing clear thing doesn't work.
+        painter.circle(center, self.center_radius, egui::Color32::TRANSPARENT, stroke);        
+        //  Draw the radial dividing lines and text.
         let pie_cut = |v: egui::Vec2| { painter.line_segment([center + v*self.center_radius, center + v*self.radius], stroke); };
-        
-        //  Draw the dividing lines and labels
-/*
-        for (dir, text) in self.cut_vectors.iter().zip(&self.button_text) {
-            pie_cut(*dir);   // draw the line
-            let font_id = egui::FontId::default();           // for now
-            let text_pos = center + (*dir)*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
-            painter.text(text_pos, egui::Align2::CENTER_CENTER, text.text().to_string(), font_id, egui::Color32::WHITE);
-        }
-*/        
         let text_pos_on_radial = |dir: egui::Vec2| dir*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
         for n in 0..self.button_text.len() {
             pie_cut(self.cut_vectors[n]);
@@ -102,7 +98,7 @@ impl egui::Widget for &mut PieMenu {
             let text_pos = center + (text_pos_on_radial(self.cut_vectors[n]) + text_pos_on_radial(self.cut_vectors[m])) * 0.5;
             let font_id = egui::FontId::default();           // for now
             let text = &self.button_text[n];
-            painter.text(text_pos, egui::Align2::CENTER_CENTER, text.text().to_string(), font_id, egui::Color32::WHITE);            
+            painter.text(text_pos, egui::Align2::CENTER_CENTER, text.text().to_string(), font_id, self.text_color);            
         }
         response
     }
