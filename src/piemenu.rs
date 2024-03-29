@@ -16,7 +16,7 @@ use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
 const LINE_WIDTH: f32 = 2.0;                // line width for drawing
-const TEXT_POS_RADIUS_FRACT: f32 = 0.6;     // how far out to put the text (0..1)
+const TEXT_POS_RADIUS_FRACT: f32 = 0.7;     // how far out to put the text (0..1)
 
 /// PieMenu -- N-choice circular menu
 //  The persistent part.
@@ -87,11 +87,22 @@ impl egui::Widget for &mut PieMenu {
         let pie_cut = |v: egui::Vec2| { painter.line_segment([center + v*self.center_radius, center + v*self.radius], stroke); };
         
         //  Draw the dividing lines and labels
+/*
         for (dir, text) in self.cut_vectors.iter().zip(&self.button_text) {
             pie_cut(*dir);   // draw the line
             let font_id = egui::FontId::default();           // for now
             let text_pos = center + (*dir)*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
             painter.text(text_pos, egui::Align2::CENTER_CENTER, text.text().to_string(), font_id, egui::Color32::WHITE);
+        }
+*/        
+        let text_pos_on_radial = |dir: egui::Vec2| dir*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
+        for n in 0..self.button_text.len() {
+            pie_cut(self.cut_vectors[n]);
+            let m = (n+1) % self.button_text.len();
+            let text_pos = center + (text_pos_on_radial(self.cut_vectors[n]) + text_pos_on_radial(self.cut_vectors[m])) * 0.5;
+            let font_id = egui::FontId::default();           // for now
+            let text = &self.button_text[n];
+            painter.text(text_pos, egui::Align2::CENTER_CENTER, text.text().to_string(), font_id, egui::Color32::WHITE);            
         }
         response
     }
