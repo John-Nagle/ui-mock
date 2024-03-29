@@ -85,9 +85,10 @@ winit = "0.29"
 ## egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
 # Winit integration with egui (turn off the clipboard feature)
 ## egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
-egui = "0.26"
-egui_plot = "0.26"
-egui-winit = "0.26"
+egui = "^0.26"
+epaint = "^0.26"
+egui_plot = "^0.26"
+egui-winit = "^0.26"
 
 #   End of Rend3 compatibilty section.
 
