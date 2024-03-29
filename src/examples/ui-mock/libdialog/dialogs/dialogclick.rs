@@ -28,8 +28,8 @@ pub struct ClickWindow {
 
 impl ClickWindow {
 
-    const CLICK_MENU_RADIUS: f32 = 80.0;   // size of pie menu
-    const CLICK_MENU_CONTENT: [&'static str;4] = ["menu.pie_menu.sit", "menu.pie_menu.inspect", "", ""];
+    const CLICK_MENU_RADIUS: f32 = 100.0;   // size of pie menu
+    const CLICK_MENU_CONTENT: [&'static str;5] = ["menu.pie_menu.sit", "", "menu.pie_menu.inspect", "", ""];
 
     /// Open the click window.
     pub fn open_window(state: &mut CommonState) {
@@ -52,7 +52,7 @@ impl ClickWindow {
             click_menu: PieMenu::new(
                 radius,
                 radius/4.0,
-                Self::CLICK_MENU_CONTENT.iter().map	(|w| (*w).into()).collect::<Vec<_>>().as_slice(),
+                Self::CLICK_MENU_CONTENT.iter().map	(|w| (state.get_lang().translate(*w)).into()).collect::<Vec<_>>().as_slice(),
                 egui::Color32::BLACK, // line color
                 egui::Color32::from_gray(32).gamma_multiply(0.5), // background color
                 egui::Color32::GREEN, // hover color

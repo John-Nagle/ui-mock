@@ -15,8 +15,8 @@ use egui::{Response, Ui, WidgetText};
 use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
-const LINE_WIDTH: f32 = 2.0;            // line width for drawing
-const TEXT_POS_RADIUS_FRACT: f32 = 0.75;    // how far out to put the text (0..1)
+const LINE_WIDTH: f32 = 2.0;                // line width for drawing
+const TEXT_POS_RADIUS_FRACT: f32 = 0.6;     // how far out to put the text (0..1)
 
 /// PieMenu -- N-choice circular menu
 //  The persistent part.
