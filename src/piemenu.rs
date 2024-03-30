@@ -62,8 +62,8 @@ impl PieMenu {
         background_color: egui::Color32,
     ) -> Self {
         //  Direction vector for each dividing line
-        let cut_vector = |n:usize| egui::Vec2::new((2.0*PI/button_text.len() as f32 * (n as f32)).sin(), 
-            (2.0*PI/button_text.len() as f32 * (n as f32)).cos());
+        let cut_vector = |n:usize| egui::Vec2::new((2.0*PI/button_text.len() as f32 * (n as f32)).cos(), 
+            (2.0*PI/button_text.len() as f32 * (n as f32)).sin());
         Self {
             radius,
             center_radius,
@@ -87,7 +87,7 @@ impl PieMenu {
         let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
         if response.dragged() || response.clicked() || response.hovered() {
             if let Some(interact_pos) = response.hover_pos() {
-                println!("Interact pos: {:?}", interact_pos); // ***TEMP***
+                ////println!("Interact pos: {:?}", interact_pos); // ***TEMP***
                 //  Compute position relative to center of button.
                 //  Do case analysis for left, right, center, up, down.
                 let center = response.rect.center();
@@ -97,7 +97,7 @@ impl PieMenu {
                     return ClickAction::None;
                 }
                 //  Got hit on pie menu. Which wedge?
-                let angle = -f32::atan2(dir_vec.y, dir_vec.x);     // to angle
+                let angle = f32::atan2(dir_vec.y, dir_vec.x);     // to angle
                 //  Angle can be negative. Fix.
                 let angle = if angle < 0.0 {
                     angle + PI*2.0
