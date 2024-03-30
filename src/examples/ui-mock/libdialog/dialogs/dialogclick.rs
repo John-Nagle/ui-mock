@@ -10,13 +10,10 @@ use core::any::Any;
 use core::cell::RefCell;
 ////use crate::GuiAssets;
 use libui::{ t, GuiWindow, GuiWindowLink, SendAnyBoxed, CommonState, PieMenu };
-use egui::Widget;
 
 /// The circular click dialog.
 /// The persistent part.
 pub struct ClickWindow {
-    /// Title of window
-    title: String,
     /// Unique ID
     id: egui::Id,        
     /// True if open. Set to false to make it close.
@@ -39,20 +36,18 @@ impl ClickWindow {
     /// Open the click window.
     pub fn open_window(state: &mut CommonState) {
         //  Add window if not already open
-        let window = Self::new_link("click", t!("menu.world.pie_menu", state.get_lang()), Self::CLICK_MENU_RADIUS, state);
+        let window = Self::new_link("click", Self::CLICK_MENU_RADIUS, state);
         state.add_window(window).expect("Unable to open click window");     
     }
     
     /// Create click window data areas.
     fn new(
         id: &str,
-        title: &str,
         radius: f32,
         state: &mut CommonState,
     ) -> Self {
         ClickWindow {
             id: egui::Id::new(id),
-            title: title.to_string(),
             is_open: true,
             click_menu: PieMenu::new(
                 radius,
@@ -61,15 +56,12 @@ impl ClickWindow {
                 egui::Color32::WHITE,   // text color
                 egui::Color32::BLACK, // line color
                 Self::CLICK_MENU_BACKGROUND_COLOR, // background color
-                egui::Color32::GREEN, // hover color
-                title,
             ),                
-
         }
     }   
     /// As link
-    fn new_link(id: &str, title: &str, radius: f32, state: &mut CommonState) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, title, radius, state)))
+    fn new_link(id: &str, radius: f32, state: &mut CommonState) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, radius, state)))
     }
 
     /// Reopen previously closed window, with old contents.

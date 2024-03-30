@@ -39,10 +39,6 @@ pub struct PieMenu {
     line_color: egui::Color32,
     /// Background color
     background_color: egui::Color32,
-    /// Hover color
-    hover_color: egui::Color32,
-    /// Hover help text
-    hover_text: WidgetText,
     /// Cut vectors, one per button text entry
     cut_vectors: Vec<egui::Vec2>,
 }
@@ -56,8 +52,6 @@ impl PieMenu {
         text_color: egui::Color32,
         line_color: egui::Color32,
         background_color: egui::Color32,
-        hover_color: egui::Color32,
-        hover_text: impl Into<WidgetText>,
     ) -> Self {
         //  Direction vector for each dividing line
         let cut_vector = |n:usize| egui::Vec2::new((2.0*PI/button_text.len() as f32 * (n as f32)).sin(), 
@@ -69,8 +63,6 @@ impl PieMenu {
             text_color,
             line_color,			
             background_color,	
-            hover_color,
-            hover_text: hover_text.into(),
             cut_vectors: (0..button_text.len()).map(|n| cut_vector(n)).collect(),
         }
     }
