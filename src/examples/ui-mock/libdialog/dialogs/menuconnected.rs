@@ -107,7 +107,7 @@ impl MenuGroup for MenuConnected<'_> {
                         //  ***MORE***
                         // World menu
                         if ui
-                            .button(t!("menu.world.pie_menu", state.get_lang()))
+                            .button(t!("menu.world.pie_menu", state.get_lang())) // TEMP TEST ONLY
                             .clicked()
                         {
                             ClickWindow::open_window(state);

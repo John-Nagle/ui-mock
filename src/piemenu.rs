@@ -24,6 +24,14 @@ const SELECTED_GAMMA: f32 = 0.75;
 /// Density of unselected wedges
 const UNSELECTED_GAMMA: f32 = 0.25;
 
+/// Result of click menu
+pub enum ClickAction {
+    Hover(usize),
+    Click(usize),
+    None,
+}
+
+
 /// PieMenu -- N-choice circular menu
 //  The persistent part.
 pub struct PieMenu {
@@ -72,9 +80,41 @@ impl PieMenu {
     pub fn get_radius(&self) -> f32 {
         self.radius
     }
-}
+        
+    /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
+    /// Users of this widget must call this on Response to find out what the user is asking for.
+    pub fn decode_response(&self, response: &Response) -> ClickAction {
+        let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
+        if response.dragged() || response.clicked() || response.hovered() {
+            if let Some(interact_pos) = response.hover_pos() {
+                println!("Interact pos: {:?}", interact_pos); // ***TEMP***
+                //  Compute position relative to center of button.
+                //  Do case analysis for left, right, center, up, down.
+                let center = response.rect.center();
+                let dir_vec = interact_pos - center;
+                //  Check fo hit 
+                if dir_vec.length() <= self.center_radius || dir_vec.length() > self.radius {
+                    return ClickAction::None;
+                }
+                //  Got hit on pie menu. Which wedge?
+                let angle = -f32::atan2(dir_vec.y, dir_vec.x);     // to angle
+                //  Angle can be negative. Fix.
+                let angle = if angle < 0.0 {
+                    angle + PI*2.0
+                } else {
+                    angle
+                };
+                let wedge_number = (angle / (PI*2.0 / (self.button_text.len() as f32))).floor() as usize;
+                if response.clicked() {
+                    return ClickAction::Click(wedge_number);
+                }
+                //  Otherwise just continue hovering
+                return ClickAction::Hover(wedge_number);
+            }
+        }
+        ClickAction::None           // nothing happening this round
+    }
 
-impl PieMenu {
     /// Draw pie-shaped wedge with hole in center.
     fn draw_wedge(&self, painter: &mut egui::Painter, center: egui::Pos2, wedge_number: usize, fill_color: egui::Color32) {
         assert!(wedge_number < self.button_text.len());     // must be in range
@@ -116,7 +156,12 @@ impl egui::Widget for &mut PieMenu {
             ui.allocate_painter(egui::Vec2::new(self.radius*2.0, self.radius*2.0), egui::Sense::hover());
         painter.set_clip_rect(response.rect); // clip drawing to widget rect
         let center = response.rect.center();
-        let hovered_wedge = Some(2);  // ***TEMP***    
+        let hovered_wedge = match self.decode_response(&response) {
+            ClickAction::Hover(n) => Some(n),
+            ClickAction::Click(n) => Some(n), // for now
+            _  => None
+        };
+        ////let hovered_wedge = Some(2);  // ***TEMP***    
         //  Draw wedges and text first.
         let text_pos_on_radial = |dir: egui::Vec2| dir*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
         for n in 0..self.button_text.len() {
@@ -146,7 +191,6 @@ impl egui::Widget for &mut PieMenu {
         for n in 0..self.button_text.len() {
             self.draw_pie_cut(painter, center, n,  stroke);
         }
-
         response
     }
 }
