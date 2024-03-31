@@ -114,7 +114,7 @@ impl PieMenu {
                     angle
                 };
                 let wedge_number = (angle / (PI*2.0 / (self.button_text.len() as f32))).floor() as usize;
-                if response.clicked() {
+                if response.clicked() && !self.button_text[wedge_number].is_empty() {
                     self.click_result = Some(wedge_number);     // record result
                     return ClickAction::Click(wedge_number);
                 }

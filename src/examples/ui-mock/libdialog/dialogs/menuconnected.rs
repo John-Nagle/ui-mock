@@ -111,7 +111,8 @@ impl MenuGroup for MenuConnected<'_> {
                             .clicked()
                         {
                             let dummy_click_loc = egui::Pos2::new(400.0, 400.0);   // dummy location of click
-                            ClickWindow::open_window(state, dummy_click_loc);
+                            const CLICK_MENU_CONTENT: [&'static str;5] = ["menu.pie_menu.sit", "", "menu.pie_menu.inspect", "", ""];
+                            ClickWindow::open_window(state, &CLICK_MENU_CONTENT, dummy_click_loc);
                         }
                     });
                     ui.menu_button(t!("menu.content", state.get_lang()), |ui| {

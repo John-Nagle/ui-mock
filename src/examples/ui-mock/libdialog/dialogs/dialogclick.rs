@@ -36,9 +36,9 @@ impl ClickWindow {
     const CLICK_MENU_BACKGROUND_COLOR: egui::Color32 = egui::Color32::DARK_RED;
 
     /// Open the click window.
-    pub fn open_window(state: &mut CommonState, location: egui::Pos2) {
+    pub fn open_window(state: &mut CommonState, click_menu_content: &[&str], location: egui::Pos2) {
         //  Add window if not already open
-        let window = Self::new_link("click", Self::CLICK_MENU_RADIUS, state, location);
+        let window = Self::new_link("click", Self::CLICK_MENU_RADIUS, state, click_menu_content, location);
         state.add_window(window).expect("Unable to open click window");     
     }
     
@@ -47,6 +47,7 @@ impl ClickWindow {
         id: &str,
         radius: f32,
         state: &mut CommonState,
+        click_menu_content: &[&str],
         location: egui::Pos2,
     ) -> Self {
         ClickWindow {
@@ -56,7 +57,7 @@ impl ClickWindow {
             click_menu: PieMenu::new(
                 radius,
                 radius/4.0,
-                Self::CLICK_MENU_CONTENT.iter().map	(|w| (state.get_lang().translate(*w)).into()).collect::<Vec<_>>().as_slice(),
+                click_menu_content.iter().map	(|w| (state.get_lang().translate(*w)).into()).collect::<Vec<_>>().as_slice(),
                 egui::Color32::WHITE,   // text color
                 egui::Color32::BLACK, // line color
                 Self::CLICK_MENU_BACKGROUND_COLOR, // background color
@@ -64,8 +65,8 @@ impl ClickWindow {
         }
     }   
     /// As link
-    fn new_link(id: &str, radius: f32, state: &mut CommonState, location: egui::Pos2) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, radius, state, location)))
+    fn new_link(id: &str, radius: f32, state: &mut CommonState, click_menu_content: &[&str], location: egui::Pos2) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, radius, state, click_menu_content, location)))
     }
 
     /// Reopen previously closed window, with old contents.
