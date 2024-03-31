@@ -8,7 +8,7 @@
 //  Animats
 //  March 2024
 //
-use egui::{Response, Ui, WidgetText};
+use egui::{Response, Ui};
 use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
@@ -37,6 +37,8 @@ pub struct PieMenu {
     center_radius: f32,
     /// Text of button segments, clockwise from top.
     button_text: Vec<egui::WidgetText>,
+    /// Font for text
+    font_id: egui::FontId,
     /// Text color
     text_color: egui::Color32,
     /// Line color
@@ -57,6 +59,7 @@ impl PieMenu {
         radius: f32,
         center_radius: f32,
         button_text: &[egui::WidgetText],
+        font_id: egui::FontId,
         text_color: egui::Color32,
         line_color: egui::Color32,
         background_color: egui::Color32,
@@ -73,6 +76,7 @@ impl PieMenu {
             radius,
             center_radius,
             button_text: button_text.iter().map(|s| (*s).clone()).collect(),
+            font_id,
             text_color,
             line_color,
             background_color,
@@ -98,7 +102,6 @@ impl PieMenu {
         let response = response.interact(egui::Sense::click_and_drag()); // must sense 'dragged' to sense held down.
         if response.dragged() || response.clicked() || response.hovered() {
             if let Some(interact_pos) = response.hover_pos() {
-                ////println!("Interact pos: {:?}", interact_pos); // ***TEMP***
                 //  Compute position relative to center of button.
                 //  Do case analysis for left, right, center, up, down.
                 let center = response.rect.center();
@@ -224,13 +227,12 @@ impl egui::Widget for &mut PieMenu {
                 + (text_pos_on_radial(self.cut_vectors[n])
                     + text_pos_on_radial(self.cut_vectors[m]))
                     * 0.5;
-            let font_id = egui::FontId::default(); // for now
             let text = &self.button_text[n];
             painter.text(
                 text_pos,
                 egui::Align2::CENTER_CENTER,
                 text.text().to_string(),
-                font_id,
+                self.font_id.clone(),
                 self.text_color,
             );
         }

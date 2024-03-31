@@ -35,13 +35,14 @@ impl ClickWindow {
     const CLICK_MENU_BACKGROUND_COLOR: egui::Color32 = egui::Color32::DARK_RED;
 
     /// Open the click window.
-    pub fn open_window(state: &mut CommonState, click_menu_content: &[&str], location: egui::Pos2) {
+    pub fn open_window(state: &mut CommonState, click_menu_content: &[&str], font_id: egui::FontId, location: egui::Pos2) {
         //  Add window if not already open
         let window = Self::new_link(
             "click",
             Self::CLICK_MENU_RADIUS,
             state,
             click_menu_content,
+            font_id,
             location,
         );
         state
@@ -55,6 +56,7 @@ impl ClickWindow {
         radius: f32,
         state: &mut CommonState,
         click_menu_content: &[&str],
+        font_id: egui::FontId,
         location: egui::Pos2,
     ) -> Self {
         ClickWindow {
@@ -69,6 +71,7 @@ impl ClickWindow {
                     .map(|w| (state.get_lang().translate(*w)).into())
                     .collect::<Vec<_>>()
                     .as_slice(),
+                font_id,
                 egui::Color32::WHITE,              // text color
                 egui::Color32::BLACK,              // line color
                 Self::CLICK_MENU_BACKGROUND_COLOR, // background color
@@ -81,6 +84,7 @@ impl ClickWindow {
         radius: f32,
         state: &mut CommonState,
         click_menu_content: &[&str],
+        font_id: egui::FontId,
         location: egui::Pos2,
     ) -> GuiWindowLink {
         Rc::new(RefCell::new(Self::new(
@@ -88,6 +92,7 @@ impl ClickWindow {
             radius,
             state,
             click_menu_content,
+            font_id,
             location,
         )))
     }
