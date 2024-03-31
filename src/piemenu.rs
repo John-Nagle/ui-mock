@@ -5,12 +5,9 @@
 //! Draws a circle of pie slices, with text in each box.
 //! Each "slice" is clickable.
 //
-//  ***UNFINISHED***
-//
 //  Animats
 //  March 2024
 //
-////use core::ops::Index;
 use egui::{Response, Ui, WidgetText};
 use std::f32::consts::PI;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.

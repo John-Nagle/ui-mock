@@ -110,7 +110,8 @@ impl MenuGroup for MenuConnected<'_> {
                             .button(t!("menu.world.pie_menu", state.get_lang())) // TEMP TEST ONLY
                             .clicked()
                         {
-                            ClickWindow::open_window(state);
+                            let dummy_click_loc = egui::Pos2::new(400.0, 400.0);   // dummy location of click
+                            ClickWindow::open_window(state, dummy_click_loc);
                         }
                     });
                     ui.menu_button(t!("menu.content", state.get_lang()), |ui| {

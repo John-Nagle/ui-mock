@@ -18,6 +18,8 @@ pub struct ClickWindow {
     id: egui::Id,        
     /// True if open. Set to false to make it close.
     is_open: bool,
+    /// Location of window on screen
+    location: egui::Pos2,
     /// The circular pie menu
     click_menu: PieMenu,
     
@@ -34,9 +36,9 @@ impl ClickWindow {
     const CLICK_MENU_BACKGROUND_COLOR: egui::Color32 = egui::Color32::DARK_RED;
 
     /// Open the click window.
-    pub fn open_window(state: &mut CommonState) {
+    pub fn open_window(state: &mut CommonState, location: egui::Pos2) {
         //  Add window if not already open
-        let window = Self::new_link("click", Self::CLICK_MENU_RADIUS, state);
+        let window = Self::new_link("click", Self::CLICK_MENU_RADIUS, state, location);
         state.add_window(window).expect("Unable to open click window");     
     }
     
@@ -45,10 +47,12 @@ impl ClickWindow {
         id: &str,
         radius: f32,
         state: &mut CommonState,
+        location: egui::Pos2,
     ) -> Self {
         ClickWindow {
             id: egui::Id::new(id),
             is_open: true,
+            location,
             click_menu: PieMenu::new(
                 radius,
                 radius/4.0,
@@ -60,8 +64,8 @@ impl ClickWindow {
         }
     }   
     /// As link
-    fn new_link(id: &str, radius: f32, state: &mut CommonState) -> GuiWindowLink {
-        Rc::new(RefCell::new(Self::new(id, radius, state)))
+    fn new_link(id: &str, radius: f32, state: &mut CommonState, location: egui::Pos2) -> GuiWindowLink {
+        Rc::new(RefCell::new(Self::new(id, radius, state, location)))
     }
 
     /// Reopen previously closed window, with old contents.
@@ -84,7 +88,8 @@ impl GuiWindow for ClickWindow {
                 .open(&mut not_cancelled)
                 .title_bar(false)
                 .frame(frame)
-                .fixed_size(egui::Vec2::new(self.click_menu.get_radius()*2.0, self.click_menu.get_radius()*2.0));
+                .fixed_size(egui::Vec2::new(self.click_menu.get_radius()*2.0, self.click_menu.get_radius()*2.0))
+                .fixed_pos(self.location - egui::Vec2::new(self.click_menu.get_radius(), self.click_menu.get_radius()));
             window.show(ctx, |ui| {
                 ui.add(&mut self.click_menu);
             });
