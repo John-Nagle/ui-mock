@@ -25,7 +25,7 @@ const SELECTED_GAMMA: f32 = 0.75;
 const UNSELECTED_GAMMA: f32 = 0.25;
 
 /// Result of click menu
-pub enum ClickAction {
+enum ClickAction {
     Hover(usize),
     Click(usize),
     None,
@@ -47,6 +47,10 @@ pub struct PieMenu {
     line_color: egui::Color32,
     /// Background color
     background_color: egui::Color32,
+    /// Previous wedge, so we can tell there was a change and make a sound
+    hovered_wedge: Option<usize>,
+    /// Click result - what, if anything, was clicked upon?
+    click_result: Option<usize>,
     /// Cut vectors, one per button text entry
     cut_vectors: Vec<egui::Vec2>,
 }
@@ -61,6 +65,7 @@ impl PieMenu {
         line_color: egui::Color32,
         background_color: egui::Color32,
     ) -> Self {
+        assert!(button_text.len() >= 2);    // must have at least two options
         //  Direction vector for each dividing line
         let cut_vector = |n:usize| egui::Vec2::new((2.0*PI/button_text.len() as f32 * (n as f32)).cos(), 
             (2.0*PI/button_text.len() as f32 * (n as f32)).sin());
@@ -70,7 +75,9 @@ impl PieMenu {
             button_text: button_text.iter().map(|s| (*s).clone()).collect(),
             text_color,
             line_color,			
-            background_color,	
+            background_color,
+            hovered_wedge: None,	
+            click_result: None,
             cut_vectors: (0..button_text.len()).map(|n| cut_vector(n)).collect(),
         }
     }
@@ -80,14 +87,16 @@ impl PieMenu {
     pub fn get_radius(&self) -> f32 {
         self.radius
     }
+    
+    /// Get click result, if any
+    pub fn get_click_result(&self) -> Option<usize> {
+        self.click_result
+    }
         
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     /// Users of this widget must call this on Response to find out what the user is asking for.
-    pub fn decode_response(&self, response: &Response) -> ClickAction {
+    fn decode_response(&mut self, response: &Response) -> ClickAction {
         let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
-        if response.lost_focus() {
-            println!("Pie menu lost focus");    // ***TEMP*** time to drop window?
-        }
         if response.dragged() || response.clicked() || response.hovered() {
             if let Some(interact_pos) = response.hover_pos() {
                 ////println!("Interact pos: {:?}", interact_pos); // ***TEMP***
@@ -109,6 +118,7 @@ impl PieMenu {
                 };
                 let wedge_number = (angle / (PI*2.0 / (self.button_text.len() as f32))).floor() as usize;
                 if response.clicked() {
+                    self.click_result = Some(wedge_number);     // record result
                     return ClickAction::Click(wedge_number);
                 }
                 //  Otherwise just continue hovering
@@ -145,9 +155,15 @@ impl PieMenu {
         painter.add(wedge);
     }
     
+    /// Draw a radial pie cut line from inner circle to outer circle.
     fn draw_pie_cut(&self, painter: &mut egui::Painter, center: egui::Pos2, wedge_number: usize, stroke: egui::Stroke) {
         let v = self.cut_vectors[wedge_number];
         painter.line_segment([center + v*self.center_radius, center + v*self.radius], stroke); 
+    }
+    
+    /// Make some kind of sound or beep as user moves cursor.
+    fn make_click_sound(&mut self) {
+        //  Future, when we add audio.
     }
 }
 
@@ -164,7 +180,10 @@ impl egui::Widget for &mut PieMenu {
             ClickAction::Click(n) => Some(n), // for now
             _  => None
         };
-        ////let hovered_wedge = Some(2);  // ***TEMP***    
+        if hovered_wedge != self.hovered_wedge {
+            self.make_click_sound();        // in new wedge
+            self.hovered_wedge = hovered_wedge;
+        }
         //  Draw wedges and text first.
         let text_pos_on_radial = |dir: egui::Vec2| dir*(self.center_radius * (1.0 - TEXT_POS_RADIUS_FRACT) + self.radius*TEXT_POS_RADIUS_FRACT);
         for n in 0..self.button_text.len() {

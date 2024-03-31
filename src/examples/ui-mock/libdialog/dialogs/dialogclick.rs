@@ -73,6 +73,7 @@ impl ClickWindow {
 impl GuiWindow for ClickWindow {
     /// Usual draw function
     fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState) {
+        let mut click_result_opt = None;
         if self.is_open {
             let mut not_cancelled = true;
             let frame = egui::Frame::none()
@@ -88,10 +89,14 @@ impl GuiWindow for ClickWindow {
                 ui.add(&mut self.click_menu);
             });
             //  Cancel click window when GUI times out.
-            not_cancelled = state.if_gui_awake();
+            not_cancelled = state.if_gui_awake() && self.click_menu.get_click_result().is_none();
+            click_result_opt = self.click_menu.get_click_result(); 
             if !not_cancelled {
                 self.is_open = false;
             } // do here to avoid borrow clash
+        }
+        if let Some(click_result) = click_result_opt {
+            println!("ClickWindow result: {}", click_result);   // ***TEMP***
         }
     }
 /*    
