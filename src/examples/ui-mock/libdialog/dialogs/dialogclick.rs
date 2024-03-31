@@ -28,8 +28,6 @@ impl ClickWindow {
     /// Size of pie menu
     const CLICK_MENU_RADIUS: f32 = 100.0; // size of pie menu
     /// Text of pie menu
-    const CLICK_MENU_CONTENT: [&'static str; 5] =
-        ["menu.pie_menu.sit", "", "menu.pie_menu.inspect", "", ""];
     /// Background color of pie menu (will be made translucent
     ////const CLICK_MENU_BACKGROUND_COLOR: egui::Color32 = egui::Color32::from_rgb(255, 166, 0); // orange
     const CLICK_MENU_BACKGROUND_COLOR: egui::Color32 = egui::Color32::DARK_RED;
@@ -101,6 +99,11 @@ impl ClickWindow {
     pub fn reopen(&mut self) {
         self.is_open = true;
     }
+    
+    /// Tell somebody that something was clicked.
+    pub fn report_result(&mut self, wedge_number: usize) {
+        println!("ClickWindow result: {}", wedge_number); // ***TEMP***
+    }
 }
 
 impl GuiWindow for ClickWindow {
@@ -138,7 +141,7 @@ impl GuiWindow for ClickWindow {
             } // do here to avoid borrow clash
         }
         if let Some(click_result) = click_result_opt {
-            println!("ClickWindow result: {}", click_result); // ***TEMP***
+            self.report_result(click_result);
         }
     }
     /*

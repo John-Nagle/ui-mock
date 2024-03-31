@@ -4,6 +4,8 @@
 //!
 //! Draws a circle of pie slices, with text in each box.
 //! Each "slice" is clickable.
+//! There must be at least two slices.
+//! Slices start at the right and go clockwise.
 //
 //  Animats
 //  March 2024
