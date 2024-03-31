@@ -98,7 +98,7 @@ pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event
             data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
         }
         GuiEvent::LoginStart(_login_params) => {
-            data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
+            ////data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
         }
         GuiEvent::Connected => {
             println!("Connected, show 3D world");

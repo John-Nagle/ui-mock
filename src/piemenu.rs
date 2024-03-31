@@ -85,6 +85,9 @@ impl PieMenu {
     /// Users of this widget must call this on Response to find out what the user is asking for.
     pub fn decode_response(&self, response: &Response) -> ClickAction {
         let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
+        if response.lost_focus() {
+            println!("Pie menu lost focus");    // ***TEMP*** time to drop window?
+        }
         if response.dragged() || response.clicked() || response.hovered() {
             if let Some(interact_pos) = response.hover_pos() {
                 ////println!("Interact pos: {:?}", interact_pos); // ***TEMP***

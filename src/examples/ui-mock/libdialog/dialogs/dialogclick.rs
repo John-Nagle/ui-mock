@@ -9,7 +9,7 @@ use std::rc::Rc;
 use core::any::Any;
 use core::cell::RefCell;
 ////use crate::GuiAssets;
-use libui::{ t, GuiWindow, GuiWindowLink, SendAnyBoxed, CommonState, PieMenu };
+use libui::{ GuiWindow, GuiWindowLink, SendAnyBoxed, CommonState, PieMenu };
 
 /// The circular click dialog.
 /// The persistent part.
@@ -72,7 +72,7 @@ impl ClickWindow {
 
 impl GuiWindow for ClickWindow {
     /// Usual draw function
-    fn draw(&mut self, ctx: &egui::Context, _state: &mut CommonState) {
+    fn draw(&mut self, ctx: &egui::Context, state: &mut CommonState) {
         if self.is_open {
             let mut not_cancelled = true;
             let frame = egui::Frame::none()
@@ -87,6 +87,8 @@ impl GuiWindow for ClickWindow {
             window.show(ctx, |ui| {
                 ui.add(&mut self.click_menu);
             });
+            //  Cancel click window when GUI times out.
+            not_cancelled = state.if_gui_awake();
             if !not_cancelled {
                 self.is_open = false;
             } // do here to avoid borrow clash
