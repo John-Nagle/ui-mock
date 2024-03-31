@@ -6,16 +6,16 @@
 //  Animats
 //  November 2022
 //
+use super::dialogclick::ClickWindow;
+use super::dialogstats::StatisticsWindow;
 use super::menuavatar;
 use super::menuhelp::{menu_help_about, menu_help_manual}; // submenus
-use super::dialogstats::StatisticsWindow;
-use super::dialogclick::ClickWindow;
 use crate::UiAppAssets;
 use core::any::Any;
 use core::cell::RefCell;
 use egui::{menu, Frame};
 use libui::t;
-use libui::{CommonState, MenuGroup, MenuGroupLink, NavArrows, NavAction};
+use libui::{CommonState, MenuGroup, MenuGroupLink, NavAction, NavArrows};
 use log::LevelFilter;
 use std::rc::Rc;
 #[allow(clippy::blocks_in_if_conditions)] // allow excessive nesting, which is the style Egui uses.
@@ -61,7 +61,7 @@ impl MenuConnected<'_> {
                 (assets.pressed_arrow_icon, button_size),
                 (assets.pressed_button_icon, button_size),
                 8.0,
-                "Aim camera"
+                "Aim camera",
             ),
         })) // create a trait object to dispatch
     }
@@ -110,8 +110,9 @@ impl MenuGroup for MenuConnected<'_> {
                             .button(t!("menu.world.pie_menu", state.get_lang())) // TEMP TEST ONLY
                             .clicked()
                         {
-                            let dummy_click_loc = egui::Pos2::new(400.0, 400.0);   // dummy location of click
-                            const CLICK_MENU_CONTENT: [&'static str;5] = ["menu.pie_menu.sit", "", "menu.pie_menu.inspect", "", ""];
+                            let dummy_click_loc = egui::Pos2::new(400.0, 400.0); // dummy location of click
+                            const CLICK_MENU_CONTENT: [&'static str; 5] =
+                                ["menu.pie_menu.sit", "", "menu.pie_menu.inspect", "", ""];
                             ClickWindow::open_window(state, &CLICK_MENU_CONTENT, dummy_click_loc);
                         }
                     });
@@ -172,7 +173,10 @@ impl MenuGroup for MenuConnected<'_> {
                         //  ***MOVE LOG LEVEL TO STATE*** params is read-only.
                         ////state.params.log_level = log_level;     // update log level
                         //  Statistics menu
-                        if ui.button(t!("menu.developer.statistics", state.get_lang())).clicked() {
+                        if ui
+                            .button(t!("menu.developer.statistics", state.get_lang()))
+                            .clicked()
+                        {
                             ////println!("Statistics menu");
                             StatisticsWindow::open_window(state);
                         }
@@ -232,5 +236,4 @@ impl MenuGroup for MenuConnected<'_> {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         todo!(); //// self
     }
-
 }

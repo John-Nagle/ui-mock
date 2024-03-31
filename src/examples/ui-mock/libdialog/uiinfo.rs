@@ -16,7 +16,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
-use std::time::{Instant, Duration};
+use std::time::{Duration, Instant};
 
 /// User events sent to the main event loop.
 //  These are specific to the application. libui has a few more.
@@ -78,7 +78,6 @@ pub struct UiData {
 
 impl UiData {}
 
-
 /// Useful statistical info
 #[derive(Debug)]
 pub struct FrameStatistics {
@@ -96,14 +95,14 @@ impl FrameStatistics {
     /// Usual new
     pub fn new() -> Self {
         let now = Instant::now();
-        Self { 
+        Self {
             last_frame_time: now,
             last_statistics_time: now,
-            longest_frame_time: Duration::new(0,0),
-            frame_count: 0
+            longest_frame_time: Duration::new(0, 0),
+            frame_count: 0,
         }
     }
-    
+
     /// Per frame update
     pub fn frame_update(&mut self, now: Instant) -> Duration {
         let since_stats = now.duration_since(self.last_statistics_time);
@@ -111,17 +110,23 @@ impl FrameStatistics {
         self.last_frame_time = now;
         self.frame_count += 1;
         self.longest_frame_time = self.longest_frame_time.max(frame_time);
-        since_stats                                 // returns duration
+        since_stats // returns duration
     }
-    
+
     /// Get frame statistics and reset
     pub fn reset(&mut self) -> (usize, Duration, Duration) {
-        let statistics_elapsed = self.last_frame_time.duration_since(self.last_statistics_time);
-        let result = (self.frame_count, statistics_elapsed, self.longest_frame_time);
+        let statistics_elapsed = self
+            .last_frame_time
+            .duration_since(self.last_statistics_time);
+        let result = (
+            self.frame_count,
+            statistics_elapsed,
+            self.longest_frame_time,
+        );
         self.last_statistics_time = self.last_frame_time;
-        self.longest_frame_time = Duration::new(0,0);
+        self.longest_frame_time = Duration::new(0, 0);
         self.frame_count = 0;
-        result              // (frame_count, statistics_elapsed, longest_frame_time)
+        result // (frame_count, statistics_elapsed, longest_frame_time)
     }
 }
 

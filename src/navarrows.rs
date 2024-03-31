@@ -3,7 +3,7 @@
 //! A general-use 'egui' widget.
 //! A navigation button with four directional arrows and a optional center button.
 //! The user must provide a background button image, and an image of an arrow.
-//! The arrow image should point to the right, and will be rotated into the 
+//! The arrow image should point to the right, and will be rotated into the
 //! Up, Down, and Left positions.
 //
 //  Animats
@@ -20,7 +20,7 @@ pub struct NavArrows<'a> {
     button: (egui::TextureId, egui::Vec2), // the button image
     arrow: egui::Image<'a>,                // the arrow image for pressed direction
     center_button: egui::Image<'a>,        // the center button
-    hover_text: WidgetText,                // hover text for help       
+    hover_text: WidgetText,                // hover text for help
     center_button_size: f32,               // center button of arrows, if nonzero
 }
 
@@ -65,7 +65,7 @@ impl NavArrows<'_> {
     /// Decode the click into the user action -- Left, Right, Up, Down, Center, or None.
     /// Users of this widget must call this on Response to find out what the user is asking for.
     pub fn decode_response(&self, response: &Response) -> NavAction {
-        let response = response.interact(egui::Sense::click_and_drag());    // must sense 'dragged' to sense held down.
+        let response = response.interact(egui::Sense::click_and_drag()); // must sense 'dragged' to sense held down.
         if response.dragged() {
             if let Some(interact_pos) = response.hover_pos() {
                 //  Compute position relative to center of button.
@@ -108,20 +108,22 @@ impl NavArrows<'_> {
             0.0,      // center
         ];
         match nav_action {
-            NavAction::None => {}     // no press
-            NavAction::Center => {              // center press
+            NavAction::None => {} // no press
+            NavAction::Center => {
+                // center press
                 self.center_button.paint_at(ui, response.rect);
             }
             _ => {
                 //  Arrow press
                 let arrow_rot = ARROW_ROTS[nav_action as usize];
                 // Draw the arrow if pressed
-                self.arrow.clone()
-                .rotate(arrow_rot, egui::Vec2::new(0.5, 0.5))
-                .paint_at(ui, response.rect);
+                self.arrow
+                    .clone()
+                    .rotate(arrow_rot, egui::Vec2::new(0.5, 0.5))
+                    .paint_at(ui, response.rect);
             }
         }
-        response    // pass through response
+        response // pass through response
     }
 }
 
@@ -129,8 +131,7 @@ impl NavArrows<'_> {
 impl egui::Widget for &mut NavArrows<'_> {
     fn ui(self, ui: &mut Ui) -> Response {
         let response =
-            ui.add(egui::widgets::ImageButton::new((self.button.0, self.button.1))            
-            .frame(false));
+            ui.add(egui::widgets::ImageButton::new((self.button.0, self.button.1)).frame(false));
         //  Only show hover text when not clicked
         let response = if !response.dragged() {
             response.on_hover_text(self.hover_text.clone())

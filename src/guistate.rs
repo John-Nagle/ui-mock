@@ -20,11 +20,11 @@ use simplelog::LevelFilter;
 use simplelog::SharedLogger;
 use std::any::Any;
 
+use crate::Dictionary;
 use std::collections::VecDeque;
 use std::path::PathBuf;
 use std::rc::Rc;
-use std::time::{Instant};
-use crate::Dictionary;
+use std::time::Instant;
 /// Configuration
 const MESSAGE_SCROLLBACK_LIMIT: usize = 200; // max scrollback for message window
 /// Useful types
@@ -32,7 +32,7 @@ pub type SendAny = dyn Any + Send; // Can send anything across a channel. Must b
 pub type SendAnyBoxed = Box<SendAny>; // the boxed version
 
 /// Program executable version information
-#[derive (Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct ExecutableVersion {
     /// Program name
     pub program_name: String,
@@ -49,14 +49,23 @@ pub struct ExecutableVersion {
 impl ExecutableVersion {
     /// Get Cargo version as a string.
     pub fn get_cargo_version(&self) -> String {
-        format!("{}.{}.{}", self.major_version, self.minor_version, self.patch_version)
+        format!(
+            "{}.{}.{}",
+            self.major_version, self.minor_version, self.patch_version
+        )
     }
 }
 
 impl std::fmt::Display for ExecutableVersion {
     /// Full version info in human readable form.
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {}, build {}", self.program_name, self.get_cargo_version(), self.git_build_id)
+        write!(
+            f,
+            "{} {}, build {}",
+            self.program_name,
+            self.get_cargo_version(),
+            self.git_build_id
+        )
     }
 }
 
@@ -66,9 +75,9 @@ pub struct GuiParams {
     ////pub version: String,
     pub executable_version: ExecutableVersion,
     /// Asset directory.    
-    pub asset_dir: PathBuf,     // the asset directory
+    pub asset_dir: PathBuf, // the asset directory
     /// Translation dictionary for chosen language.
-    pub lang: Dictionary,       // translation dictionary for chosen language
+    pub lang: Dictionary, // translation dictionary for chosen language
     /// True if in dark mode.
     pub dark_mode: bool,
     /// Logging level, which needs to move elsewhere because this is not a constant.
@@ -113,8 +122,8 @@ pub struct CommonState {
     //  Disposable dynamic windows
     pub temporary_windows: Vec<GuiWindowLink>,
     //  Misc.
-    pub msg_ok: String,                      // translated OK message
-    unique_id: usize,                        // unique ID, serial
+    pub msg_ok: String,             // translated OK message
+    unique_id: usize,               // unique ID, serial
     last_interaction_time: Instant, // time of last user 2D interaction
     pub event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
     pub event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
@@ -181,7 +190,8 @@ impl CommonState {
         window: &winit::window::Window,
     ) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
-        self.context.begin_frame(self.platform.take_egui_input(window));
+        self.context
+            .begin_frame(self.platform.take_egui_input(window));
 
         // egui commands run here
         ////let show_menus = self.if_gui_awake();
@@ -209,7 +219,11 @@ impl CommonState {
             );
         }
         //  Tesselate and return paint jobs.
-        (self.context.tessellate(shapes, window.scale_factor() as f32), textures_delta)
+        (
+            self.context
+                .tessellate(shapes, window.scale_factor() as f32),
+            textures_delta,
+        )
     }
 
     /// Draw all live windows
@@ -244,9 +258,11 @@ impl CommonState {
     /// Don't overdo this, because it is a broadcast.
     /// Windows must ignore messages they don't need.
     pub fn pass_event(&mut self, event: SendAnyBoxed) {
-        Rc::clone(&self.menu_group).borrow_mut().pass_event(self, &event);    // pass to menu group, if it wants events.
-        //  Send to all. Ones that don't need it will ignore it.
-        //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
+        Rc::clone(&self.menu_group)
+            .borrow_mut()
+            .pass_event(self, &event); // pass to menu group, if it wants events.
+                                       //  Send to all. Ones that don't need it will ignore it.
+                                       //  We have to make a list of the windows to do outside "state" to avoid a double mutable borrow.
         let todo_list: Vec<GuiWindowLink> = self.temporary_windows.iter().map(Rc::clone).collect();
         for window in &todo_list {
             window.borrow_mut().pass_event(self, &event)
@@ -336,7 +352,7 @@ impl<T: AppState> GuiState<T> {
         params: GuiParams,
         assets: GuiAssets,
         platform: egui_winit::State,
-        context: egui::Context, 
+        context: egui::Context,
         event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
         event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
         app_state: T,
@@ -422,8 +438,7 @@ impl GuiWindow for TextWindow {
                     });
                 } else {
                     //  Multi-line message, can become scrollable.
-                    egui::ScrollArea::both()
-                        .show_rows(
+                    egui::ScrollArea::both().show_rows(
                         ui,
                         row_height,
                         total_rows,
@@ -502,9 +517,7 @@ impl MessageWindow {
             //  Ref: https://docs.rs/egui/latest/egui/containers/struct.ScrollArea.html#method.show_rows
             let text_style = egui::TextStyle::Body;
             let row_height = ui.text_style_height(&text_style);
-            egui::ScrollArea::both()
-                .stick_to_bottom(true)
-                .show_rows(
+            egui::ScrollArea::both().stick_to_bottom(true).show_rows(
                 ui,
                 row_height,
                 self.lines.len(),
@@ -597,16 +610,18 @@ impl log::Log for MessageLogger {
 
     /// Log an error. Filtering has already taken place.
     fn log(&self, record: &log::Record<'_>) {
-        if record.level() > self.level_filter { return }  // filter out messages below threshold
-        // Format for display.
-        const MAX_LOG_MSG_LENGTH: usize = 100;   // trim msg to this length
+        if record.level() > self.level_filter {
+            return;
+        } // filter out messages below threshold
+          // Format for display.
+        const MAX_LOG_MSG_LENGTH: usize = 100; // trim msg to this length
         let s = format!(
             "[{}] ({}): {}",
             record.level(),
             record.target(),
             record.args()
         );
-        let s = first_n_chars(&s, MAX_LOG_MSG_LENGTH).to_string();   // trim string
+        let s = first_n_chars(&s, MAX_LOG_MSG_LENGTH).to_string(); // trim string
         let event = GuiCommonEvent::LogMessage(s);
         if let Err(e) = CommonState::send_gui_event_on_channel(&self.send_channel, Box::new(event))
         {

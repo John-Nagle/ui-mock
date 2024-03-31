@@ -16,10 +16,13 @@ mod libdialog;
 
 use anyhow::Error;
 use libdialog::handle_gui_event;
-use libdialog::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo, StatisticsEvent};
+use libdialog::{
+    GridSelectParams, GuiEvent, StatisticsEvent, SystemMode, UiAppAssets, UiData, UiInfo,
+};
 use libui::{get_executable_name, get_log_file_name, panic_dialog, t};
 use libui::{
-    Dictionary, GuiAssets, GuiCommonEvent, GuiParams, ExecutableVersion, GuiState, MessageLogger, SendAnyBoxed,
+    Dictionary, ExecutableVersion, GuiAssets, GuiCommonEvent, GuiParams, GuiState, MessageLogger,
+    SendAnyBoxed,
 };
 use log::LevelFilter;
 use std::str::FromStr;
@@ -27,7 +30,7 @@ use std::time::{Duration, Instant};
 
 /// Base level configuration
 const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
-const STATISTICS_INTERVAL: Duration = Duration::new(1, 0);   // statistics this often
+const STATISTICS_INTERVAL: Duration = Duration::new(1, 0); // statistics this often
 
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One; // anti-aliasing
 
@@ -88,7 +91,10 @@ impl AppUi {
         }
     }
     /// Setup of the graphics environment. Returns error.
-    fn setup_with_error(&mut self, context: rend3_framework::SetupContext<'_>) -> Result<(), Error> {
+    fn setup_with_error(
+        &mut self,
+        context: rend3_framework::SetupContext<'_>,
+    ) -> Result<(), Error> {
         //  Test forcing full screen ***TURNED OFF*** - crashes on Windows
         ////window.set_visible(true); // ***TEMP TEST***
         ////window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(None)));
@@ -118,7 +124,7 @@ impl AppUi {
         // make an object.
         let mesh_handle = match context.renderer.add_mesh(mesh) {
             Ok(handle) => handle,
-            Err(e) => { return Err(anyhow::anyhow!("{:?}", e)) } // because WGPU errors are not Send, cloneable, or copyable.
+            Err(e) => return Err(anyhow::anyhow!("{:?}", e)), // because WGPU errors are not Send, cloneable, or copyable.
         };
 
         // Add PBR material with all defaults except a single color.
@@ -162,14 +168,17 @@ impl AppUi {
         // Create a single directional light
         //
         // We need to keep the directional light handle alive.
-        let _directional_handle = context.renderer.add_directional_light(rend3::types::DirectionalLight {
-            color: glam::Vec3::ONE,
-            intensity: 10.0,
-            // Direction will be normalized
-            direction: glam::Vec3::new(-1.0, -4.0, 2.0),
-            distance: 400.0,
-            resolution: 2048,       // ***NOT SURE ABOUT THIS***
-        });
+        let _directional_handle =
+            context
+                .renderer
+                .add_directional_light(rend3::types::DirectionalLight {
+                    color: glam::Vec3::ONE,
+                    intensity: 10.0,
+                    // Direction will be normalized
+                    direction: glam::Vec3::new(-1.0, -4.0, 2.0),
+                    distance: 400.0,
+                    resolution: 2048, // ***NOT SURE ABOUT THIS***
+                });
         // Create the egui context
         let egui_context = egui::Context::default();
         //  Copied from Rend3 egui example.
@@ -194,8 +203,7 @@ impl AppUi {
         let rot_arrows_icon_bytes = include_bytes!("../../assets/images/rot-arrows-128.png");
         let pressed_arrow_icon_bytes =
             include_bytes!("../../assets/images/arrow-pressed-right-64.png");
-        let pressed_button_icon_bytes =
-            include_bytes!("../../assets/images/center-pressed-64.png");
+        let pressed_button_icon_bytes = include_bytes!("../../assets/images/center-pressed-64.png");
         let ui_app_assets = UiAppAssets {
             move_arrows_icon: libui::load_canned_icon(
                 move_arrows_icon_bytes,
@@ -235,7 +243,7 @@ impl AppUi {
         let log_level = LevelFilter::Warn; // warn is default logging level
         println!("Dark mode: {:?} -> {}", dark_light::detect(), dark_mode); // ***TEMP***
         let adapter_info: rend3::ExtendedAdapterInfo = context.renderer.adapter_info.clone(); // adapter info for About box
-                                                                                      ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP***
+                                                                                              ////println!("Adapter info: {:?}", adapter_info);   // ***TEMP***
         const GRID_FILE: &str = "grids.json";
         // Read in the grid select params, which requires reading some images.
         let grid_select_params = GridSelectParams::read_grid_select_params(
@@ -244,11 +252,11 @@ impl AppUi {
             &mut egui_routine,
             context.renderer,
         )?;
-        
+
         //  Info about the executable program.
         const BUILD_ID: &str = git_version::git_version!(); // build info, computed at compile time
         let executable_version = ExecutableVersion {
-            program_name: env!("CARGO_PKG_NAME").trim().to_string(),           
+            program_name: env!("CARGO_PKG_NAME").trim().to_string(),
             major_version: env!("CARGO_PKG_VERSION_MAJOR").trim().to_string(),
             minor_version: env!("CARGO_PKG_VERSION_MINOR").trim().to_string(),
             patch_version: env!("CARGO_PKG_VERSION_PATCH").trim().to_string(),
@@ -299,21 +307,24 @@ impl AppUi {
             .unwrap(); // Start up the GUI.
         Ok(())
     }
-    
+
     /// Frame statistics update, called once per frame.
     /// Only does something once per second.
     fn frame_statistics_update(data: &mut UiData) {
         //  Calculate frame statistics
         let now = Instant::now();
-        if data.gui_state.app_state.frame_statistics.frame_update(now) < STATISTICS_INTERVAL { return } // too soon?
-        //  Only once per second past this point.
-        let (frame_count, statistics_time, worst_frame_time) = data.gui_state.app_state.frame_statistics.reset();
+        if data.gui_state.app_state.frame_statistics.frame_update(now) < STATISTICS_INTERVAL {
+            return;
+        } // too soon?
+          //  Only once per second past this point.
+        let (frame_count, statistics_time, worst_frame_time) =
+            data.gui_state.app_state.frame_statistics.reset();
         //  ***MORE***
         //  Send 1 second statistics to GUI
         let stats_msg = StatisticsEvent {
             frame_time_average: statistics_time.as_secs_f32() / (frame_count.max(1) as f32),
             frame_time_longest: worst_frame_time.as_secs_f32(),
-            .. Default::default()
+            ..Default::default()
         };
         //  Pass directly to GUI, without going through a queue.
         data.gui_state.common_state.pass_event(Box::new(stats_msg));
@@ -361,8 +372,10 @@ impl rend3_framework::App for AppUi {
         let data = self.data.as_mut().unwrap();
         Self::frame_statistics_update(data);
         //  Build the 2D GUI
-        let (paint_jobs, textures_delta) =
-            data.gui_state.common_state.draw_all(context.window.as_ref().unwrap()); // build the 2D GUI
+        let (paint_jobs, textures_delta) = data
+            .gui_state
+            .common_state
+            .draw_all(context.window.as_ref().unwrap()); // build the 2D GUI
         let input = rend3_egui::Input {
             clipped_meshes: &paint_jobs,
             textures_delta,
@@ -380,11 +393,14 @@ impl rend3_framework::App for AppUi {
 
         // Build a rendergraph
         let mut graph = rend3::graph::RenderGraph::new();
-                
+
         // Import the surface texture into the render graph.
-        let frame_handle =
-            graph.add_imported_render_target(context.surface_texture, 0..1, 0..1,
-                rend3::graph::ViewportRect::from_size(context.resolution));
+        let frame_handle = graph.add_imported_render_target(
+            context.surface_texture,
+            0..1,
+            0..1,
+            rend3::graph::ViewportRect::from_size(context.resolution),
+        );
 
         // Add the default rendergraph without a skybox
         context.base_rendergraph.add_to_graph(
@@ -406,11 +422,11 @@ impl rend3_framework::App for AppUi {
                 ambient_color: glam::Vec4::ZERO,
                 clear_color: glam::Vec4::new(0.10, 0.05, 0.10, 1.0), // Nice scene-referred purple
             },
-
         );
 
         // Add egui on top of all the other passes
-        data.egui_routine.add_to_graph(&mut graph, input, frame_handle);
+        data.egui_routine
+            .add_to_graph(&mut graph, input, frame_handle);
 
         // Dispatch a render using the built up rendergraph!
         graph.execute(context.renderer, &mut eval_output);
@@ -421,12 +437,14 @@ impl rend3_framework::App for AppUi {
             context.event_loop_window_target.as_ref().unwrap().exit();
             ////control_flow(winit::event_loop::ControlFlow::Exit);
         }
-
     }
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
-    fn handle_event(&mut self, context: rend3_framework::EventContext<'_>, event: winit::event::Event<()>) {
-
+    fn handle_event(
+        &mut self,
+        context: rend3_framework::EventContext<'_>,
+        event: winit::event::Event<()>,
+    ) {
         profiling::scope!("Event");
 
         //  Handle any user events.
@@ -453,20 +471,26 @@ impl rend3_framework::App for AppUi {
         let data = self.data.as_mut().unwrap();
 
         match event {
-
             winit::event::Event::WindowEvent { event, .. } => {
-            
                 //  This is where EGUI handles 2D UI events.
                 ////if data.gui_state.common_state.platform.on_window_event(&data.gui_state.common_state.context, &event).consumed {
-                if data.gui_state.common_state.platform.on_window_event(&context.window.as_ref().unwrap(), &event).consumed {
+                if data
+                    .gui_state
+                    .common_state
+                    .platform
+                    .on_window_event(&context.window.as_ref().unwrap(), &event)
+                    .consumed
+                {
                     return; // 2D UI consumed this event.
                 }
-                
+
                 match event {
-          
                     winit::event::WindowEvent::Resized(size) => {
-                        data.egui_routine
-                             .resize(size.width, size.height, context.window.as_ref().unwrap().scale_factor() as f32);
+                        data.egui_routine.resize(
+                            size.width,
+                            size.height,
+                            context.window.as_ref().unwrap().scale_factor() as f32,
+                        );
                     }
                     winit::event::WindowEvent::Focused(gained) => {
                         if gained {
@@ -481,7 +505,7 @@ impl rend3_framework::App for AppUi {
                     }
                     winit::event::WindowEvent::KeyboardInput { .. } => {
                         ////let _ = input; // not yet used
-                                   ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
+                        ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
                     }
                     _ => {}
                 }

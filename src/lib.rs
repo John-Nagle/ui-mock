@@ -12,21 +12,21 @@ mod guistate;
 mod guiutil;
 mod menunone;
 mod navarrows; // a widget
-mod statgraph;  // a widget
-mod piemenu; // a widget
+mod piemenu;
+mod statgraph; // a widget // a widget
 
 use core::any::Any;
 use core::cell::RefCell;
 use std::rc::Rc;
- 
+
 /// Internationalization
 pub use basicintl::Dictionary;
 pub use guistate::panic_dialog;
 /// The main draw function. Called on every frame.
 ////pub use guimenus::{draw};
 pub use guistate::{
-    AppState, CommonState, GuiAssets, GuiCommonEvent, GuiParams, ExecutableVersion, GuiState, MessageLogger, SendAny,
-    SendAnyBoxed, TextWindow,
+    AppState, CommonState, ExecutableVersion, GuiAssets, GuiCommonEvent, GuiParams, GuiState,
+    MessageLogger, SendAny, SendAnyBoxed, TextWindow,
 };
 /// Utility functions.
 pub use guiutil::{
@@ -34,9 +34,9 @@ pub use guiutil::{
     load_image, set_default_styles,
 };
 /// Widgets
-pub use navarrows::{NavArrows, NavAction};
-pub use piemenu::{PieMenu};
-pub use statgraph::{StatGraph};
+pub use navarrows::{NavAction, NavArrows};
+pub use piemenu::PieMenu;
+pub use statgraph::StatGraph;
 
 //  Traits
 /// A group of menus. Libui user sets what menus are to be shown.
@@ -46,10 +46,10 @@ pub trait MenuGroup {
     ///  Pass event to a GUI item. Override to get events.
     fn pass_event(&mut self, _state: &mut CommonState, _event: &SendAnyBoxed) {}
     /// Name for debug and logging purposes only
-    fn get_name(&self) -> &'static str; 
+    fn get_name(&self) -> &'static str;
     /// For downcasting. Little used, may be removed.
     fn as_any(&self) -> &dyn Any;
-    /// For downcasting. 
+    /// For downcasting.
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
@@ -64,10 +64,10 @@ pub trait GuiWindow {
     ///  Pass event to a GUI item. Override to get events.
     fn pass_event(&mut self, _state: &mut CommonState, _event: &SendAnyBoxed) {}
     /// GetID  of window.
-    fn get_id(&self) -> egui::Id; 
-    /// For downcasting. 
+    fn get_id(&self) -> egui::Id;
+    /// For downcasting.
     fn as_any(&self) -> &dyn Any;
-    /// For downcasting. 
+    /// For downcasting.
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
