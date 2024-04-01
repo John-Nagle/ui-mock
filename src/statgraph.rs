@@ -14,7 +14,7 @@ use std::collections::VecDeque;
 //  Always write TextureId, Vec2, Rect fully qualified to avoid name confusion.
 
 /// Time series of equally spaced data
-pub struct TimeSeries {
+struct TimeSeries {
     /// Length
     length: usize,
     /// The points
@@ -23,7 +23,7 @@ pub struct TimeSeries {
 
 impl TimeSeries {
     /// Usual new
-    pub fn new(length: usize) -> Self {
+    fn new(length: usize) -> Self {
         assert!(length > 0);
         Self {
             length,
@@ -32,7 +32,7 @@ impl TimeSeries {
     }
 
     /// Add to time series
-    pub fn push(&mut self, v: f32) {
+    fn push(&mut self, v: f32) {
         while self.values.len() >= self.length {
             // if oversize, drain
             let _ = self.values.pop_front();
@@ -40,18 +40,8 @@ impl TimeSeries {
         self.values.push_back(v);
     }
 
-    /// Set new length. Discards data if needed
-    pub fn set_length(&mut self, length: usize) {
-        assert!(length > 0);
-        self.length = length;
-        while self.values.len() >= length {
-            // if oversize, drain
-            let _ = self.values.pop_front();
-        }
-    }
-
     /// Return time series as a generator of plot points
-    pub fn as_plot_points(&self) -> impl Iterator<Item = egui_plot::PlotPoint> + '_ {
+    fn as_plot_points(&self) -> impl Iterator<Item = egui_plot::PlotPoint> + '_ {
         self.values
             .iter()
             .enumerate()
@@ -101,7 +91,6 @@ impl egui::Widget for &mut StatGraph {
             let temp_values = egui_plot::PlotPoints::Owned(temp_values_1);
             egui_plot::Plot::new(self.id)
                 .view_aspect(5.0)
-                ////.width(250.0)
                 .include_x(0.0)
                 .include_x(self.time_series.length as f64)
                 .include_y(self.y_range[0])

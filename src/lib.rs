@@ -22,8 +22,6 @@ use std::rc::Rc;
 /// Internationalization
 pub use basicintl::Dictionary;
 pub use guistate::panic_dialog;
-/// The main draw function. Called on every frame.
-////pub use guimenus::{draw};
 pub use guistate::{
     AppState, CommonState, ExecutableVersion, GuiAssets, GuiCommonEvent, GuiParams, GuiState,
     MessageLogger, SendAny, SendAnyBoxed, TextWindow,
