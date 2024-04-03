@@ -237,7 +237,8 @@ impl CommonState {
         self.temporary_windows.retain(|w| w.borrow().retain()); // keep only live ones
     }
 
-    /// General window add
+    /// General window add.
+    /// Cannot be called from within a draw, when some window is borrowed.
     pub fn add_window(&mut self, window: GuiWindowLink) -> Result<(), Error> {
         //  Check for duplicate window
         for w in &self.temporary_windows {
@@ -275,7 +276,8 @@ impl CommonState {
     }
 
     /// Add error message popup.
-    //  Handle common errors
+    /// Handle common errors.
+    /// OK to call from within a draw.
     pub fn add_error_window(&mut self, title: &str, message: &[&str]) {
         //  Create a window with text and an "OK" button.
         let w = TextWindow::new_link(
@@ -284,7 +286,8 @@ impl CommonState {
             message,
             Some(self.msg_ok.as_str()),
         );
-        self.add_window(w).expect("Duplicate error msg ID"); // had better not be a duplicate
+        //  Don't have to check for unique temporary ID, because a unique ID was just generated.
+        self.temporary_windows.push(w);
     }
 
     /// Pop up "unimplemented" message.
