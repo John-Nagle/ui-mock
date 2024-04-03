@@ -143,6 +143,7 @@ impl PieMenu {
         let interp = |f: f32| (dir1 * (1.0 - f) + dir2 * f).normalized();
         //  Approximate a wedge with curved inner and outer edges.
         //  A Bezier curve would be more elegant, but this is close enough.
+        //  Painter's fill fills this as a convex hull, which is a bit off.
         let points = vec![
             center + dir1 * self.center_radius,
             center + dir1 * (self.radius - LINE_WIDTH * 0.5),
@@ -157,9 +158,32 @@ impl PieMenu {
             center + interp(0.5) * self.center_radius,
             center + interp(0.25) * self.center_radius,
         ];
+        let fill1 = vec![
+            center + dir1 * self.center_radius,
+            center + dir1 * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.25) * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.375) * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.50) * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.5) * self.center_radius,
+        ];
+        
+        let fill2 = vec![
+            center + interp(0.5) * self.center_radius,
+            center + interp(0.50) * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.625) * (self.radius - LINE_WIDTH * 0.5),
+            center + interp(0.75) * (self.radius - LINE_WIDTH * 0.5),
+            center + dir2 * (self.radius - LINE_WIDTH * 0.5),
+            center + dir2 * self.center_radius,
+        ];
         let stroke = egui::Stroke::new(LINE_WIDTH, self.line_color);
-        let wedge = epaint::PathShape::convex_polygon(points, fill_color, stroke);
+        let wedge = epaint::PathShape::closed_line(points, stroke);
         painter.add(wedge);
+        //  Fill has to be subdivided into two convex polygons.
+        let null_stroke = egui::Stroke::new(0.0, egui::Color32::TRANSPARENT);
+        let wedge1 = epaint::PathShape::convex_polygon(fill1, fill_color, null_stroke);
+        painter.add(wedge1);
+        let wedge2 = epaint::PathShape::convex_polygon(fill2, fill_color, null_stroke);
+        painter.add(wedge2);
     }
 
     /// Draw a radial pie cut line from inner circle to outer circle.
