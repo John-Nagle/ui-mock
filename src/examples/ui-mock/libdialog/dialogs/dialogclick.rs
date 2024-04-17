@@ -9,7 +9,7 @@ use core::any::Any;
 use core::cell::RefCell;
 use std::rc::Rc;
 ////use crate::GuiAssets;
-use libui::{CommonState, GuiWindow, GuiWindowLink, PieMenu, SendAnyBoxed};
+use libui::{CommonState, GuiWindow, GuiWindowLink, PieMenu};
 
 /// The circular click dialog.
 /// The persistent part.
@@ -44,8 +44,7 @@ impl ClickWindow {
             location,
         );
         state
-            .add_window(window)
-            .expect("Unable to open click window");
+            .add_window(window);
     }
 
     /// Create click window data areas.

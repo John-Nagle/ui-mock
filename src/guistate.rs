@@ -103,32 +103,43 @@ pub struct GuiAssets {
     pub web_icon: egui::TextureId,
 }
 
-//  User interface info specific to the app
+///  User interface info specific to the app
 pub trait AppState {
     ////fn draw_item(&mut self);
 }
 
+/// Common state for all GUI elements
 pub struct CommonState {
-    //  Data needed in GUI
+    ///  Data needed in GUI
     pub params: Rc<GuiParams>, // starting params
-    //  Assets - images, etc.
+    ///  Assets - images, etc.
     pub assets: GuiAssets,
-    //  Platform data for context
+    ///  Platform data for context
     pub platform: egui_winit::State,
+    /// Context data
     pub context: egui::Context,
-    ////pub grid_select_window: GridSelectWindow,   // used at start
+    /// Miscellaneous message window
     pub message_window: MessageWindow, // miscellaneous messages ***TEMP***
+    /// Currently active menu group
     pub menu_group: MenuGroupLink,     // currently active menu group
-    //  Disposable dynamic windows
+    ///  Disposable dynamic windows
     pub temporary_windows: Vec<GuiWindowLink>,
-    //  Misc.
+    /// Windows about to be created
+    pending_windows: Vec<GuiWindowLink>,
+    /// Translated "OK" for dialogs.
     pub msg_ok: String,             // translated OK message
-    unique_id: usize,               // unique ID, serial
-    last_interaction_time: Instant, // time of last user 2D interaction
+    /// Unique ID serial number
+    unique_id: usize,
+    /// Time of last user 2D interaction
+    last_interaction_time: Instant,
+    /// Event to ???, send end.
     pub event_send_channel: crossbeam_channel::Sender<SendAnyBoxed>,
+    /// Event to ???, receive end.
     pub event_recv_channel: crossbeam_channel::Receiver<SendAnyBoxed>,
-    pub light_mode_visuals: egui::Visuals, // light mode colors, etc.
-    pub dark_mode_visuals: egui::Visuals,  // dark mode colors, etc.
+    /// Light mode colors
+    pub light_mode_visuals: egui::Visuals,
+    /// Dark mode colors
+    pub dark_mode_visuals: egui::Visuals,
 }
 
 impl CommonState {
@@ -166,6 +177,7 @@ impl CommonState {
             params: Rc::new(params),
             assets,
             temporary_windows: Vec::new(),
+            pending_windows: Vec::new(),
             menu_group: MenuNone::new_link(),
             msg_ok,
             unique_id: 0,
@@ -234,20 +246,32 @@ impl CommonState {
         for w in &todo_list {
             w.borrow_mut().draw(ctx, self)
         } // draw all temporaries
-        self.temporary_windows.retain(|w| w.borrow().retain()); // keep only live ones
+        //  Now unlocked.
+        //  Remove any non-live windows.
+        self.temporary_windows.retain(|w| w.borrow().retain());
+        //  Add any new windows.
+        //  Windows with duplicate IDs are ignored.
+        while let Some(w) = self.pending_windows.pop() {
+            self.add_window_internal(w);
+        }
     }
 
     /// General window add.
-    /// Cannot be called from within a draw, when some window is borrowed.
-    pub fn add_window(&mut self, window: GuiWindowLink) -> Result<(), Error> {
+    /// Called at end of draw cycle
+    fn add_window_internal(&mut self, window: GuiWindowLink) {
         //  Check for duplicate window
         for w in &self.temporary_windows {
             if w.borrow().get_id() == window.borrow().get_id() {
-                return Err(anyhow!("Duplicate id for window"));
+                log::error!("Duplicate ID for window: {:?}", window.borrow().get_id());
+                return
             }
         }
         self.temporary_windows.push(window);
-        Ok(())
+    }
+    
+    //  Add a new window    
+    pub fn add_window(&mut self, window: GuiWindowLink)  {
+        self.pending_windows.push(window);
     }
 
     /// Get a unique ID, starting from 1.
@@ -286,8 +310,8 @@ impl CommonState {
             message,
             Some(self.msg_ok.as_str()),
         );
-        //  Don't have to check for unique temporary ID, because a unique ID was just generated.
-        self.temporary_windows.push(w);
+        //  And add it.
+        self.add_window(w);
     }
 
     /// Pop up "unimplemented" message.

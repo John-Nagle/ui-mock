@@ -80,8 +80,7 @@ pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event
                         let id = data.gui_state.common_state.get_unique_id();
                         data.gui_state
                             .common_state
-                            .add_window(LoginDialogWindow::new_link(id, grid))
-                            .unwrap();
+                            .add_window(LoginDialogWindow::new_link(id, grid));
                     }
                 }
                 _ => {

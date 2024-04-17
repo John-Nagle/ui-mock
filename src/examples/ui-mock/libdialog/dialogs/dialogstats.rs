@@ -76,8 +76,7 @@ impl StatisticsWindow {
             state,
         );
         state
-            .add_window(window)
-            .expect("Unable to open statistics window");
+            .add_window(window);
     }
 
     /// Create statistics window data areas.
