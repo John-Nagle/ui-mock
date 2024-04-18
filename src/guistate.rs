@@ -125,7 +125,7 @@ pub struct CommonState {
     ///  Disposable dynamic windows
     pub temporary_windows: Vec<GuiWindowLink>,
     /// Windows about to be created
-    pending_windows: Vec<GuiWindowLink>,
+    pending_windows: Vec<(GuiWindowLink, bool)>,
     /// Translated "OK" for dialogs.
     pub msg_ok: String,             // translated OK message
     /// Unique ID serial number
@@ -258,26 +258,35 @@ impl CommonState {
 
     /// General window add.
     /// Called at end of draw cycle
-    fn add_window_internal(&mut self, window: GuiWindowLink) {
+    fn add_window_internal(&mut self, (window, replace): (GuiWindowLink, bool)) {
+        let new_id = window.borrow().get_id();
         //  Check for duplicate window
-        for w in &self.temporary_windows {
-            if w.borrow().get_id() == window.borrow().get_id() {
-                log::error!("Duplicate ID for window: {:?}", window.borrow().get_id());
-                return
+        if replace {
+            //  If replacing, drop the old one.
+            self.temporary_windows.retain(|w| w.borrow().get_id() != new_id)
+        } else {
+            //  If adding, drop the new one.
+            if self.temporary_windows.iter().find(|w| w.borrow().get_id() == new_id).is_some() {
+                return;
             }
         }
-        self.temporary_windows.push(window);
+        self.temporary_windows.push(window);    // add
     }
     
-    //  Add a new window    
+    //  Add a new window, ignore if dup.  
     pub fn add_window(&mut self, window: GuiWindowLink)  {
-        self.pending_windows.push(window);
+        self.pending_windows.push((window, false));
+    }
+    
+    //  Add a new window, replace if dup.  
+    pub fn replace_window(&mut self, window: GuiWindowLink)  {
+        self.pending_windows.push((window, true));
     }
 
     /// Get a unique ID, starting from 1.
     pub fn get_unique_id(&mut self) -> egui::Id {
         self.unique_id += 1; // serial number increment
-        egui::Id::new(self.unique_id) // unique egui Id
+        egui::Id::new(self.unique_id) // unique egui Id, a 64-bit hash.
     }
     /// Send message to all windows.
     /// Don't overdo this, because it is a broadcast.
