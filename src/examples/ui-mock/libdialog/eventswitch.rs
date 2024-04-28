@@ -92,10 +92,6 @@ pub fn handle_gui_event(data: &mut UiData, window: &winit::window::Window, event
                 }
             }
         }
-        GuiEvent::SaveReplay(_path_buf) => {
-            // save a replay file
-            data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
-        }
         GuiEvent::LoginStart(_login_params) => {
             ////data.gui_state.common_state.unimplemented_msg(); // ***TEMP***
         }

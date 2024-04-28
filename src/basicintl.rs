@@ -204,6 +204,7 @@ impl Dictionary {
         );
         let lang_tag = if let Some(locale) = locale_opt {
             let locale = locale.replace('_', "-"); // Workaround for https://github.com/1Password/sys-locale/issues/3
+            let locale = terminate_at(&locale,"@");  // Workaround for deprecated "@euro" ending.
             let language_tag = LanguageTag::parse(locale)?; // system locale is garbled if this doesn't parse.
             let tag = language_tag.primary_language(); // two-letter tag
             if lang_list.contains(tag) {
@@ -220,13 +221,32 @@ impl Dictionary {
     }
 }
 
+/// Terminate string at delimiter.
+/// Used to get rid of obsolete LANG extensions which use "@".
+/// Notably, "@euro", a pre-UTF8 hack.
+fn terminate_at<'a>(s: &'a str, delimiter: &str) -> &'a str {
+    match s.rsplit_once(delimiter) {
+        Some((first, _last)) => first,
+        None => s
+    }
+}
+
+#[test]
+fn test_terminate_at() {
+    let s1 = "foo@baz";
+    let s2 = "foobaz";
+    println!("{} {}", terminate_at(s1,"@"), terminate_at(s2,"@"));
+    assert_eq!(terminate_at(s1, "@"), "foo");
+    assert_eq!(terminate_at(s2, "@"), "foobaz");
+}
+
 #[test]
 fn test_translation() {
     use std::str::FromStr;
     //  Initialize the dictionary
     let locale_file = PathBuf::from_str(concat!(
         env!["CARGO_MANIFEST_DIR"],
-        "/src/locales/menus.json"
+        "/src/assets/locales/menus.json"
     ))
     .unwrap(); // test only
     let dictionary: Dictionary = Dictionary::new(&[locale_file], "fr").unwrap(); // build translations for "fr".

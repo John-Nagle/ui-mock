@@ -44,6 +44,7 @@ pub struct StatisticsEvent {
 
 impl StatisticsEvent {
     /// For downcasting
+    #[allow(dead_code)]
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -103,11 +104,6 @@ impl StatisticsWindow {
     fn new_link(id: &str, title: &str, length: usize, state: &mut CommonState) -> GuiWindowLink {
         Rc::new(RefCell::new(Self::new(id, title, length, state)))
     }
-
-    /// Reopen previously closed window, with old contents.
-    pub fn reopen(&mut self) {
-        self.is_open = true;
-    }
 }
 
 impl GuiWindow for StatisticsWindow {
@@ -156,6 +152,7 @@ impl GuiWindow for StatisticsWindow {
     }
 
     /// For downcasting
+    #[allow(dead_code)]
     fn as_any(&self) -> &dyn Any {
         todo!(); // lifetime problem
                  ////self

@@ -93,11 +93,6 @@ impl ClickWindow {
             location,
         )))
     }
-
-    /// Reopen previously closed window, with old contents.
-    pub fn reopen(&mut self) {
-        self.is_open = true;
-    }
     
     /// Tell somebody that something was clicked.
     pub fn report_result(&mut self, wedge_number: usize) {

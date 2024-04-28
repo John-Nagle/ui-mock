@@ -56,6 +56,7 @@ pub struct LoginParams {
     pub auth_token: Option<usize>,    // future when 2FA implemented.
 }
 
+#[allow(dead_code)]
 impl LoginParams {
     pub const CREDENTIAL_PREFIX: &'static str = "metaverse"; // credential keys are prefixed with this.
     pub const CRED_TYPE_PASS: &'static str = "pass";
@@ -180,11 +181,6 @@ impl LoginDialogWindow {
     /// As link
     pub fn new_link(id: egui::Id, grid: &GridSelectParams) -> GuiWindowLink {
         Rc::new(RefCell::new(Self::new(id, grid)))
-    }
-
-    /// Reopen previously closed window, with old contents.
-    pub fn reopen(&mut self) {
-        self.is_open = true;
     }
 }
 

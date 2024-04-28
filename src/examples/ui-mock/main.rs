@@ -227,7 +227,7 @@ impl AppUi {
             ),
         };
         let start_time = Instant::now();
-        let version = env!("CARGO_PKG_VERSION").to_string(); // Version of main, not libraries
+        let _version = env!("CARGO_PKG_VERSION").to_string(); // Version of main, not libraries
         let asset_dir =
             std::path::PathBuf::from_str(concat!(env!["CARGO_MANIFEST_DIR"], "/src/assets/"))?; // ***TEST ONLY*** installer dependent
         let mut locale_file = asset_dir.clone();

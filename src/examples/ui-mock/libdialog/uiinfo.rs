@@ -24,7 +24,6 @@ use std::time::{Duration, Instant};
 pub enum GuiEvent {
     Startup,                     // back to startup state
     OpenReplay(Option<PathBuf>), // open a replay file
-    SaveReplay(PathBuf),         // save into a replay file
     LoginTo(GridSelectParams),   // ask for login params
     LoginStart(LoginParams),     // start the login process
     Connected,                   // dummy connected state
@@ -40,11 +39,7 @@ pub enum SystemMode {
     // -> Login, Replay. Exit
     Login, // login dialog is up.
     // -> Connected, Start
-    Connecting, // Connecting to server
-    // -> Connected, Start
     Connected, // Fully connected, all menus live
-    // -> Shutdown
-    Replay, // in replay mode, some menus live
     // -> Shutdown
     Shutdown, // shutting down and cleaning up
               // -> Exit, Start
