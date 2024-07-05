@@ -63,16 +63,16 @@ pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 
 # May 2024 version of Rend3.
-rend3 = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "d088a84" }
-rend3-egui = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "d088a84" }
-rend3-framework = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "d088a84" }
-rend3-routine = { version = "^0.3.0", git = 'https://github.com/BVE-Reborn/rend3.git', rev = "d088a84" }
+rend3 = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
+rend3-egui = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
+rend3-framework = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
+rend3-routine = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
 
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
-wgpu = "0.19"
+wgpu = "0.20"
 wgpu-profiler = "^0.16.0"
 winit = "0.29"
 #### egui = "0.24"
@@ -85,10 +85,10 @@ winit = "0.29"
 ## egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
 # Winit integration with egui (turn off the clipboard feature)
 ## egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
-egui = "^0.26"
-epaint = "^0.26"
-egui_plot = "^0.26"
-egui-winit = "^0.26"
+egui = "^0.28"
+epaint = "^0.28"
+egui_plot = "^0.28"
+egui-winit = "^0.28"
 
 #   End of Rend3 compatibilty section.
 

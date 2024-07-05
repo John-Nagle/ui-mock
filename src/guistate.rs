@@ -483,7 +483,7 @@ impl GuiWindow for TextWindow {
                                 if row >= self.message.len() {
                                     break;
                                 } // prevent scrolling off end
-                                ui.add(egui::Label::new(self.message[row].as_str()).wrap(false));
+                                ui.add(egui::Label::new(self.message[row].as_str()).truncate());
                             }
                         },
                     );
@@ -563,7 +563,7 @@ impl MessageWindow {
                             break;
                         }
                         let text = &self.lines[row];
-                        ui.add(egui::Label::new(text).wrap(false));
+                        ui.add(egui::Label::new(text).truncate());
                     }
                 },
             );
