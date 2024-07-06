@@ -90,6 +90,12 @@ epaint = "^0.28"
 egui_plot = "^0.28"
 egui-winit = "^0.28"
 
+#   Embedding shaders. This forces shaders to be compiled into the executable
+#   rather than loaded at run time. That's because rust-embed won't work cross platform
+#   where source and target file systems are different. Version must match that used in rend3 so 
+#   that feature merging takes place.
+rust-embed = { version = "8.2.0", features = ["debug-embed"] }
+
 #   End of Rend3 compatibilty section.
 
 ####egui_winit_platform = "0.16.0"
