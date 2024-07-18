@@ -73,7 +73,7 @@ smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
 wgpu = "0.20"
-wgpu-profiler = "^0.16.0"
+wgpu-profiler = "^0.17"
 winit = "0.29"
 #### egui = "0.24"
 #### egui-wgpu = "0.24"
