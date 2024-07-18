@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.12.2"
+version = "0.13.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -63,10 +63,10 @@ pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 
 # May 2024 version of Rend3.
-rend3 = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
-rend3-egui = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
-rend3-framework = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
-rend3-routine = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu20" }
+rend3 = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
+rend3-egui = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
+rend3-framework = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
+rend3-routine = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp'  }
 
 rustc-hash = "1"
 smallvec = "1"
