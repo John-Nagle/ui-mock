@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.13.0"
+version = "0.13.1"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -55,40 +55,35 @@ path = "src/examples/ui-mock/main.rs"
 [dependencies]
 #   Rendering-related
 env_logger = { version = "0.10.1" }
-glam = {version = "^0.25", features = ["bytemuck"]}
+glam = {version = "^0.28", features = ["bytemuck"]}
 histogram = "0.6.9"
 image = { version = "0.24", default-features = false, features = ["png", "jpeg"]}
 pico-args = "0.4"
 pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 
-# May 2024 version of Rend3.
-rend3 = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
-rend3-egui = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
-rend3-framework = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp' }
-rend3-routine = { version = "^0.20.0", git = 'https://github.com/John-Nagle/rend3-hp'  }
+rend3 = { version = "^0.22.1", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu22safe" }
+rend3-egui = { version = "^0.22.1", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu22safe" }
+rend3-framework = { version = "^0.22.1", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu22safe" }
+rend3-routine = { version = "^0.22.1", git = 'https://github.com/John-Nagle/rend3-hp', branch = "wgpu22safe" }
 
 rustc-hash = "1"
 smallvec = "1"
 tracy-client = {version = "0.16", optional = true }
 #   WGPU only for texture format, which is also re-imported via Rend3.
-wgpu = "0.20"
-wgpu-profiler = "^0.17"
-winit = "0.29"
-#### egui = "0.24"
-#### egui-wgpu = "0.24"
-#### egui-winit = "0.24"
-#### egui_plot = "0.24"
+wgpu = "^22"
+wgpu-profiler = "^0.18"
+winit = "^0.30"
 
 # The egui immediate mode gui library
 ## egui = {git = "https://github.com/emilk/egui.git", branch="master"}
 ## egui_plot = {git = "https://github.com/emilk/egui.git", branch="master"}
 # Winit integration with egui (turn off the clipboard feature)
 ## egui-winit = { git = "https://github.com/emilk/egui.git", branch="master", default-features = false, features = ["links", "wayland"] }
-egui = "^0.28"
-epaint = "^0.28"
-egui_plot = "^0.28"
-egui-winit = "^0.28"
+egui = "^0.29"
+epaint = "^0.29"
+egui_plot = "^0.29"
+egui-winit = "^0.29"
 
 #   Embedding shaders. This forces shaders to be compiled into the executable
 #   rather than loaded at run time. That's because rust-embed won't work cross platform

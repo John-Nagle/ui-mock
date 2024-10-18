@@ -203,7 +203,7 @@ impl CommonState {
     ) -> (Vec<egui::ClippedPrimitive>, egui::TexturesDelta) {
         ////self.platform.update_time(data.start_time.elapsed().as_secs_f64());
         self.context
-            .begin_frame(self.platform.take_egui_input(window));
+            .begin_pass(self.platform.take_egui_input(window));
 
         // egui commands run here
         ////let show_menus = self.if_gui_awake();
@@ -221,7 +221,7 @@ impl CommonState {
             textures_delta,
             platform_output,
             ..
-        } = self.context.end_frame();
+        } = self.context.end_pass();
         if !platform_output.events.is_empty() {
             self.wake_up_gui(); // reset GUI idle time.
             log::debug!(

@@ -189,6 +189,7 @@ impl AppUi {
                 &windowing.window,
                 Some(context.scale_factor),
                 None,
+                None,
             ))
         } else {
             None
@@ -366,7 +367,7 @@ impl rend3_framework::App for AppUi {
     }
 
     /// The redraw event, which has its own trait item
-    fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_, ()>) {
+    fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_>) {
         profiling::scope!("Redraw.");
         //  Calculate frame statistics
         let data = self.data.as_mut().unwrap();
@@ -526,7 +527,7 @@ fn main() {
     let app = AppUi::new();
     rend3_framework::start(
         app,
-        winit::window::WindowBuilder::new()
+        winit::window::WindowAttributes::default()
             .with_title(get_executable_name().as_str())
             .with_visible(true)
             .with_maximized(true), // this is not effective on Linux/X11. Has to be re-done at startup.
