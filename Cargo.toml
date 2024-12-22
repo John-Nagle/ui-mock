@@ -72,9 +72,7 @@ egui-winit = { version = "0.30", default-features = false, features = ["links", 
 
 rustc-hash = "1"
 smallvec = "1"
-tracy-client = {version = "0.16", optional = true }
-#   WGPU only for texture format, which is also re-imported via Rend3.
-wgpu = "23"
+tracy-client = {version = "0.17", optional = true }
 winit = "^0.30"
 
 # The egui immediate mode gui library

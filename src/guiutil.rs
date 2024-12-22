@@ -1,3 +1,7 @@
+//! guiutil.rs -- GUI utility functions
+//
+//  Animats
+//  June, 2022
 use anyhow::{anyhow, Context, Error};
 use egui::FontFamily::Proportional;
 use egui::FontId;
@@ -7,10 +11,7 @@ use image::{DynamicImage, GenericImageView};
 use rend3::Renderer;
 use rend3_egui::EguiRenderRoutine;
 use std::str::FromStr;
-/// guiutil.rs -- GUI utility functions
-//
-//  Animats
-//  June, 2022
+use rend3::types::TextureFormat;
 use std::sync::Arc;
 
 const DEVELOPER: &str = "animats"; // used for directory generation - lower case
@@ -26,7 +27,7 @@ pub fn load_canned_icon(
     let image_image = image::load_from_memory(image_bytes).unwrap();
     let image_rgba = image_image.as_rgba8().unwrap().clone().into_raw();
     let dimensions = image_image.dimensions();
-    let format = wgpu::TextureFormat::Rgba8UnormSrgb;
+    let format = TextureFormat::Rgba8UnormSrgb;
     //  Create and return texture
     rend3_egui::EguiRenderRoutine::create_egui_texture(
         &mut egui_routine.internal,
@@ -47,7 +48,7 @@ pub fn load_image(
     //Images
     let image_rgba = image_image.as_rgba8().unwrap().clone().into_raw();
     let dimensions = image_image.dimensions();
-    let format = wgpu::TextureFormat::Rgba8UnormSrgb;
+    let format = TextureFormat::Rgba8UnormSrgb;
     //  Create and return texture
     rend3_egui::EguiRenderRoutine::create_egui_texture(
         &mut egui_routine.internal,
