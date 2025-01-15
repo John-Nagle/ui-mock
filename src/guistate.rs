@@ -94,6 +94,7 @@ pub struct GuiParams {
 pub enum GuiCommonEvent {
     ErrorMessage((String, Vec<String>)), // pops up an warning dialog (title, [text])
     LogMessage(String),                  // log to GUI
+    ErrorShutdown(String),               // Shutdown with a pop-up error dialog.
     Shutdown,                            // eventually, everything shuts down
 }
 

@@ -78,6 +78,12 @@ impl AppUi {
                     data.gui_state.common_state.add_error_window(title, &msgs);
                 }
                 GuiCommonEvent::LogMessage(s) => data.gui_state.common_state.add_msg(s.to_string()),
+                GuiCommonEvent::ErrorShutdown(s) => {
+                    log::error!("Error shutdown: {}",s); // in real programs do a popup.
+                    data.gui_state.app_state.change_mode(SystemMode::Shutdown); // shutdown starts
+                    data.quit = true; // force quit
+                }
+
                 GuiCommonEvent::Shutdown => {
                     data.gui_state.app_state.change_mode(SystemMode::Shutdown); // shutdown starts
                     data.quit = true; // force quit
