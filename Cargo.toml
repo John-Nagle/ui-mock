@@ -1,6 +1,6 @@
 [package]
 name = "libui"
-version = "0.13.2"
+version = "0.14.0"
 edition = "2021"
 description = "User interface mock-up and demo for Rend3/Egui game-type cross platform applications"
 
@@ -63,10 +63,10 @@ pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 
 #   Now using Rend3-hp.
-rend3 = { version = "^0.23.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'objectbug2' }
-rend3-egui = { version = "^0.23.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'objectbug2'}
-rend3-framework = { version = "^0.23.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'objectbug2' }
-rend3-routine = { version = "^0.23.0", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'objectbug2' }
+rend3 = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
+rend3-egui = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit'}
+rend3-framework = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
+rend3-routine = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
 # Winit integration with egui (turn off the clipboard feature)
 egui-winit = { version = "0.30", default-features = false, features = ["links", "wayland"] }
 

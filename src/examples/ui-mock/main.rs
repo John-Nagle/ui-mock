@@ -340,7 +340,12 @@ impl AppUi {
 
 /// This is an instance of the Rend3 application framework.
 impl rend3_framework::App for AppUi {
-    const HANDEDNESS: rend3::types::Handedness = rend3::types::Handedness::Left;
+   
+    /// Which handedness do we want.
+    //  Has to have a function due to mod to Rend3 API due to mod to Winit. 
+    fn get_handedness(&self) -> rend3::types::Handedness {
+        rend3::types::Handedness::Left
+    }
 
     fn sample_count(&self) -> rend3::types::SampleCount {
         SAMPLE_COUNT
