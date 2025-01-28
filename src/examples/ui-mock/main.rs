@@ -450,6 +450,11 @@ impl rend3_framework::App for AppUi {
             ////control_flow(winit::event_loop::ControlFlow::Exit);
         }
     }
+    
+    /// We do window redraw only when everything else goes idle.
+    /// Otherwise, arrow key processing is too slow.
+    /// Ref: Rend3 issue 570.
+    fn handle_redraw_done(&mut self, _window: &winit::window::Window) {}
 
     /// The event loop. This runs forever, or at least until the user causes an exit.
     fn handle_event(
@@ -518,10 +523,16 @@ impl rend3_framework::App for AppUi {
                     winit::event::WindowEvent::KeyboardInput { .. } => {
                         ////let _ = input; // not yet used
                         ////println!("Keyboard event: {:?}", input);    // ***TEMP TEST***
-                    }
+                    }                
+                    
                     _ => {}
                 }
             }
+            //  About to wait, so time to redraw
+            winit::event::Event::AboutToWait => {
+                //////println!("AboutToWait"); // ***TEMP TEST***
+                context.window.as_ref().unwrap().request_redraw();
+            }            
             _ => {}
         }
     }
