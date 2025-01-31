@@ -27,12 +27,23 @@ use libui::{
 use log::LevelFilter;
 use std::str::FromStr;
 use std::time::{Duration, Instant};
+use std::fmt::Debug;
 
-/// Base level configuration
-const MENU_DISPLAY_SECS: u64 = 3; // hide menus after this much time
-const STATISTICS_INTERVAL: Duration = Duration::new(1, 0); // statistics this often
+//  Debug use only.
+use winit::event_loop::ActiveEventLoop;
+use winit::event::StartCause;
 
-const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One; // anti-aliasing
+/// Hide menus after this much time
+const MENU_DISPLAY_SECS: u64 = 3; 
+/// Statistics this often
+const STATISTICS_INTERVAL: Duration = Duration::new(1, 0); 
+/// Turn on for verbose event printing.
+const PRINT_ALL_EVENTS: bool = true;
+/// Formatting for timestamps in debug print
+const TIME_FORMAT_DESCRIPTION: &[time::format_description::FormatItem] =
+    time::macros::format_description!("[hour]:[minute]:[second].[subsecond digits:3]");
+/// Anti-aliasing
+const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
 /// The application.
 pub struct AppUi {
@@ -340,6 +351,15 @@ impl AppUi {
 
 /// This is an instance of the Rend3 application framework.
 impl rend3_framework::App for AppUi {
+
+    /// Called for every event.
+    /// Debug use only.
+    fn new_events(&mut self, event_loop: &ActiveEventLoop, cause: StartCause) {
+        if PRINT_ALL_EVENTS {
+            let now = time::OffsetDateTime:: now_utc();
+            println!("{} Event: {:?}", now.format(TIME_FORMAT_DESCRIPTION).unwrap(), cause);
+        }
+    }
    
     /// Which handedness do we want.
     //  Has to have a function due to mod to Rend3 API due to mod to Winit. 
@@ -380,6 +400,9 @@ impl rend3_framework::App for AppUi {
     /// The redraw event, which has its own trait item
     fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_>) {
         profiling::scope!("Redraw.");
+        if PRINT_ALL_EVENTS {
+            println!("{} Redraw.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
+        }
         //  Calculate frame statistics
         let data = self.data.as_mut().unwrap();
         Self::frame_statistics_update(data);
@@ -530,7 +553,7 @@ impl rend3_framework::App for AppUi {
             }
             //  About to wait, so time to redraw
             winit::event::Event::AboutToWait => {
-                //////println!("AboutToWait"); // ***TEMP TEST***
+                println!("AboutToWait"); // ***TEMP TEST***
                 context.window.as_ref().unwrap().request_redraw();
             }            
             _ => {}
