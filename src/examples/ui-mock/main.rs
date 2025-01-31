@@ -553,7 +553,9 @@ impl rend3_framework::App for AppUi {
             }
             //  About to wait, so time to redraw
             winit::event::Event::AboutToWait => {
-                println!("AboutToWait"); // ***TEMP TEST***
+                if PRINT_ALL_EVENTS {
+                    println!("{} AboutToWait.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
+                }
                 context.window.as_ref().unwrap().request_redraw();
             }            
             _ => {}
