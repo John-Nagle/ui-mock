@@ -41,7 +41,7 @@ const STATISTICS_INTERVAL: Duration = Duration::new(1, 0);
 const PRINT_ALL_EVENTS: bool = true;
 /// Formatting for timestamps in debug print
 const TIME_FORMAT_DESCRIPTION: &[time::format_description::FormatItem] =
-    time::macros::format_description!("[hour]:[minute]:[second].[subsecond digits:3]");
+    time::macros::format_description!("[hour]:[minute]:[second].[subsecond digits:4]");
 /// Anti-aliasing
 const SAMPLE_COUNT: rend3::types::SampleCount = rend3::types::SampleCount::One;
 
@@ -357,7 +357,7 @@ impl rend3_framework::App for AppUi {
     fn new_events(&mut self, event_loop: &ActiveEventLoop, cause: StartCause) {
         if PRINT_ALL_EVENTS {
             let now = time::OffsetDateTime:: now_utc();
-            println!("{} Event: {:?}", now.format(TIME_FORMAT_DESCRIPTION).unwrap(), cause);
+            eprintln!("{} Event: {:?}", now.format(TIME_FORMAT_DESCRIPTION).unwrap(), cause);
         }
     }
    
@@ -401,7 +401,7 @@ impl rend3_framework::App for AppUi {
     fn handle_redraw(&mut self, context: rend3_framework::RedrawContext<'_>) {
         profiling::scope!("Redraw.");
         if PRINT_ALL_EVENTS {
-            println!("{} Redraw.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
+            eprintln!("{} Redraw.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
         }
         //  Calculate frame statistics
         let data = self.data.as_mut().unwrap();
@@ -554,7 +554,7 @@ impl rend3_framework::App for AppUi {
             //  About to wait, so time to redraw
             winit::event::Event::AboutToWait => {
                 if PRINT_ALL_EVENTS {
-                    println!("{} AboutToWait.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
+                    eprintln!("{} AboutToWait.", time::OffsetDateTime:: now_utc().format(TIME_FORMAT_DESCRIPTION).unwrap());
                 }
                 context.window.as_ref().unwrap().request_redraw();
             }            
