@@ -55,7 +55,7 @@ path = "src/examples/ui-mock/main.rs"
 [dependencies]
 #   Rendering-related
 env_logger = { version = "0.10.1" }
-glam = {version = "^0.28", features = ["bytemuck"]}
+glam = {version = "^0.29", features = ["bytemuck"]}
 histogram = "0.6.9"
 image = { version = "0.24", default-features = false, features = ["png", "jpeg"]}
 pico-args = "0.4"
@@ -63,12 +63,12 @@ pollster = "0.2.4"
 profiling = { version = "1", default-features = false }
 
 #   Now using Rend3-hp.
-rend3 = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
-rend3-egui = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit'}
-rend3-framework = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
-rend3-routine = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu23newwinit' }
+rend3 = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu24' }
+rend3-egui = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu24'}
+rend3-framework = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu24' }
+rend3-routine = { version = "^0.24", git = 'https://github.com/John-Nagle/rend3-hp', branch = 'wgpu24' }
 # Winit integration with egui (turn off the clipboard feature)
-egui-winit = { version = "0.30", default-features = false, features = ["links", "wayland"] }
+egui-winit = { version = "0.31", default-features = false, features = ["links", "wayland"] }
 
 rustc-hash = "1"
 smallvec = "1"
@@ -77,9 +77,9 @@ winit = "^0.30"
 
 # The egui immediate mode gui library
 # Winit integration with egui (turn off the clipboard feature)
-egui = "^0.30"
-epaint = "^0.30"
-egui_plot = "^0.30"
+egui = "^0.31"
+epaint = "^0.31"
+egui_plot = "^0.31"
 
 #   Embedding shaders. This forces shaders to be compiled into the executable
 #   rather than loaded at run time. That's because rust-embed won't work cross platform

@@ -38,7 +38,7 @@ const MENU_DISPLAY_SECS: u64 = 3;
 /// Statistics this often
 const STATISTICS_INTERVAL: Duration = Duration::new(1, 0); 
 /// Turn on for verbose event printing.
-const PRINT_ALL_EVENTS: bool = true;
+const PRINT_ALL_EVENTS: bool = false;
 /// Formatting for timestamps in debug print
 const TIME_FORMAT_DESCRIPTION: &[time::format_description::FormatItem] =
     time::macros::format_description!("[hour]:[minute]:[second].[subsecond digits:4]");
