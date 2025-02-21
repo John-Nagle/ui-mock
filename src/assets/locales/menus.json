@@ -52,6 +52,14 @@
         "en": "Save replay",
         "fr": "Enregistrer la relecture"
     },
+    "menu.developer.statistics": {
+        "en": "Statistics",
+        "fr": "Statistiques"
+    },
+    "menu.developer.screenshot": {
+        "en": "Screenshot",
+        "fr": "Capture d’écran"
+    },
     "menu.unimplemented": {
         "en": "Unimplemented",
         "fr": "Non construit"

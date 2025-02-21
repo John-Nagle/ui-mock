@@ -181,6 +181,13 @@ impl MenuGroup for MenuConnected<'_> {
                             ////println!("Statistics menu");
                             StatisticsWindow::open_window(state);
                         }
+                        if ui
+                            .button(t!("menu.developer.screenshot", state.get_lang()))
+                            .clicked()
+                        {
+                            println!("Screenshot");
+                            //////StatisticsWindow::open_window(state);
+                        }
                         //  End statistics menu
                         #[cfg(feature = "replay")]
                         if ui
