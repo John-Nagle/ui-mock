@@ -3,6 +3,7 @@
 mod dialogs;
 mod eventswitch;
 mod uiinfo;
+mod screenshot;
 
 pub use dialogs::dialogstats::StatisticsEvent;
 pub use eventswitch::handle_gui_event;
