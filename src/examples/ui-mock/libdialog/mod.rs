@@ -8,3 +8,4 @@ mod screenshot;
 pub use dialogs::dialogstats::StatisticsEvent;
 pub use eventswitch::handle_gui_event;
 pub use uiinfo::{GridSelectParams, GuiEvent, SystemMode, UiAppAssets, UiData, UiInfo};
+pub use screenshot::check_for_screenshot;

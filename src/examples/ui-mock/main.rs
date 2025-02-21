@@ -15,7 +15,7 @@ mod examplesupport;
 mod libdialog;
 
 use anyhow::Error;
-use libdialog::handle_gui_event;
+use libdialog::{handle_gui_event, check_for_screenshot};
 use libdialog::{
     GridSelectParams, GuiEvent, StatisticsEvent, SystemMode, UiAppAssets, UiData, UiInfo,
 };
@@ -406,6 +406,8 @@ impl rend3_framework::App for AppUi {
         //  Calculate frame statistics
         let data = self.data.as_mut().unwrap();
         Self::frame_statistics_update(data);
+        //  Check for any new screenshot events.
+        check_for_screenshot(&data.gui_state.common_state);
         //  Build the 2D GUI
         let (paint_jobs, textures_delta) = data
             .gui_state

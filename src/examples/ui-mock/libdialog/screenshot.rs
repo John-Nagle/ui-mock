@@ -1,3 +1,33 @@
+//! Screenshot test
+use libui::{CommonState};
+//////pub fn check_for_screenshot(context: &rend3_framework::RedrawContext<'_>) {
+pub fn check_for_screenshot(state: &CommonState) {
+    let ctx = state.context.clone();
+    let image = ctx.input(|i| {
+        i.events
+            .iter()
+            .filter_map(|e| {
+                if let egui::Event::Screenshot { image, .. } = e {
+                    Some(image.clone())
+                } else {
+                    None
+                }
+            })
+            .last()
+    });
+
+    if let Some(image) = image {
+        println!("Got screenshot.");
+        /*
+        self.image = Some((
+            image.clone(),
+            ui.ctx()
+                .load_texture("screenshot_demo", image, Default::default()),
+        ));
+        */
+    }
+}
+
 /*  From EGUI demo
 use egui::{Image, UserData, ViewportCommand, Widget};
 use std::sync::Arc;

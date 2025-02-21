@@ -13,7 +13,7 @@ use super::menuhelp::{menu_help_about, menu_help_manual}; // submenus
 use crate::UiAppAssets;
 use core::any::Any;
 use core::cell::RefCell;
-use egui::{menu, Frame};
+use egui::{menu, Frame, ViewportCommand, UserData};
 use libui::t;
 use libui::{CommonState, MenuGroup, MenuGroupLink, NavAction, NavArrows};
 use log::LevelFilter;
@@ -186,7 +186,9 @@ impl MenuGroup for MenuConnected<'_> {
                             .clicked()
                         {
                             println!("Screenshot");
-                            //////StatisticsWindow::open_window(state);
+                            ui
+                                .ctx()
+                                .send_viewport_cmd(ViewportCommand::Screenshot(UserData::default()));
                         }
                         //  End statistics menu
                         #[cfg(feature = "replay")]
