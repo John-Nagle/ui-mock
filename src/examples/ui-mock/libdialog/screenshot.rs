@@ -7,6 +7,7 @@ pub fn check_for_screenshot(state: &CommonState) {
         i.events
             .iter()
             .filter_map(|e| {
+                println!("EGUI Event: {:?}", e); // ***TEMP***
                 if let egui::Event::Screenshot { image, .. } = e {
                     Some(image.clone())
                 } else {
